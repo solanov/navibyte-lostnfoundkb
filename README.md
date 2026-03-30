@@ -1,3 +1,3 @@
 # Navibyte Lost & Found Knowledge Board
 
-main
+Refer to CONTRIBUTING.md
