@@ -9,7 +9,7 @@ To maintain this project systematically, all pull requests must be compared agai
 1. **In your code editor terminal, preferably VSCode, **CLONE** the `dev` branch. Don't, in any circumstance, clone `main`.**
 
 ```bash
-git clone -b dev --single-branch https://github.com/solanov/navibyte-lostnfoundkb.git
+git clone dev https://github.com/solanov/navibyte-lostnfoundkb.git
 ```
 
 2. **Install dependencies**
@@ -19,6 +19,8 @@ npm install
 ```
 
 3. **Start the development server**
+
+> Press Ctrl + C to stop the development server
 
 ```bash
 npm run dev
@@ -33,10 +35,14 @@ The naming convention of branch names should be as follows
 - Spaces should be indicated by a dash
 - After your last name, it should indicate your role. Keep the role name short (e.g. Full Stack Developer => fullstack, Knowledge Management Analyst => km, UI/UX Designer => ui, QA & Document => qa)
 
+Example: (solano-scrum)
+
 1. **To create your own branch, type this command in your code editor terminal**
 
 ```bash
 git checkout -b <branch name>
+
+git push origin <branch name>
 ```
 
 ## Creation and usage of your prompt-log file
@@ -45,7 +51,7 @@ git checkout -b <branch name>
 
 > Only create the file when you've cloned `dev` branch and created your own branch.
 
-This file serves the purpose of logging every prompt you made for this project. As this file is in `.gitignore`, you have to forcefully add it to you branch by typing in the following commands:
+This file serves the purpose of logging every prompt you made for this project. As this file is in `.gitignore`, we will add this in the **FINAL** sprint.
 
 ```bash
 git add -f prompt-log.md
