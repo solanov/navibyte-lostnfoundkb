@@ -53,7 +53,7 @@ Registration fails. The system displays an inline validation error stating "Only
 
 ---
 
-# `TC-AUTH-NEG-003`
+# `TC-AUTH-NEG-002`
 
 ## Feature
 Authentication / Login
