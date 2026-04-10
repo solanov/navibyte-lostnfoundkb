@@ -165,3 +165,120 @@ I didn't change anything as this is mostly a refresher, I followed it's given ou
 ### **What you learned or the decision you made as a result**
 
 - I refreshed my knowledge on how to properly apply git pulling and fetching, their differences and similarities.
+
+## Entry 3 - (06/04/2026)
+
+### **Task(s)**
+
+- Task Issuing/Delegation
+
+### **Prompt (or Summary) provided to the AI**
+
+### Test Cases
+
+- Valid registration using institutional email
+- Invalid registration using a non-institutional email
+- Blocked user attempts to log in to the platform
+- Successful posting of a "Lost" item with an image
+- Attempt to post a "Found" item missing required fields
+- Attempt to post an item using only whitespace and special characters
+- Uploading an unsupported file format for an item image
+- System rejects image uploads that exceed the maximum file size
+- User successfully edits their own existing post
+- User successfully deletes their own post
+- User attempts to edit another user's post
+- User submits an edit without making any changes
+- Filtering items by exact category
+- Searching items using special characters and partial words
+- Submitting an excessively long search query
+- Navigating between core pages and viewing specific listings
+- Standard user attempts to access Admin Dashboard via URL
+- Contacting another user regarding a listed item
+- Attempting to send an empty message
+- Admin moderates and removes an inappropriate post
+- Admin searches for a specific student's posting history
+- Admin successfully blocks a standard user account
+- Admin successfully unblocks a previously blocked user
+- Core platform features are accessible on mobile screen resolutions
+
+### Core Features
+
+- Authentication View
+- Public Board & Search
+- Refined Intake Form Card
+- Staff/Admin Dashboard
+
+We're making a Lost and Found Knowledge Board app. I'm the scrum, based on the core features and test cases I've provided you, give me a list of tasks for sprints 1 and 2. Where Sprint 1 handles the most important features, and Sprint 2 is for testing, adding more features, or bug fixing, basically polishing. We have 5 roles: Scrum, UI, Fullstack Dev, Quality Analyst, and Knowledge Management Analyst.
+
+Think of these tasks as Github issues. I want you to be specific. The format is a list.
+
+Example
+
+- Task1, Assignee
+
+### **Output**
+
+Here is the updated list of tasks, keeping your original items and injecting the new ones based strictly on the visual elements in the wireframes.
+
+### **Sprint 1: Core Functionalities**
+
+- Implement User Authentication UI (Login and Registration Views) - UI
+- Implement "Forgot Password" recovery flow - Fullstack Dev
+- Integrate Supabase Auth and configure Institutional Email restrictions - Fullstack Dev
+- Develop Top Navigation Bar with conditional "Admin" tab visibility - UI
+- Develop Refined Intake Form Card including Drag-and-Drop file upload UI - UI
+- Add "Primary Object Color" picker and "Hidden Note" fields to Intake Form and Database Schema - Fullstack Dev
+- Implement 'Posts' database CRUD operations (Create, Read, Update, Delete) - Fullstack Dev
+- Develop Image Upload logic with format (PNG/JPG) and max file size validation - Fullstack Dev
+- Build Public Board UI to map and display active Lost/Found listings - UI
+- Implement "Load More Archives" pagination on the Public Board - Fullstack Dev
+- Implement Sidebar Filters (Categories, Colors, Buildings, Timeline, Storage Bins) and search query logic - Fullstack Dev
+- Implement user-to-user messaging/contact interface and backend logic - Fullstack Dev
+- Integrate the Knowledge Architecture taxonomy into the Intake Form categories and Search filters - Knowledge Management Analyst
+- Write initial API integration tests for Post creation and Authentication - Quality Analyst
+- Monitor Sprint 1 velocity and clear developer blockers - Scrum
+
+### **Sprint 2: Admin Features, Testing, & Polish**
+
+- Develop Staff/Admin Dashboard UI components (Tables, Status Tags) - UI
+- wImplement Role-Based Access Control (RBAC) to protect Admin Dashboard URL routes - Fullstack Dev
+- Build Admin moderation API (Remove inappropriate posts, Block/Unblock standard users) - Fullstack Dev
+- Implement Admin search logic to fetch specific student posting histories - Fullstack Dev
+- Build Notification System (Bell Icon UI and backend logic) - Fullstack Dev
+- Implement 30-day lifecycle flagging for aged items on the Admin Dashboard - Fullstack Dev
+- Develop "Mark as Returned" verification modal (Student ID lookup, E-signature checkboxes) - UI
+- Add static placeholder pages for Footer Links (Privacy, Terms) - UI
+- Audit and fix mobile screen resolution responsiveness across all core pages - UI
+- Execute Test Suite: Authentication edge cases (invalid emails, blocked login attempts) - Quality Analyst
+- Execute Test Suite: Intake Form edge cases (missing fields, whitespace entries, unsupported file uploads) - Quality Analyst
+- Execute Test Suite: Post management (unauthorized cross-user edits, empty edit submissions) - Quality Analyst
+- Execute Test Suite: Search/Filter stress tests (special characters, excessively long queries) - Quality Analyst
+- Refine search algorithms and KM taxonomy based on initial QA feedback - Knowledge Management Analyst
+- Address and patch bugs reported during QA execution - Fullstack Dev
+- Conduct Sprint Review, Retrospective, and prep for launch - Scrum
+
+### **What you changed/improved/rejected fom the AI's output**
+
+- I moved task "Implement "Forgot Password" recovery flow - Fullstack Dev" fom Sprint 1 to 2, as that isn't a priority as of right now.
+
+### **Reason (Why?)**
+
+- For Task Delagation and clean project progress.
+
+### **What you learned or the decision you made as a result**
+
+- I learned how to properly delagate
+
+## Entry 4 - (06/04/2026)
+
+### **Task(s)**
+
+### **Prompt (or Summary) provided to the AI**
+
+### **Output**
+
+### **What you changed/improved/rejected fom the AI's output**
+
+### **Reason (Why?)**
+
+### **What you learned or the decision you made as a result**
