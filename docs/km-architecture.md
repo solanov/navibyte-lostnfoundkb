@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Knowledge Management Architecture
 
 The NaviByte Lost and Found System (LFS) uses a structured Knowledge Management (KM) architecture designed to standardize the conversion of subjective human observations data into valuable and usable digital assets. This framework addresses the inherent "Vocabulary Gap" and "Inventory Drift" found in traditional lost and found systems by applying a process-driven approach to data schema, taxonomy, and retrieval logic.
@@ -51,3 +52,4 @@ The data retrieval logic is facilitated by strict requirements intended to maxim
 | :--- | :--- |
 | **Backend Enforcement** | Validation rules reject any submissions that deviate from the predefined taxonomy, preventing the injection of unstructured "human noise" into the database. |
 | **Privacy Advocacy** | The user interface includes mandatory disclaimers and reminders advising users to redact or avoid capturing Personally Identifiable Information (PII) during the image upload process. |
+=======
