@@ -3,7 +3,7 @@
 import { supabase } from "@/src/lib/supabase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Login() {
   const router = useRouter();
@@ -11,6 +11,14 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const err = params.get("error");
+    if (err === "domain") setError("Only @neu.edu.ph email addresses are allowed.");
+    if (err === "blocked") setError("Your account has been suspended. Please contact the administrator.");
+    if (err === "oauth_failed") setError("Google sign-in failed. Please try again.");
+  }, []);
 
   async function handleEmailLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
