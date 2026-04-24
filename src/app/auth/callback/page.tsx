@@ -10,11 +10,14 @@ export default function AuthCallback() {
 
   useEffect(() => {
     async function handleCallback() {
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get("code");
+      // This callback is only reached by OAuth (Google) sign-ins.
+      // Email verification is handled directly by /auth/verified via emailRedirectTo.
+      const searchParams = new URLSearchParams(window.location.search);
+      const code = searchParams.get("code");
 
       if (code) {
-        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        const { error: exchangeError } =
+          await supabase.auth.exchangeCodeForSession(code);
         if (exchangeError) {
           router.replace("/login?error=oauth_failed");
           return;

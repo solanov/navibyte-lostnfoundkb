@@ -27,7 +27,13 @@ export default function Register() {
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: fullName } },
+        options: {
+          data: { full_name: fullName },
+          // Redirect directly to the verified page after email confirmation.
+          // This bypasses /auth/callback and avoids PKCE code-verifier issues
+          // when the link is opened in a different browser context.
+          emailRedirectTo: `${window.location.origin}/auth/verified`,
+        },
       });
 
       if (signUpError) {
