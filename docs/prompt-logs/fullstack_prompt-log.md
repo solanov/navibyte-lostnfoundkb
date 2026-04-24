@@ -71,5 +71,55 @@ I learned that you should always double check and test the codes that the AI age
 -I also learned that email verification is a must use for modern systems to prevent spam and abuse.
 
 
+## Entry 3 - (04/24/2026)
+
+### **Task(s)**
+
+-FIXED NAVIGATION BAR AND HEADER
+
+### **Prompt (or Summary) provided to the AI**
+
+-Fix the header. It is appearing on the login page. It should only be appearing on the board page.
+
+### **Output**
+
+- The ai agent gave me a new code for the layout. Which took away the top nav in the auth pages. 
+### **What you changed/improved/rejected fom the AI's output**
+ 
+- I didn't change anything in this task, the ai agent's approach handled the issue very well.
+
+### **Reason (Why?)**
+
+- It's a simple bug and I'm satisfied with the solution. 
+
+### **What you learned or the decision you made as a result**
+
+- I have learned that sometimes you don't need to over-engineer a solution. A simple fix can go a long way.
+
+## Entry 4 - (04/24/2026)
+
+### **Task(s)**
+
+-IMPLEMENTED EMAIL VERIFICATION
+
+### **Prompt (or Summary) provided to the AI**
+
+-Guide me into creating a landing page after registration that will serve as a verification page. The user needs to click a link in their email to verify their account. 
+
+### **Output**
+
+- The AI agent provided a very comprehensive guide on creating a landing page after registration that will serve as a verification page. It also created a sample routing code for the landing page.
+
+### **What you changed/improved/rejected fom the AI's output**
+ 
+- I changed a little bit in the code specifically on redirecting the user after the email verification. The ai agent immediately redirected the user to the dashboard. So I changed it to redirect the user to login page instead to let the new verified user log-in with their credentials.
+
+### **Reason (Why?)**
+
+- It's a must fix since it can be a security risk if we allow users to be redirected in the board page without logging in first. 
+
+### **What you learned or the decision you made as a result**
+
+- Having a keen eye for security is a must in software development. 
 
 
