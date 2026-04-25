@@ -1,4 +1,3 @@
-import TopNav from "@/src/components/layout/TopNav";
 import type { Metadata } from "next";
 import { Inter, Public_Sans } from "next/font/google";
 import "./globals.css";
@@ -35,7 +34,6 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#EEEEEE] font-body">
-        <TopNav />
         {children}
       </body>
     </html>
