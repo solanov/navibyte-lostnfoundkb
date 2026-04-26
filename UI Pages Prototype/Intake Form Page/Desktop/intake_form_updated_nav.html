@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;800;900&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#98defe",
+                    "on-background": "#1b1c1c",
+                    "tertiary-fixed": "#8df4ec",
+                    "surface-variant": "#e4e2e1",
+                    "on-secondary-fixed": "#001f2a",
+                    "primary-fixed-dim": "#a1cce6",
+                    "on-surface-variant": "#41484c",
+                    "surface": "#fbf9f8",
+                    "surface-bright": "#fbf9f8",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#bde9ff",
+                    "inverse-surface": "#303030",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#c2e8ff",
+                    "surface-tint": "#38637a",
+                    "on-primary-container": "#7aa5be",
+                    "secondary": "#0d6682",
+                    "on-tertiary-container": "#44afa9",
+                    "surface-container-low": "#f5f3f3",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "inverse-primary": "#a1cce6",
+                    "on-secondary": "#ffffff",
+                    "surface-container": "#f0eded",
+                    "primary": "#002433",
+                    "tertiary-fixed-dim": "#70d7d0",
+                    "on-secondary-container": "#05637f",
+                    "surface-dim": "#dcd9d9",
+                    "tertiary": "#002624",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#8ad0ef",
+                    "surface-container-highest": "#e4e2e1",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#1d4c61",
+                    "outline": "#71787d",
+                    "on-tertiary-fixed": "#00201e",
+                    "surface-container-high": "#eae8e7",
+                    "on-tertiary-fixed-variant": "#00504c",
+                    "on-surface": "#1b1c1c",
+                    "on-primary-fixed": "#001e2c",
+                    "primary-container": "#053b50",
+                    "background": "#fbf9f8",
+                    "on-error-container": "#93000a",
+                    "tertiary-container": "#003e3b",
+                    "inverse-on-surface": "#f3f0f0",
+                    "on-secondary-fixed-variant": "#004d64",
+                    "outline-variant": "#c1c7cd"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Public Sans"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-custom-gray { background-color: #EEEEEE; }
+        .text-custom-teal { color: #176B87; }
+        .bg-custom-teal { background-color: #176B87; }
+        .bg-post-btn { background-color: #64CCC5; }
+    </style>
+</head>
+<body class="bg-custom-gray font-body text-on-surface">
+<!-- TopNavBar (Shared Component) -->
+<nav class="bg-[#053B50] shadow-lg flex justify-between items-center w-full px-8 h-16 docked full-width top-0 z-50 sticky">
+<div class="text-xl font-black tracking-tighter text-white">The Academic Curator</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-white/80 font-medium hover:text-white hover:bg-white/10 transition-all px-3 py-1 rounded" href="#">Home</a>
+<a class="text-white/80 font-medium hover:text-white hover:bg-white/10 transition-all px-3 py-1 rounded" href="#">Archive</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-white active:scale-95 duration-200">notifications</button>
+<button class="material-symbols-outlined text-white active:scale-95 duration-200">account_circle</button>
+</div>
+</nav>
+<main class="min-h-screen py-12 px-6 lg:px-24 flex flex-col items-center lg:ml-72">
+<!-- Header Section -->
+<div class="w-full max-w-2xl mb-8">
+<h1 class="font-headline font-black text-4xl tracking-tighter leading-none text-[#053B50]">Create Entry</h1>
+</div>
+<!-- Intake Form Container -->
+<div class="w-full max-w-2xl bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] overflow-hidden">
+<!-- Form Content -->
+<div class="p-8 lg:p-12">
+<form class="space-y-8">
+<!-- Lost/Found Toggle -->
+<div class="flex p-1 bg-surface-container-low rounded-lg w-fit">
+<button class="px-6 py-2 rounded-md font-bold text-xs uppercase tracking-widest bg-white text-primary shadow-sm transition-all" type="button">Lost</button>
+<button class="px-6 py-2 rounded-md font-bold text-xs uppercase tracking-widest text-on-surface-variant hover:text-primary transition-all" type="button">Found</button>
+</div>
+<!-- Primary Info -->
+<div class="space-y-6">
+<div>
+<label class="block font-headline font-bold text-primary mb-2 text-sm uppercase tracking-tight">Title <span class="text-error">*</span></label>
+<input class="w-full bg-surface-container-low border-none rounded-lg p-4 focus:ring-2 focus:ring-on-tertiary-container text-on-surface transition-all" placeholder="e.g. Leather Wallet, Silver Keyring" required="" type="text"/>
+</div>
+<div>
+<label class="block font-headline font-bold text-primary mb-2 text-sm uppercase tracking-tight">Description <span class="text-error">*</span></label>
+<textarea class="w-full bg-surface-container-low border-none rounded-lg p-4 focus:ring-2 focus:ring-on-tertiary-container text-on-surface transition-all" placeholder="Detail any distinguishing marks, stickers, or brand names..." required="" rows="3"></textarea>
+</div>
+</div>
+<!-- Category Icon Grid -->
+<div>
+<label class="block font-headline font-bold text-primary mb-4 text-sm uppercase tracking-tight">Category Selection</label>
+<div class="grid grid-cols-4 gap-4">
+<button class="group flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl hover:bg-custom-teal/10 border-2 border-transparent hover:border-custom-teal transition-all" type="button">
+<span class="material-symbols-outlined text-custom-teal mb-2">account_balance_wallet</span>
+<span class="text-[10px] font-bold text-on-surface-variant group-hover:text-custom-teal">Wallet</span>
+</button>
+<button class="group flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl hover:bg-custom-teal/10 border-2 border-transparent hover:border-custom-teal transition-all" type="button">
+<span class="material-symbols-outlined text-custom-teal mb-2">vpn_key</span>
+<span class="text-[10px] font-bold text-on-surface-variant group-hover:text-custom-teal">Keys</span>
+</button>
+<button class="group flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl hover:bg-custom-teal/10 border-2 border-transparent hover:border-custom-teal transition-all" type="button">
+<span class="material-symbols-outlined text-custom-teal mb-2">badge</span>
+<span class="text-[10px] font-bold text-on-surface-variant group-hover:text-custom-teal">ID</span>
+</button>
+<button class="group flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl hover:bg-custom-teal/10 border-2 border-transparent hover:border-custom-teal transition-all" type="button">
+<span class="material-symbols-outlined text-custom-teal mb-2">devices</span>
+<span class="text-[10px] font-bold text-on-surface-variant group-hover:text-custom-teal">Tech</span>
+</button>
+</div>
+</div>
+<!-- Image Upload -->
+<div>
+<label class="block font-headline font-bold text-primary mb-2 text-sm uppercase tracking-tight">Visual Evidence</label>
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-8 flex flex-col items-center justify-center text-on-surface-variant bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-4xl mb-2 text-outline group-hover:text-custom-teal transition-colors">cloud_upload</span>
+<p class="text-sm font-medium">Drag and drop images or <span class="text-custom-teal underline">browse</span></p>
+<p class="text-[10px] mt-1 text-outline opacity-70">PNG, JPG up to 10MB</p>
+</div>
+</div>
+<!-- Color Palette Selector -->
+<div>
+<label class="block font-headline font-bold text-primary mb-3 text-sm uppercase tracking-tight">Primary Object Color</label>
+<div class="flex flex-wrap gap-3">
+<div class="w-8 h-8 rounded-full bg-[#002433] ring-2 ring-offset-2 ring-transparent cursor-pointer hover:ring-outline-variant"></div>
+<div class="w-8 h-8 rounded-full bg-[#ba1a1a] ring-2 ring-offset-2 ring-transparent cursor-pointer hover:ring-outline-variant"></div>
+<div class="w-8 h-8 rounded-full bg-[#44afa9] ring-2 ring-offset-2 ring-transparent cursor-pointer hover:ring-outline-variant"></div>
+<div class="w-8 h-8 rounded-full bg-white border border-outline-variant ring-2 ring-offset-2 ring-transparent cursor-pointer hover:ring-outline-variant"></div>
+<div class="w-8 h-8 rounded-full bg-[#98defe] ring-2 ring-offset-2 ring-transparent cursor-pointer hover:ring-outline-variant"></div>
+<div class="w-8 h-8 rounded-full bg-[#303030] ring-2 ring-offset-2 ring-transparent cursor-pointer hover:ring-outline-variant"></div>
+</div>
+</div>
+<!-- Hidden Note -->
+<div>
+<label class="flex items-center gap-2 font-headline font-bold text-primary mb-2 text-sm uppercase tracking-tight">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">lock</span>
+                            Hidden Note
+                        </label>
+<textarea class="w-full bg-surface-container-low border-2 border-primary rounded-lg p-4 focus:ring-0 text-on-surface transition-all text-sm italic" placeholder="Private details for admin verification only (e.g. serial number, specific internal markings)..." rows="2"></textarea>
+</div>
+<!-- Footer Action -->
+<div class="pt-6 border-t border-surface-container">
+<button class="w-full bg-post-btn text-white font-headline font-black py-4 rounded-lg uppercase tracking-widest text-sm shadow-[0_8px_20px_rgba(100,204,197,0.3)] hover:scale-[1.02] active:scale-95 transition-all" type="submit">
+                            Post Entry to Archive
+                        </button>
+</div>
+</form>
+</div>
+</div>
+</main>
+<!-- SideNavBar (Shared Component) - Rendered as filters/quick links on desktop -->
+<aside class="hidden lg:flex fixed flex-col w-72 left-0 top-16 bottom-0 bg-white border-r border-slate-200 z-40">
+<div class="flex flex-col h-full">
+<div class="p-6">
+<h3 class="font-headline font-black text-primary text-xl tracking-tight">Archive Filters</h3>
+<p class="font-body text-[10px] uppercase tracking-widest font-bold text-slate-400 mt-1">New Era University</p>
+</div>
+<nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">category</span>
+<span class="font-medium text-sm">Categories</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">palette</span>
+<span class="font-medium text-sm">Colors</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">apartment</span>
+<span class="font-medium text-sm">Buildings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">history_toggle_off</span>
+<span class="font-medium text-sm">Timeline</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">inventory_2</span>
+<span class="font-medium text-sm">Storage Bins</span>
+</a>
+</nav>
+<div class="p-6 border-t border-slate-100">
+<button class="w-full bg-primary text-white font-bold py-3.5 rounded-xl text-[11px] uppercase tracking-widest shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all">
+                    Create Entry
+                </button>
+</div>
+</div>
+</aside>
+</body></html>
