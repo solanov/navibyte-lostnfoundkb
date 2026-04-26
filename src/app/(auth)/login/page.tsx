@@ -156,7 +156,7 @@ export default function Login() {
                 <label htmlFor="login-password" className="block text-[11px] font-label font-bold uppercase tracking-widest text-[#053B50]">
                   Password
                 </label>
-                <Link href="#" className="text-[10px] font-label font-bold text-[#64CCC5] hover:underline uppercase tracking-wider">Forgot?</Link>
+                <Link href="/forgot-password" className="text-[10px] font-label font-bold text-[#64CCC5] hover:underline uppercase tracking-wider">Forgot?</Link>
               </div>
               <div className="relative group">
                 <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-lg transition-colors group-focus-within:text-[#64CCC5]">lock</span>
