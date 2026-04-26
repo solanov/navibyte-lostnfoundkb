@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEU Knowledge Board - Create Entry</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;800;900&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "inverse-on-surface": "#f3f0f0",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#001e2c",
+                        "inverse-primary": "#a1cce6",
+                        "surface-bright": "#fbf9f8",
+                        "surface": "#fbf9f8",
+                        "secondary-container": "#98defe",
+                        "tertiary-fixed": "#8df4ec",
+                        "primary": "#002433",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "surface-container-low": "#f5f3f3",
+                        "inverse-surface": "#303030",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#0d6682",
+                        "on-secondary-fixed": "#001f2a",
+                        "on-error": "#ffffff",
+                        "surface-container": "#f0eded",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#a1cce6",
+                        "tertiary-container": "#003e3b",
+                        "on-tertiary-fixed": "#00201e",
+                        "on-secondary-container": "#05637f",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#dcd9d9",
+                        "outline": "#71787d",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#41484c",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "surface-variant": "#e4e2e1",
+                        "surface-tint": "#38637a",
+                        "on-surface": "#1b1c1c",
+                        "primary-container": "#053b50",
+                        "on-primary": "#ffffff",
+                        "on-background": "#1b1c1c",
+                        "primary-fixed": "#c2e8ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "on-tertiary-container": "#44afa9",
+                        "background": "#fbf9f8",
+                        "secondary-fixed": "#bde9ff",
+                        "tertiary": "#002624",
+                        "outline-variant": "#c1c7cd",
+                        "on-primary-container": "#7aa5be",
+                        "surface-container-highest": "#e4e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .glass-panel {
+                @apply bg-primary-container/85 backdrop-blur-xl;
+            }
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+            .no-scrollbar {
+                -ms-overflow-style: none;  /* IE and Edge */
+                scrollbar-width: none;  /* Firefox */
+            }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface-container font-body text-on-surface antialiased min-h-screen pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 sticky z-50 bg-[#053B50] backdrop-blur-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] flex items-center justify-between px-6 py-4 w-full">
+<button class="text-white hover:bg-white/10 transition-colors p-2 rounded-full focus:outline-none">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-public-sans tracking-tight font-bold text-xl text-white font-black uppercase tracking-wider flex-1 text-center">
+            The Academic Curator
+        </h1>
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/20 flex-shrink-0">
+<img alt="University Seal" class="w-full h-full object-cover" data-alt="Close-up of an intricate university seal cast in bronze, glowing under warm library lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVWrxI2noTupAosQ304LmJFowVVWHtsuPugI6TfKWf_AOJIsqy2zjeSy4UwPTDJgKTAFmpeZSvcp96nnFh7znQTIQeFkh2gue_dKC8SuG5gKj0ZCd7VmpkKRaBZwW0wAt2spaBMNaPrJGCDgyz3xfeIuDK3BniWip7Ndh23RhOByQ-_TxR2M8vJnyqN_v47UVbXxXhWAfXo8DhODbOsh0Hg-F0hKqB5haTleS1doghV8kCVouHPKvUdSK5vRREC4kLwrooDrV5AJHo"/>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-xl mx-auto px-4 pt-8 pb-12">
+<!-- Page Title -->
+<h2 class="font-headline font-extrabold text-3xl text-primary tracking-tight mb-6">Create Entry</h2>
+<!-- Form Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm border-none overflow-hidden flex flex-col relative before:absolute before:inset-0 before:ring-1 before:ring-inset before:ring-outline-variant/15 before:rounded-xl">
+<form class="p-6 space-y-8 flex-1">
+<!-- Toggle: Lost / Found -->
+<div class="bg-surface-container p-1 rounded-lg flex items-center relative isolation-auto">
+<input checked="" class="sr-only peer/found" id="type-found" name="entry-type" type="radio"/>
+<label class="flex-1 text-center py-2.5 rounded-lg text-sm font-label font-semibold cursor-pointer transition-all peer-checked/found:bg-surface-container-lowest peer-checked/found:text-primary peer-checked/found:shadow-sm text-on-surface-variant hover:text-on-surface z-10" for="type-found">
+                        FOUND
+                    </label>
+<input class="sr-only peer/lost" id="type-lost" name="entry-type" type="radio"/>
+<label class="flex-1 text-center py-2.5 rounded-lg text-sm font-label font-semibold cursor-pointer transition-all peer-checked/lost:bg-surface-container-lowest peer-checked/lost:text-primary peer-checked/lost:shadow-sm text-on-surface-variant hover:text-on-surface z-10" for="type-lost">
+                        LOST
+                    </label>
+</div>
+<!-- Title & Description -->
+<div class="space-y-5">
+<div>
+<label class="block text-sm font-semibold text-primary mb-1.5 font-label tracking-wide" for="title">Title <span class="text-error">*</span></label>
+<input class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface focus:ring-2 focus:ring-primary-container focus:bg-surface-container-lowest transition-colors placeholder:text-on-surface-variant/50" id="title" placeholder="e.g. Blue Hydroflask, Silver MacBook" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-semibold text-primary mb-1.5 font-label tracking-wide" for="description">Description <span class="text-error">*</span></label>
+<textarea class="w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-on-surface focus:ring-2 focus:ring-primary-container focus:bg-surface-container-lowest transition-colors placeholder:text-on-surface-variant/50 resize-none" id="description" placeholder="Provide details about condition, unique markings, or exact location found..." rows="4"></textarea>
+</div>
+</div>
+<!-- Category Grid -->
+<div>
+<label class="block text-sm font-semibold text-primary mb-3 font-label tracking-wide">Category</label>
+<div class="grid grid-cols-4 gap-3">
+<!-- Electronics -->
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors focus:ring-2 focus:ring-primary-container focus:outline-none group" type="button">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors mb-1">devices</span>
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider group-hover:text-primary transition-colors">Tech</span>
+</button>
+<!-- Keys -->
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-lowest ring-2 ring-primary-container rounded-lg shadow-sm focus:outline-none" type="button">
+<span class="material-symbols-outlined text-primary mb-1">key</span>
+<span class="text-[10px] font-semibold text-primary uppercase tracking-wider">Keys</span>
+</button>
+<!-- Wallet -->
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors focus:ring-2 focus:ring-primary-container focus:outline-none group" type="button">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors mb-1">account_balance_wallet</span>
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider group-hover:text-primary transition-colors">Wallet</span>
+</button>
+<!-- ID/Card -->
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors focus:ring-2 focus:ring-primary-container focus:outline-none group" type="button">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors mb-1">badge</span>
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider group-hover:text-primary transition-colors">ID</span>
+</button>
+<!-- Clothing -->
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors focus:ring-2 focus:ring-primary-container focus:outline-none group" type="button">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors mb-1">checkroom</span>
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider group-hover:text-primary transition-colors">Apparel</span>
+</button>
+<!-- Books/Notebooks -->
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors focus:ring-2 focus:ring-primary-container focus:outline-none group" type="button">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors mb-1">menu_book</span>
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider group-hover:text-primary transition-colors">Books</span>
+</button>
+<!-- Water Bottle -->
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors focus:ring-2 focus:ring-primary-container focus:outline-none group" type="button">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors mb-1">water_bottle</span>
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider group-hover:text-primary transition-colors">Bottle</span>
+</button>
+<!-- Other -->
+<button class="flex flex-col items-center justify-center p-3 bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors focus:ring-2 focus:ring-primary-container focus:outline-none group" type="button">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary transition-colors mb-1">category</span>
+<span class="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider group-hover:text-primary transition-colors">Other</span>
+</button>
+</div>
+</div>
+<!-- Primary Color -->
+<div>
+<label class="block text-sm font-semibold text-primary mb-3 font-label tracking-wide">Primary Color</label>
+<div class="flex space-x-3 overflow-x-auto no-scrollbar pb-2">
+<button aria-label="Black" class="w-8 h-8 rounded-full bg-black ring-2 ring-offset-2 ring-transparent hover:ring-outline-variant focus:ring-primary flex-shrink-0" type="button"></button>
+<button aria-label="White" class="w-8 h-8 rounded-full bg-white border border-outline-variant/30 ring-2 ring-offset-2 ring-transparent hover:ring-outline-variant focus:ring-primary flex-shrink-0" type="button"></button>
+<button aria-label="Gray" class="w-8 h-8 rounded-full bg-gray-500 ring-2 ring-offset-2 ring-primary focus:ring-primary flex-shrink-0 relative" type="button">
+<span class="absolute inset-0 flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</span>
+</button>
+<button aria-label="Red" class="w-8 h-8 rounded-full bg-red-600 ring-2 ring-offset-2 ring-transparent hover:ring-outline-variant focus:ring-primary flex-shrink-0" type="button"></button>
+<button aria-label="Blue" class="w-8 h-8 rounded-full bg-blue-600 ring-2 ring-offset-2 ring-transparent hover:ring-outline-variant focus:ring-primary flex-shrink-0" type="button"></button>
+<button aria-label="Green" class="w-8 h-8 rounded-full bg-green-600 ring-2 ring-offset-2 ring-transparent hover:ring-outline-variant focus:ring-primary flex-shrink-0" type="button"></button>
+<button aria-label="Yellow" class="w-8 h-8 rounded-full bg-yellow-400 ring-2 ring-offset-2 ring-transparent hover:ring-outline-variant focus:ring-primary flex-shrink-0" type="button"></button>
+<button aria-label="Multi-color" class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30 flex-shrink-0 flex" type="button">
+<div class="w-1/2 h-full bg-red-500"></div>
+<div class="w-1/2 h-full bg-blue-500"></div>
+</button>
+</div>
+</div>
+<!-- Hidden Note (Security) -->
+<div class="p-4 bg-surface-container rounded-lg border-l-4 border-primary">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">lock</span>
+<div class="flex-1">
+<label class="block text-sm font-bold text-primary mb-1 font-label" for="hidden-note">Hidden Verification Note</label>
+<p class="text-xs text-on-surface-variant mb-2">Only visible to administrators. Ask the claimant to verify this detail.</p>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-md px-3 py-2 text-sm text-on-surface focus:ring-2 focus:ring-primary-container focus:border-transparent transition-colors" id="hidden-note" placeholder="e.g. Has a small dent on the bottom corner" type="text"/>
+</div>
+</div>
+</div>
+<!-- Image Upload Zone -->
+<div>
+<label class="block text-sm font-semibold text-primary mb-1.5 font-label tracking-wide">Photo</label>
+<div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-outline-variant/40 rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="space-y-2 text-center">
+<span class="material-symbols-outlined text-4xl text-secondary group-hover:text-primary transition-colors">add_photo_alternate</span>
+<div class="flex text-sm text-on-surface-variant justify-center">
+<label class="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary-container focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary" for="file-upload">
+<span>Upload a file</span>
+<input class="sr-only" id="file-upload" name="file-upload" type="file"/>
+</label>
+<p class="pl-1">or drag and drop</p>
+</div>
+<p class="text-xs text-on-surface-variant/70">PNG, JPG, GIF up to 10MB</p>
+</div>
+</div>
+</div>
+<!-- Submit Action -->
+<div class="pt-4">
+<button class="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-on-primary bg-on-tertiary-container hover:bg-tertiary-fixed-dim focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-container transition-colors font-label tracking-wide" type="button">
+                        POST ENTRY
+                    </button>
+</div>
+</form>
+</div>
+</main>
+<!-- BottomNavBar (Hidden on desktop, shown on mobile) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl bg-white/85 dark:bg-slate-950/85 backdrop-blur-lg shadow-[0_-4px_20px_rgba(0,36,51,0.04)] fixed bottom-0 left-0 w-full h-20 flex justify-around items-center px-4 pb-safe">
+<!-- Not Active (Since this is a transactional form page, none are strictly active, but assuming it sits under Home/Feed context if we had to pick, but the prompt says to apply inactive to rest. Wait, prompt says: Automatic Suppression: You MUST exclude the navigation shell if the page intent is: Linear/Transactional: Login, Sign-up, Onboarding, Checkout, or "Success/Confirmation" splash screens. Task-Focused: Any sub-page featuring a "Close" or "Back" action that implies a temporary departure from the main navigation flow.
+        This is an Intake Form. It should ideally be suppressed or show a "Back" button. I will suppress the bottom nav as instructed by the logic rule "Automatic Suppression: You MUST exclude the navigation shell if the page intent is: Linear/Transactional or Task-Focused". -->
+</nav>
+<!-- Actually, the instructions say "Create Entry" is a standalone form. I will omit BottomNavBar completely as per the Semantic Shell Mandate: "Automatic Suppression: You MUST exclude the navigation shell if the page intent is... Task-Focused". -->
+</body></html>
