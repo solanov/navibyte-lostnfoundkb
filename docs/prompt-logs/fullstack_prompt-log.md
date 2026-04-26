@@ -122,4 +122,33 @@ I learned that you should always double check and test the codes that the AI age
 
 - Having a keen eye for security is a must in software development. 
 
+## Entry 5 - (04/27/2026)
+
+### **Task(s)**
+
+-IMPLEMENTED A CREATION PAGE
+-IMPLEMENTED A DRAG/DROP/BROWSE IMAGE FEATURE
+
+### **Prompt (or Summary) provided to the AI**
+
+- Guide me into creating a creation page for the lost/found items. It should have a form that will allow the user to create a new lost/found item. 
+- Guide me into creating a drag/drop/browse image feature for the creation page. It should allow the user to drag and drop an image to the creation page, browse for an image, or take a picture of an image. 
+
+### **Output**
+
+- The AI agent provided a very comprehensive guide on creating a creation page for the lost/found items. It also created a sample routing code for the creation page. 
+
+- The AI agent provided a very comprehensive guide on creating a drag/drop/browse image feature for the creation page. It also created a sample code for the drag/drop/browse image feature. 
+
+### **What you changed/improved/rejected fom the AI's output**
+ 
+- I changed a little bit in the code specifically on the image upload feature. The ai agent didn't thought that we need to verify the email of the user first before logging them in. So I added a landing page after registration. 
+
+### **Reason (Why?)**
+
+- It's a must fix since it can be a security risk if we allow users to be redirected in the board page without logging in first. 
+
+### **What you learned or the decision you made as a result**
+
+- Having a keen eye for security is a must in software development. 
 
