@@ -1,3 +1,5 @@
+import StatusBadge from './StatusBadge';
+
 interface ItemCardProps {
   status: 'Found' | 'Lost';
   icon: string;
@@ -9,7 +11,7 @@ interface ItemCardProps {
 }
 
 export default function ItemCard({ status, icon, placeholderIcon, placeholderText, title, location, reference }: ItemCardProps) {
-  const isFound = status === 'Found';
+
 
   return (
     <div className="bg-surface-container-lowest p-6 rounded-xl group hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md">
@@ -17,11 +19,7 @@ export default function ItemCard({ status, icon, placeholderIcon, placeholderTex
         <div className="w-12 h-12 bg-surface-container-low flex items-center justify-center rounded-lg">
           <span className="material-symbols-outlined text-primary-container">{icon}</span>
         </div>
-        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded ${
-          isFound ? 'text-on-tertiary-container bg-tertiary-fixed' : 'text-white bg-[#ba1a1a]' // Used standard red/error for lost
-        }`}>
-          {status}
-        </span>
+        <StatusBadge status={status} />
       </div>
       
       <div className="space-y-4 mb-8">

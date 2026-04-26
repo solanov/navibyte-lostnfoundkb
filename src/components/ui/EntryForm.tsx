@@ -1,5 +1,6 @@
 "use client";
-
+import CategoryButton from './CategoryButton';
+import ColorSwatch from './ColorSwatch';
 import { useState } from "react";
 
 export default function EntryForm() {
@@ -83,27 +84,14 @@ export default function EntryForm() {
             </label>
             <div className="grid grid-cols-4 gap-4">
               {categories.map((cat) => (
-                <button 
+                <CategoryButton 
                   key={cat.id}
-                  type="button" 
+                  id={cat.id}
+                  label={cat.label}
+                  icon={cat.icon}
+                  isSelected={selectedCategory === cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`group flex flex-col items-center justify-center p-4 bg-surface-container-low rounded-xl border-2 transition-all ${
-                    selectedCategory === cat.id 
-                      ? 'border-secondary bg-secondary/10' 
-                      : 'border-transparent hover:border-secondary hover:bg-secondary/5'
-                  }`}
-                >
-                  <span className={`material-symbols-outlined mb-2 transition-colors ${
-                    selectedCategory === cat.id ? 'text-secondary' : 'text-outline group-hover:text-secondary'
-                  }`}>
-                    {cat.icon}
-                  </span>
-                  <span className={`text-[10px] font-bold transition-colors ${
-                    selectedCategory === cat.id ? 'text-secondary' : 'text-on-surface-variant group-hover:text-secondary'
-                  }`}>
-                    {cat.label}
-                  </span>
-                </button>
+                  />
               ))}
             </div>
           </div>
@@ -131,17 +119,12 @@ export default function EntryForm() {
             </label>
             <div className="flex flex-wrap gap-3">
               {colors.map((colorClass, idx) => (
-                <div 
-                  key={idx}
-                  onClick={() => setSelectedColor(colorClass)}
-                  className={`w-8 h-8 rounded-full ${colorClass} cursor-pointer transition-all ${
-                    colorClass === 'bg-white' ? 'border border-outline-variant' : ''
-                  } ${
-                    selectedColor === colorClass 
-                      ? 'ring-2 ring-offset-2 ring-primary scale-110' 
-                      : 'ring-2 ring-offset-2 ring-transparent hover:ring-outline-variant'
-                  }`}
-                />
+              <ColorSwatch 
+                key={idx}
+                colorClass={colorClass}
+                isSelected={selectedColor === colorClass}
+                onClick={() => setSelectedColor(colorClass)}
+              />
               ))}
             </div>
           </div>
