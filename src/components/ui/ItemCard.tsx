@@ -1,17 +1,20 @@
 import StatusBadge from './StatusBadge';
 
 interface ItemCardProps {
-  status: 'Found' | 'Lost';
+  status: string;
   icon: string;
-  placeholderIcon: string;
-  placeholderText: string;
   title: string;
   location: string;
   reference: string;
+  imageUrl?: string | null;
 }
 
-export default function ItemCard({ status, icon, placeholderIcon, placeholderText, title, location, reference }: ItemCardProps) {
-
+export default function ItemCard({ status, icon, title, location, reference, imageUrl }: ItemCardProps) {
+  const isFound = status.toLowerCase() === 'found';
+  const displayStatus = status === 'Reported' ? 'Lost' : status;
+  
+  const placeholderIcon = isFound ? 'lock' : 'visibility_off';
+  const placeholderText = isFound ? 'Media Redacted for Privacy' : 'Verification Required';
 
   return (
     <div className="bg-surface-container-lowest p-6 rounded-xl group hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md">
@@ -19,20 +22,28 @@ export default function ItemCard({ status, icon, placeholderIcon, placeholderTex
         <div className="w-12 h-12 bg-surface-container-low flex items-center justify-center rounded-lg">
           <span className="material-symbols-outlined text-primary-container">{icon}</span>
         </div>
-        <StatusBadge status={status} />
+        <StatusBadge status={displayStatus} />
       </div>
       
       <div className="space-y-4 mb-8">
-        <div className="h-48 bg-surface-container-low rounded-lg flex flex-col items-center justify-center text-outline-variant gap-2 overflow-hidden relative">
-          <span className="material-symbols-outlined text-4xl">{placeholderIcon}</span>
-          <p className="text-xs font-medium uppercase tracking-tighter">{placeholderText}</p>
-          <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/50 to-transparent"></div>
-        </div>
+        {imageUrl ? (
+          <div className="h-48 rounded-lg overflow-hidden relative border border-outline-variant/15 group-hover:shadow-inner transition-all bg-surface-container">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
+          </div>
+        ) : (
+          <div className="h-48 bg-surface-container-low rounded-lg flex flex-col items-center justify-center text-outline-variant gap-2 overflow-hidden relative border border-outline-variant/15">
+            <span className="material-symbols-outlined text-4xl">{placeholderIcon}</span>
+            <p className="text-xs font-medium uppercase tracking-tighter">{placeholderText}</p>
+            <div className="absolute inset-0 bg-gradient-to-t from-surface-container-low/50 to-transparent"></div>
+          </div>
+        )}
+        
         <div>
-          <h3 className="text-xl font-bold text-primary mb-1">{title}</h3>
+          <h3 className="text-xl font-bold text-primary mb-1 line-clamp-1">{title}</h3>
           <div className="flex items-center gap-2 text-on-surface-variant text-sm">
             <span className="material-symbols-outlined text-sm">location_on</span>
-            <span>{location}</span>
+            <span className="line-clamp-1">{location}</span>
           </div>
         </div>
       </div>
@@ -42,7 +53,7 @@ export default function ItemCard({ status, icon, placeholderIcon, placeholderTex
           Ref: {reference}
         </span>
         <button className="bg-secondary text-white px-5 py-2.5 rounded-md text-sm font-bold hover:brightness-110 transition-all">
-          Contact User
+          Contact {displayStatus === 'Lost' ? 'Curator' : 'User'}
         </button>
       </div>
     </div>

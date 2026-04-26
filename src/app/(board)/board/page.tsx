@@ -1,11 +1,30 @@
 import TopNav from '@/src/components/layout/TopNav';
 import Sidebar from '@/src/components/layout/SideNav';
 import ItemCard from '@/src/components/ui/ItemCard';
-import PriorityCard from '@/src/components/ui/PriorityCard';
 import BottomNavBar from '@/src/components/layout/BottomNavBar';
 import Link from 'next/link';
+import { supabase } from '@/src/lib/supabase';
 
-export default function PublicBoard() {
+export const dynamic = 'force-dynamic';
+
+export default async function PublicBoard() {
+  const { data: lostItems, error } = await supabase
+    .from('public_lost_items')
+    .select(`
+      *,
+      categories (
+        name,
+        icon_identifier
+      )
+    `)
+    .order('created_timestamp', { ascending: false });
+
+  if (error) {
+    console.error("Error fetching board items:", error);
+  }
+
+  const items = lostItems || [];
+
   return (
     <div className="bg-background text-foreground min-h-screen font-body selection:bg-primary-fixed selection:text-primary pb-24 md:pb-0">
       
@@ -46,45 +65,41 @@ export default function PublicBoard() {
 
             {/* Bento-Style Grid Feed */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ItemCard 
-                status="Found"
-                icon="laptop_mac"
-                placeholderIcon="lock"
-                placeholderText="Media Redacted for Privacy"
-                title="Silver Portable Device"
-                location="Engineering Building - Hallway B"
-                reference="AC-9921"
-              />
-              
-              <ItemCard 
-                status="Lost"
-                icon="account_balance_wallet"
-                placeholderIcon="visibility_off"
-                placeholderText="Verification Required"
-                title="Leather Document Holder"
-                location="University Library - 3rd Floor"
-                reference="AC-8442"
-              />
+              {items.length === 0 ? (
+                <div className="col-span-1 md:col-span-2 py-12 text-center text-outline-variant">
+                  <span className="material-symbols-outlined text-5xl mb-4 opacity-50">inbox</span>
+                  <p className="font-medium">No items found in the archive.</p>
+                </div>
+              ) : (
+                items.map((item) => {
+                  const [title] = (item.general_description || '').split('\n\n');
+                  // @ts-ignore - Supabase type inference for joins can be tricky without generated types
+                  const icon = item.categories?.icon_identifier || 'help_outline';
+                  const reference = `AC-${item.post_id.substring(0, 4).toUpperCase()}`;
 
-              <PriorityCard />
-
-              <ItemCard 
-                status="Found"
-                icon="phone_iphone"
-                placeholderIcon="lock_clock"
-                placeholderText="Locked Placeholder"
-                title="Mobile Device (Locked)"
-                location="Cafeteria Terrace"
-                reference="AC-1102"
-              />
+                  return (
+                    <ItemCard 
+                      key={item.post_id}
+                      status={item.status}
+                      icon={icon}
+                      title={title || 'Unknown Item'}
+                      location={item.zone || 'Unknown Location'}
+                      reference={reference}
+                      imageUrl={item.image_url}
+                    />
+                  );
+                })
+              )}
             </div>
 
             {/* Pagination */}
-            <div className="mt-12 text-center">
-              <button className="bg-surface-container-lowest text-primary border border-outline-variant/30 px-12 py-4 rounded-xl font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all">
-                Load More Archives
-              </button>
-            </div>
+            {items.length > 0 && (
+              <div className="mt-12 text-center">
+                <button className="bg-surface-container-lowest text-primary border border-outline-variant/30 px-12 py-4 rounded-xl font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all">
+                  Load More Archives
+                </button>
+              </div>
+            )}
           </div>
         </main>
       </div>

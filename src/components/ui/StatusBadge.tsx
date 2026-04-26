@@ -1,17 +1,18 @@
 import React from 'react';
 
 interface StatusBadgeProps {
-  status: 'Found' | 'Lost';
+  status: string;
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
-  const isFound = status === 'Found';
+  const displayStatus = status === 'Reported' ? 'Lost' : status;
+  const isFound = displayStatus === 'Found';
   
   return (
     <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded ${
       isFound ? 'text-on-tertiary-container bg-tertiary-fixed' : 'text-white bg-[#ba1a1a]'
     }`}>
-      {status}
+      {displayStatus}
     </span>
   );
 }
