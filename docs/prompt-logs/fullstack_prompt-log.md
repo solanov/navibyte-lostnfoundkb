@@ -152,3 +152,31 @@ I learned that you should always double check and test the codes that the AI age
 
 - Having a keen eye for security is a must in software development. 
 
+## Entry 6 - (04/26/2026)
+
+### **Task(s)**
+
+-Implemented Mobile View with Bottom Nav Bar on public dashboard
+
+### **Prompt (or Summary) provided to the AI**
+
+- How do implement a mobile view with a bottom navigation bar on the public dashboard?  
+
+### **Output**
+
+- The ai agent gave me a proper sample code for a bottom navigation bar that is only visible on mobile view. 
+
+### **What you changed/improved/rejected fom the AI's output**
+ 
+- I didn't changed a thing, the AI agent's approach handled the issue very well. 
+
+
+### **Reason (Why?)**
+
+- The AI agent saitisfied me with its solution. And it passed the testing phase. 
+
+### **What you learned or the decision you made as a result**
+
+- Being concise to the AI agent can lead to a more precise output.
+
+
