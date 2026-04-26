@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEU Knowledge Board - Public Board</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;900&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "inverse-on-surface": "#f3f0f0",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#001e2c",
+                        "inverse-primary": "#a1cce6",
+                        "surface-bright": "#fbf9f8",
+                        "surface": "#fbf9f8",
+                        "secondary-container": "#98defe",
+                        "tertiary-fixed": "#8df4ec",
+                        "primary": "#002433",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "surface-container-low": "#f5f3f3",
+                        "inverse-surface": "#303030",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#0d6682",
+                        "on-secondary-fixed": "#001f2a",
+                        "on-error": "#ffffff",
+                        "surface-container": "#f0eded",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#a1cce6",
+                        "tertiary-container": "#003e3b",
+                        "on-tertiary-fixed": "#00201e",
+                        "on-secondary-container": "#05637f",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#dcd9d9",
+                        "outline": "#71787d",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#41484c",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "surface-variant": "#e4e2e1",
+                        "surface-tint": "#38637a",
+                        "on-surface": "#1b1c1c",
+                        "primary-container": "#053b50",
+                        "on-primary": "#ffffff",
+                        "on-background": "#1b1c1c",
+                        "primary-fixed": "#c2e8ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "on-tertiary-container": "#44afa9",
+                        "background": "#fbf9f8",
+                        "secondary-fixed": "#bde9ff",
+                        "tertiary": "#002624",
+                        "outline-variant": "#c1c7cd",
+                        "on-primary-container": "#7aa5be",
+                        "surface-container-highest": "#e4e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Public Sans"],
+                        "display": ["Public Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline, .font-display { font-family: 'Public Sans', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface-container-low text-on-surface antialiased pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 sticky z-50 bg-[#053B50] shadow-md">
+<div class="flex items-center justify-between px-6 py-4 w-full dark:text-[#fbf9f8] text-white">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-colors Active: scale-95 duration-200 text-white">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-public-sans tracking-tight font-bold font-black uppercase tracking-wider text-center flex-grow text-xl">The Academic Curator</h1>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container flex items-center justify-center border border-outline-variant/15 border-white/20">
+<img alt="University Seal" data-alt="formal crest or seal of an academic institution with classic heraldry elements in dark blue and gold" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgVbMrIszXmq-55C-Ya3hmCEHExk8thwO1OHlmn7Trt7Wqb3LV2X4h5_JKH53yYXPiffWANAithnC2ylufCI4mYQeJpdVCrw7h6Ii2Xslw0r5232A561O4aZ89HMRzxYFa2BsKnftLXguDVyV_PzBDqIZVlbCV5djCEiBiw17Pol6T27njnO1CPjyIscsJfLaPl2MIHvb6DIIWkZQLH8fZlo4YgjnXv2EPbTENvHDtItSB9jAyJmiBJ7DuMLrVxjO4T5RM9BiRqHVx"/>
+</div>
+</div>
+</header>
+<!-- Sticky Search -->
+<div class="sticky top-[72px] z-40 px-4 py-3 bg-surface-container-low/90 backdrop-blur-md">
+<div class="relative w-full max-w-md mx-auto">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-lowest rounded-full text-body text-on-surface placeholder:text-on-surface-variant border-none focus:ring-2 focus:ring-on-tertiary-container shadow-sm outline-none transition-all" placeholder="Search archive..." type="text"/>
+</div>
+</div>
+<!-- Main Content Canvas -->
+<main class="max-w-md mx-auto px-4 py-4 space-y-6">
+<!-- Feed Item 1 -->
+<article class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:bg-surface-bright hover:-translate-y-1 transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-2 text-primary font-headline font-bold text-lg">
+<span class="material-symbols-outlined text-on-tertiary-container" data-icon="devices">devices</span>
+                    Laptop - Silver MacBook
+                </div>
+<span class="inline-flex items-center px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed rounded text-[10px] font-label font-bold uppercase tracking-widest">FOUND</span>
+</div>
+<div class="w-full h-32 bg-surface-container rounded-lg mb-4 flex items-center justify-center border border-outline-variant/15">
+<span class="material-symbols-outlined text-on-surface-variant text-4xl" data-icon="lock">lock</span>
+<span class="sr-only">Image redacted for privacy</span>
+</div>
+<div class="space-y-2 mb-4">
+<p class="text-on-surface-variant text-sm font-body leading-relaxed">
+                    Silver 13" MacBook Pro found in the third-floor study lounge. Has a distinct sticker on the back casing. Turned in to the circulation desk.
+                </p>
+<div class="flex items-center gap-1 text-xs text-on-surface-variant font-label mt-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                    Snell Library - Zone C
+                </div>
+</div>
+<div class="pt-3 flex justify-end">
+<button class="bg-transparent border border-outline-variant/20 text-secondary font-label font-medium px-4 py-2 rounded-lg text-sm hover:bg-surface-container transition-colors">
+                    Claim Item
+                </button>
+</div>
+</article>
+<!-- Feed Item 2 -->
+<article class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:bg-surface-bright hover:-translate-y-1 transition-all duration-300">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-2 text-primary font-headline font-bold text-lg">
+<span class="material-symbols-outlined text-error" data-icon="menu_book">menu_book</span>
+                    Engineering Textbook
+                </div>
+<span class="inline-flex items-center px-2 py-1 bg-surface-container-highest text-on-surface rounded text-[10px] font-label font-bold uppercase tracking-widest">LOST</span>
+</div>
+<div class="w-full h-32 bg-surface-container rounded-lg mb-4 flex items-center justify-center border border-outline-variant/15">
+<span class="material-symbols-outlined text-on-surface-variant text-4xl" data-icon="image_not_supported">image_not_supported</span>
+</div>
+<div class="space-y-2 mb-4">
+<p class="text-on-surface-variant text-sm font-body leading-relaxed">
+                    Advanced Thermodynamics, 4th Edition. Left it on a desk near the back windows yesterday afternoon. Name written inside cover.
+                </p>
+<div class="flex items-center gap-1 text-xs text-on-surface-variant font-label mt-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                    Richards Hall - Rm 204
+                </div>
+</div>
+<div class="pt-3 flex justify-end">
+<button class="bg-transparent border border-outline-variant/20 text-secondary font-label font-medium px-4 py-2 rounded-lg text-sm hover:bg-surface-container transition-colors">
+                    I Have This
+                </button>
+</div>
+</article>
+</main>
+<!-- FAB -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-xl shadow-[0_8px_16px_rgba(0,36,51,0.15)] flex items-center justify-center hover:scale-105 transition-transform z-40 md:hidden">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full h-20 flex justify-around items-center px-4 pb-safe bg-white/85 dark:bg-slate-950/85 backdrop-blur-lg rounded-t-xl z-50 shadow-[0_-4px_20px_rgba(0,36,51,0.04)] text-[#44afa9]">
+<button class="flex flex-col items-center justify-center bg-[#8df4ec]/20 text-[#002433] dark:text-[#8df4ec] rounded-xl px-5 py-1.5 Active: scale-90 duration-150">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-widest">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#44afa9] transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="inventory_2">inventory_2</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-widest">Archive</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#44afa9] transition-all">
+<span class="material-symbols-outlined mb-1" data-icon="account_circle">account_circle</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-widest">Profile</span>
+</button>
+</nav>
+</body></html>
