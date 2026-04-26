@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function SideNav() {
   const filters = [
     { label: 'Categories', icon: 'category', active: true },
@@ -35,9 +37,9 @@ export default function SideNav() {
       </nav>
 
       <div className="mt-auto pb-24">
-        <button className="w-full btn-tertiary text-on-tertiary py-3 rounded-md font-bold text-sm tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition-all">
+        <Link href="/create" className="flex items-center justify-center w-full btn-tertiary text-on-tertiary py-3 rounded-md font-bold text-sm tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition-all">
           Create Entry
-        </button>
+        </Link>
       </div>
     </aside>
   );

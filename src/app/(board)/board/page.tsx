@@ -2,11 +2,11 @@ import TopNav from '@/src/components/layout/TopNav';
 import Sidebar from '@/src/components/layout/SideNav';
 import ItemCard from '@/src/components/ui/ItemCard';
 import PriorityCard from '@/src/components/ui/PriorityCard';
+import Link from 'next/link';
 
 export default function PublicBoard() {
   return (
     <div className="bg-background text-foreground min-h-screen font-body selection:bg-primary-fixed selection:text-primary">
-      <TopNav />
       
       <div className="flex min-h-screen">
         <Sidebar />
@@ -77,9 +77,9 @@ export default function PublicBoard() {
       </div>
 
       {/* Contextual FAB */}
-      <button className="fixed bottom-8 right-8 btn-tertiary text-on-tertiary w-14 h-14 rounded-xl shadow-2xl flex items-center justify-center active:scale-95 transition-all z-40 hover:brightness-110">
+      <Link href="/create" className="fixed bottom-8 right-8 btn-tertiary text-on-tertiary w-14 h-14 rounded-xl shadow-2xl flex items-center justify-center active:scale-95 transition-all z-40 hover:brightness-110">
         <span className="material-symbols-outlined">edit_square</span>
-      </button>
+      </Link>
     </div>
   );
 }
