@@ -156,19 +156,20 @@ I learned that you should always double check and test the codes that the AI age
 
 ### **Task(s)**
 
--Implemented Mobile View with Bottom Nav Bar on public dashboard
+- Implemented Mobile View with Bottom Nav Bar on public dashboard
 
 ### **Prompt (or Summary) provided to the AI**
 
 - How do implement a mobile view with a bottom navigation bar on the public dashboard?  
+ 
 
 ### **Output**
 
-- The ai agent gave me a proper sample code for a bottom navigation bar that is only visible on mobile view. 
+-  The ai agent gave me a proper sample code for a bottom navigation bar that is only visible on mobile view. 
 
 ### **What you changed/improved/rejected fom the AI's output**
  
-- I didn't changed a thing, the AI agent's approach handled the issue very well. 
+-I didn't changed a thing, the AI agent's approach handled the issue very well. 
 
 
 ### **Reason (Why?)**
@@ -177,6 +178,33 @@ I learned that you should always double check and test the codes that the AI age
 
 ### **What you learned or the decision you made as a result**
 
-- Being concise to the AI agent can lead to a more precise output.
+- Being concise to the AI agent can lead to a more precise output. 
+
+## Entry 7 - (04/27/2026)
+
+### **Task(s)**
+
+-Implemented Forgot Password Feature.
+
+### **Prompt (or Summary) provided to the AI**
+
+- Suggest a secured flow on implementing a forgot-password feature.  
+
+### **Output**
+
+- The AI agent gave me a comprehensive guide on how to implement a forgot-password feature. It provided an algorithm and proper routing codes for the feature.  
+
+### **What you changed/improved/rejected fom the AI's output**
+ 
+- I changed some flows in the forgot-password feature. The initial suggestion of the agent was a bit overkill since it involved creating a new table for the OTP verification. So I opted for a simpler flow that uses the existing database structure.  
+
+
+### **Reason (Why?)**
+
+- Although we used a simple solution, it was able to pass the security testing phase. And I also included session cookies to prevent session hijacking. The link sent for the reset password is also only valid for 1 hour. 
+
+### **What you learned or the decision you made as a result**
+
+- Security is by far the most important thing to consider in software development especially in todays era where you can just easily use ai to code. We should prioritize on learning security best practices since I think that is where AI agents usually overlook things.
 
 
