@@ -10,7 +10,7 @@ export default function SideNav() {
   ];
 
   return (
-    <aside className="fixed flex flex-col gap-6 p-6 overflow-y-auto bg-surface-container-lowest h-screen w-72 left-0 top-0 pt-24 border-r border-outline-variant/30">
+    <aside className="hidden md:flex fixed flex-col gap-6 p-6 overflow-y-auto bg-surface-container-lowest h-screen w-72 left-0 top-0 pt-24 border-r border-outline-variant/30">
       <div className="mb-2">
         <h2 className="font-body text-[11px] uppercase tracking-widest font-bold text-primary">
           Archive Filters
