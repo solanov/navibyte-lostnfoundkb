@@ -1,4 +1,4 @@
-import EntryForm from '@/src/components/ui/EntryForm';
+import EntryForm from '@/src/components/pages/EntryForm';
 import Link from 'next/link';
 
 export default function CreateEntryPage() {
