@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Academic Curator - Audit Trail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#c2e8ff",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "surface-bright": "#fbf9f8",
+                        "surface": "#fbf9f8",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#002433",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "inverse-on-surface": "#f3f0f0",
+                        "secondary-container": "#98defe",
+                        "on-secondary-container": "#05637f",
+                        "outline-variant": "#c1c7cd",
+                        "on-tertiary-fixed": "#00201e",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e4e2e1",
+                        "background": "#fbf9f8",
+                        "surface-container-highest": "#e4e2e1",
+                        "primary-container": "#053b50",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#8df4ec",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#bde9ff",
+                        "surface-dim": "#dcd9d9",
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "surface-container-low": "#f5f3f3",
+                        "surface-tint": "#38637a",
+                        "on-surface-variant": "#41484c",
+                        "primary-fixed-dim": "#a1cce6",
+                        "on-surface": "#1b1c1c",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "tertiary": "#002624",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-fixed": "#001f2a",
+                        "on-tertiary-container": "#44afa9",
+                        "tertiary-container": "#003e3b",
+                        "on-primary-fixed": "#001e2c",
+                        "on-primary-container": "#7aa5be",
+                        "secondary": "#0d6682",
+                        "outline": "#71787d",
+                        "on-background": "#1b1c1c",
+                        "surface-container": "#f0eded",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#303030",
+                        "inverse-primary": "#a1cce6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .display, .headline { font-family: 'Public Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-[60] bg-[#053B50]/85 dark:bg-slate-950/85 backdrop-blur-xl text-white shadow-[0_20px_40px_rgba(0,36,51,0.06)] flex justify-between items-center h-16 px-8 hidden md:flex">
+<div class="flex items-center gap-6">
+<span class="font-headline text-lg font-bold tracking-[-2%] text-white">The Academic Curator</span>
+</div>
+<div class="flex-1 max-w-md mx-8 flex justify-end">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none text-[20px]">search</span>
+<input class="w-full bg-white/10 border-none rounded-full py-2 pl-10 pr-4 text-sm text-white placeholder-slate-300 focus:ring-2 focus:ring-[#44afa9] focus:bg-white/20 transition-colors font-body" placeholder="Search logs..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-300 hover:text-[#44afa9] transition-all duration-200 active:scale-95 flex items-center justify-center p-2 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-300 hover:text-[#44afa9] transition-all duration-200 active:scale-95 flex items-center justify-center p-2 rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-white/20 overflow-hidden border border-white/10 ml-2">
+<img alt="Admin Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAt853oNvUaD6_D0nsDRXhgYQva927Eltrlpvlq3cOIbMnPdNC7zmpnpMHrdLYxv9GFf1PlhMCbBgUtocB2gKk75WpzSrEuVs5yfJ3_ZanpFOCOQUu_BWJInU2gZIvEYH5fmnlQsWsednJd3ubP46TUMA2ZIA2eIdW2CjI_Q6YLQ61vocZpcmWWsupF5VH4-NgT0CYd4hk1AImO7X0xUMmRH1dZg141NgWcrRMBVmNYgG5gORYcnBs9NuIoNE9lIE9Npv-u8KWP9fm-"/>
+</div>
+</div>
+</nav>
+<div class="flex flex-1 pt-16 h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col gap-2 p-6 h-full fixed left-0 top-0 w-72 pt-20 z-50 bg-white dark:bg-slate-900 shadow-xl shadow-[#002433]/5 text-[#002433] dark:text-slate-100 font-['Inter'] font-medium uppercase tracking-[5%] text-[11px] border-r border-outline-variant/15">
+<div class="mb-8 flex items-center gap-4 px-2">
+<div class="h-10 w-10 rounded-lg bg-surface-container-high overflow-hidden border border-outline-variant/20 flex-shrink-0">
+<img alt="University Seal" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9Q40yPTZ4xDIs3bGq8ooVNGCrubbOvmhwTbjeOkiZicA53-HTQUWvxKISllAxxnpmnUmnpbXS0kW0TdmvRb8gbSf8jyPXEh0CWgMlhEFWYp617utxsaYjuiQ1f_frgd2v4Q1VAQIihIdVz9xrL_h7S9AWDNuxuMqs23EaE2Xh1JCg7Sy92Dri9OIQhuks8gTjY1vITJyli7LICmW156exzCdiRVgZ239wlAhSfkbOuwIUnqS7isXtyHTUp7fQ3QJkj7Kt_59z1OBv"/>
+</div>
+<div>
+<h2 class="font-headline font-bold text-sm normal-case tracking-tight text-primary">Admin Console</h2>
+<p class="text-on-surface-variant normal-case text-xs">System Oversight</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-md group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">enhanced_encryption</span>
+<span class="group-hover:text-primary transition-colors">Secure Vault</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-md group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">group</span>
+<span class="group-hover:text-primary transition-colors">User Management</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-md group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors">delete_sweep</span>
+<span class="group-hover:text-primary transition-colors">Disposal Queue</span>
+</a>
+<a class="flex items-center gap-3 bg-[#44afa9]/10 text-[#44afa9] font-bold px-4 py-3 rounded-md" href="#">
+<span class="material-symbols-outlined text-[20px]">history_edu</span>
+<span>Audit Trail</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/15">
+<button class="w-full bg-on-tertiary-container text-on-primary font-bold py-3 px-4 rounded-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2 normal-case tracking-normal text-sm bg-gradient-to-br from-primary to-primary-container">
+<span class="material-symbols-outlined text-[18px]">summarize</span>
+                    Generate Report
+                </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-72 bg-surface-container-low p-8 overflow-y-auto">
+<header class="mb-8 flex justify-between items-end">
+<div>
+<span class="font-label text-label-md uppercase tracking-[5%] text-on-surface-variant font-semibold mb-2 block">System Logs</span>
+<h1 class="font-headline text-display-md font-extrabold tracking-[-2%] text-primary text-4xl">Audit Trail</h1>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface-container-lowest text-secondary border border-outline-variant/20 py-2 px-4 rounded-md font-body text-sm font-medium hover:bg-surface-bright transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filter
+                    </button>
+<button class="bg-surface-container-lowest text-secondary border border-outline-variant/20 py-2 px-4 rounded-md font-body text-sm font-medium hover:bg-surface-bright transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                        Export
+                    </button>
+</div>
+</header>
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_12px_rgba(0,36,51,0.03)] border border-outline-variant/15 overflow-hidden flex flex-col">
+<div class="p-6 border-b border-outline-variant/15 bg-surface-bright flex justify-between items-center">
+<h2 class="font-headline font-semibold text-primary text-lg">Recent Activity</h2>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="bg-surface-container border border-outline-variant/30 rounded-md py-1.5 pl-9 pr-3 text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none text-on-surface w-64 transition-shadow" placeholder="Filter logs..." type="text"/>
+</div>
+</div>
+<div class="overflow-x-auto flex-1">
+<table class="w-full text-left font-body text-sm">
+<thead class="bg-surface-container-high text-on-surface-variant font-semibold text-xs uppercase tracking-wider sticky top-0 z-10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+<tr>
+<th class="py-4 px-6 border-b border-outline-variant/20 w-48">Timestamp</th>
+<th class="py-4 px-6 border-b border-outline-variant/20 w-40">Admin/Staff ID</th>
+<th class="py-4 px-6 border-b border-outline-variant/20">Action Taken</th>
+<th class="py-4 px-6 border-b border-outline-variant/20 w-56">IP Address / Notes</th>
+</tr>
+</thead>
+<tbody class="text-on-surface divide-y divide-outline-variant/10 bg-surface-container-lowest">
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="py-4 px-6 text-on-surface-variant font-medium whitespace-nowrap">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed inline-block"></span>
+                                        2023-10-27 14:32:01
+                                    </div>
+</td>
+<td class="py-4 px-6 font-semibold text-primary">ADM-092</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-tertiary-fixed text-on-tertiary-fixed mr-2">VERIFIED</span>
+                                    Marked REF-9941 as Returned to owner
+                                </td>
+<td class="py-4 px-6 text-on-surface-variant text-xs font-mono">192.168.1.45<br/><span class="text-[10px] text-outline font-sans mt-1 block">Authentication via SSO</span></td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors bg-surface/50 group">
+<td class="py-4 px-6 text-on-surface-variant font-medium whitespace-nowrap">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error inline-block"></span>
+                                        2023-10-27 13:15:44
+                                    </div>
+</td>
+<td class="py-4 px-6 font-semibold text-primary">SYS-AUTO</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-error-container text-on-error-container mr-2">SUSPEND</span>
+                                    Suspended user account j.doe for policy violation
+                                </td>
+<td class="py-4 px-6 text-on-surface-variant text-xs font-mono">Internal System<br/><span class="text-[10px] text-outline font-sans mt-1 block">Rule ID: SEC-404</span></td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="py-4 px-6 text-on-surface-variant font-medium whitespace-nowrap">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-container inline-block"></span>
+                                        2023-10-27 11:05:22
+                                    </div>
+</td>
+<td class="py-4 px-6 font-semibold text-primary">ADM-014</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary-container text-on-secondary-container mr-2">UPDATE</span>
+                                    Modified storage location for ITM-442 (Engineering Wing)
+                                </td>
+<td class="py-4 px-6 text-on-surface-variant text-xs font-mono">10.0.4.112<br/><span class="text-[10px] text-outline font-sans mt-1 block">Moved to secure vault A</span></td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors bg-surface/50 group">
+<td class="py-4 px-6 text-on-surface-variant font-medium whitespace-nowrap">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-outline-variant inline-block"></span>
+                                        2023-10-27 09:30:00
+                                    </div>
+</td>
+<td class="py-4 px-6 font-semibold text-primary">STF-881</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-container-highest text-on-surface mr-2">LOGIN</span>
+                                    Successful system authentication
+                                </td>
+<td class="py-4 px-6 text-on-surface-variant text-xs font-mono">192.168.2.14<br/><span class="text-[10px] text-outline font-sans mt-1 block">Library Terminal 4</span></td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="py-4 px-6 text-on-surface-variant font-medium whitespace-nowrap">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-container inline-block"></span>
+                                        2023-10-26 16:45:12
+                                    </div>
+</td>
+<td class="py-4 px-6 font-semibold text-primary">ADM-092</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary-container text-on-secondary-container mr-2">INTAKE</span>
+                                    Logged new found item: REF-9945 (MacBook Pro)
+                                </td>
+<td class="py-4 px-6 text-on-surface-variant text-xs font-mono">192.168.1.45<br/><span class="text-[10px] text-outline font-sans mt-1 block">Photo attached to record</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-outline-variant/15 bg-surface flex justify-between items-center text-sm text-on-surface-variant">
+<div>Showing 1 to 5 of 2,491 entries</div>
+<div class="flex gap-2">
+<button class="px-3 py-1 border border-outline-variant/30 rounded text-outline hover:bg-surface-container transition-colors disabled:opacity-50" disabled="">Previous</button>
+<button class="px-3 py-1 bg-primary text-on-primary rounded shadow-sm">1</button>
+<button class="px-3 py-1 border border-outline-variant/30 rounded hover:bg-surface-container transition-colors">2</button>
+<button class="px-3 py-1 border border-outline-variant/30 rounded hover:bg-surface-container transition-colors">3</button>
+<span class="px-2 py-1">...</span>
+<button class="px-3 py-1 border border-outline-variant/30 rounded hover:bg-surface-container transition-colors">Next</button>
+</div>
+</div>
+</div>
+<div class="mt-8 flex gap-6 hidden">
+<img alt="A striking digital installation art piece featuring glowing, generative geometric shapes suspended in a vast, minimalist gallery space. The room is illuminated by high-key, soft white lighting that creates a bright, modern light-mode aesthetic. The artwork relies on a sophisticated palette of deep blacks and pristine whites, punctuated by intense accents of vibrant red. The mood is serene yet technologically advanced." class="w-full object-cover rounded-xl shadow-lg border border-outline-variant/10" data-alt="A striking digital installation art piece featuring glowing, generative geometric shapes suspended in a vast, minimalist gallery space. The room is illuminated by high-key, soft white lighting that creates a bright, modern light-mode aesthetic. The artwork relies on a sophisticated palette of deep blacks and pristine whites, punctuated by intense accents of vibrant red. The mood is serene yet technologically advanced." src="https://lh3.googleusercontent.com/aida/ADBb0uiUHVV5Xu_mLL1JhoYZjaV_xcOjYJ93sTVFEgjnMKj6iEERHihRVwyHndcDoW-NStxs6jxrwwIO8LuFSWu7m7P1leVa2Jo6khbsk4NC3QZQZot3e5RgZnmP2kYATeLp_PQHbAQMEEUA32Hjq_iXX1nkAy1Jw3cWsMc_S1RRpozbwymJXdnWGr0SzSoOldysJxAYZVuiMijNjjmM0bwD7bW6q4NMdw2ycg9Owyq_CFVxDqAsEfPzxSHlur37K6ZbMd8SL0h-iD0kIpw"/>
+</div>
+</main>
+</div>
+</body></html>

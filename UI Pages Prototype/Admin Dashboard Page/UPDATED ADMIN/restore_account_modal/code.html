@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Academic Curator - Restore Account</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;900&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "tertiary-fixed": "#8df4ec",
+                  "on-secondary-container": "#05637f",
+                  "surface-container-highest": "#e4e2e1",
+                  "on-surface": "#1b1c1c",
+                  "surface-bright": "#fbf9f8",
+                  "on-primary": "#ffffff",
+                  "on-tertiary-fixed": "#00201e",
+                  "on-primary-container": "#7aa5be",
+                  "on-primary-fixed-variant": "#1d4c61",
+                  "tertiary-container": "#003e3b",
+                  "tertiary": "#002624",
+                  "inverse-on-surface": "#f3f0f0",
+                  "error": "#ba1a1a",
+                  "surface-dim": "#dcd9d9",
+                  "surface-container-high": "#eae8e7",
+                  "secondary-container": "#98defe",
+                  "on-surface-variant": "#41484c",
+                  "tertiary-fixed-dim": "#70d7d0",
+                  "on-tertiary": "#ffffff",
+                  "on-error-container": "#93000a",
+                  "error-container": "#ffdad6",
+                  "background": "#fbf9f8",
+                  "primary-fixed": "#c2e8ff",
+                  "surface": "#fbf9f8",
+                  "on-tertiary-fixed-variant": "#00504c",
+                  "outline": "#71787d",
+                  "secondary-fixed-dim": "#8ad0ef",
+                  "inverse-surface": "#303030",
+                  "secondary-fixed": "#bde9ff",
+                  "inverse-primary": "#a1cce6",
+                  "surface-container-lowest": "#ffffff",
+                  "surface-variant": "#e4e2e1",
+                  "on-secondary-fixed-variant": "#004d64",
+                  "on-error": "#ffffff",
+                  "surface-container": "#f0eded",
+                  "outline-variant": "#c1c7cd",
+                  "on-primary-fixed": "#001e2c",
+                  "primary-container": "#053b50",
+                  "on-secondary-fixed": "#001f2a",
+                  "on-background": "#1b1c1c",
+                  "on-secondary": "#ffffff",
+                  "surface-tint": "#38637a",
+                  "secondary": "#0d6682",
+                  "on-tertiary-container": "#44afa9",
+                  "primary": "#002433",
+                  "primary-fixed-dim": "#a1cce6",
+                  "surface-container-low": "#f5f3f3"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.125rem",
+                  "lg": "0.25rem",
+                  "xl": "0.5rem",
+                  "full": "0.75rem"
+          },
+          "fontFamily": {
+                  "headline": ["Public Sans", "sans-serif"],
+                  "display": ["Public Sans", "sans-serif"],
+                  "body": ["Inter", "sans-serif"],
+                  "label": ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3, h4, h5, h6, .display-font { font-family: 'Public Sans', sans-serif; }
+  </style>
+</head>
+<body class="bg-background text-on-surface h-screen overflow-hidden flex flex-col relative">
+<!-- Shared Component: TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md flex justify-between items-center px-8 h-16 w-full no-border bg-slate-100/50 dark:bg-slate-800/50 shadow-none">
+<div class="flex items-center gap-4">
+<div class="text-xl font-black text-slate-900 dark:text-white tracking-tighter">The Academic Curator</div>
+</div>
+<!-- search_bar: "on_right" logic implies search is pushed right -->
+<div class="flex items-center gap-6">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-slate-100/80 rounded-full border-none text-sm w-48 focus:ring-1 focus:ring-primary outline-none transition-all focus:w-64" placeholder="Search..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors p-2 rounded-full text-slate-500 dark:text-slate-400 scale-98 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="hover:bg-slate-100/80 dark:hover:bg-slate-800/80 transition-colors p-2 rounded-full text-slate-500 dark:text-slate-400 scale-98 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-high overflow-hidden border border-surface-variant ml-2">
+<img alt="Admin Profile Avatar" class="w-full h-full object-cover" data-alt="A small circular avatar image showing a generic placeholder profile picture in dark blue and white. High contrast, clean, professional administrative headshot context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXOGWor6LM6qjYHQMS-mXxb3zT0t6l1A5vtHm6liN9biMytQTaTTl5it7k2dGEA9wysgnRupMjSECJn-S8z6RLXHkIqd8ErCzesRirm8-OT6bPhjpgFpka6tBvKioknUpk-nTVxzLvr454ZJzI5NWpQT7LOAqwvuJR8bU8uz3Wxfy8pUCEnrS6zK0wyHx15KpaT_sGBWoCjF4VQhN8ZgxZHWtXoT5ZXyfD36n3kSedZL84B1e92wzR2UoFrJJOZKEsEXKj47_-LlYv"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Area with SideNav -->
+<div class="flex flex-1 pt-16 h-full overflow-hidden">
+<!-- Shared Component: SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-slate-50 dark:bg-slate-950 flex flex-col py-6 pl-4 pr-0 h-full border-r-0 bg-slate-100 dark:bg-slate-900 shadow-none z-40 mt-16">
+<div class="mb-8 pr-4">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded bg-primary flex items-center justify-center text-on-primary font-bold">
+             AC
+           </div>
+<div>
+<h2 class="font-['Public_Sans'] font-bold text-slate-900 dark:text-white text-sm leading-tight">Admin Portal</h2>
+<p class="text-xs text-slate-500">University Oversight</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1 pr-0 overflow-y-auto">
+<!-- Moderation is active based on context -->
+<a class="flex items-center gap-3 py-3 px-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:translate-x-1 transition-transform duration-200 active:opacity-80 transition-opacity font-['Inter'] font-medium text-sm tracking-wide uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+          Dashboard
+        </a>
+<a class="flex items-center gap-3 py-3 px-4 text-cyan-700 dark:text-cyan-400 bg-white dark:bg-slate-900 font-bold rounded-l-lg hover:translate-x-1 transition-transform duration-200 active:opacity-80 transition-opacity font-['Inter'] font-medium text-sm tracking-wide uppercase relative" href="#">
+<div class="absolute right-0 top-0 bottom-0 w-1 bg-cyan-700 dark:bg-cyan-400 rounded-l"></div>
+<span class="material-symbols-outlined text-lg" data-icon="gavel" data-weight="fill" style="font-variation-settings: 'FILL' 1;">gavel</span>
+          Moderation
+        </a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:translate-x-1 transition-transform duration-200 active:opacity-80 transition-opacity font-['Inter'] font-medium text-sm tracking-wide uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="group">group</span>
+          Directory
+        </a>
+<a class="flex items-center gap-3 py-3 px-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:translate-x-1 transition-transform duration-200 active:opacity-80 transition-opacity font-['Inter'] font-medium text-sm tracking-wide uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="history">history</span>
+          Audit Log
+        </a>
+</nav>
+<div class="mt-auto pr-4 pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-1 pb-20">
+<a class="flex items-center gap-3 py-2 px-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-['Inter'] font-medium text-sm tracking-wide uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="help_outline">help_outline</span>
+          Support
+        </a>
+<a class="flex items-center gap-3 py-2 px-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-['Inter'] font-medium text-sm tracking-wide uppercase" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="logout">logout</span>
+          Sign Out
+        </a>
+</div>
+</aside>
+<!-- Canvas (Background Context - User Moderation Screen) -->
+<main class="flex-1 ml-64 bg-surface p-12 overflow-y-auto relative blur-sm pointer-events-none">
+<div class="max-w-5xl mx-auto">
+<header class="mb-10">
+<h1 class="display-font text-3xl font-bold text-primary tracking-tight mb-2">User Moderation</h1>
+<p class="text-on-surface-variant font-body">Manage institutional access and review suspended accounts.</p>
+</header>
+<!-- Dummy content to establish background context -->
+<div class="bg-surface-container-lowest p-6 shadow-sm mb-6 flex items-center justify-between outline-variant/15 outline outline-1">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-container-high rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-outline">person</span>
+</div>
+<div>
+<h3 class="font-bold text-primary font-body">Alice Smith</h3>
+<p class="text-sm text-on-surface-variant">a.smith@neu.edu.ph</p>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-error-container text-on-error-container text-xs font-bold tracking-wide uppercase rounded">Suspended</span>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-primary/40 backdrop-blur-sm px-4">
+<!-- Modal Container -->
+<div class="bg-surface-container-lowest w-full max-w-lg shadow-[0_20px_40px_rgba(0,36,51,0.12)] flex flex-col relative overflow-hidden p-8" style="border-radius: 0.25rem;">
+<!-- Header Section -->
+<div class="mb-6">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary-fixed-dim" data-icon="check_circle">check_circle</span>
+</div>
+<h2 class="display-font text-2xl font-bold text-primary tracking-tight">Restore Institutional Access</h2>
+</div>
+<p class="text-on-surface-variant text-sm font-body leading-relaxed">
+      You are about to reinstate privileges for this account. Please review the details below before proceeding.
+    </p>
+</div>
+<!-- Context Box (Target Account) -->
+<div class="bg-surface-container-low p-4 rounded-DEFAULT mb-6 border border-surface-variant/30 flex items-start gap-4">
+<div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shrink-0 border border-surface-variant/50">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<div>
+<div class="text-xs font-bold tracking-widest uppercase text-outline mb-1">Target Account</div>
+<div class="font-bold text-primary font-body">Alice Smith</div>
+<div class="text-sm text-on-surface-variant">a.smith@neu.edu.ph</div>
+</div>
+</div>
+<!-- Information Note -->
+<div class="bg-primary-container/10 p-4 border-l-4 border-primary mb-6">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5" style="font-size: 18px;">info</span>
+<p class="text-sm text-primary-fixed-variant font-medium">
+        Restoring access will reactivate the student's ability to login and file claims.
+      </p>
+</div>
+</div>
+<!-- Authorization Note Form -->
+<div class="mb-8">
+<label class="block text-sm font-bold text-primary mb-2" for="restoration-notes">Restoration Notes / Approval Reference</label>
+<textarea class="w-full bg-surface border border-outline-variant/50 rounded-DEFAULT p-3 text-sm text-on-surface focus:ring-2 focus:ring-on-tertiary-container focus:border-transparent outline-none transition-all resize-none placeholder-outline/50" id="restoration-notes" placeholder="Enter reference ID or reason for restoration..." rows="3"></textarea>
+</div>
+<!-- Actions -->
+<div class="flex items-center justify-end gap-4 mt-auto pt-4 border-t border-surface-variant/10">
+<button class="px-5 py-2.5 text-sm font-semibold text-secondary bg-transparent border border-outline-variant/20 rounded-DEFAULT hover:bg-surface-container-low transition-colors font-body">
+      Cancel
+    </button>
+<button class="px-5 py-2.5 text-sm font-semibold text-on-primary bg-on-tertiary-container rounded-DEFAULT hover:opacity-90 transition-opacity font-body bg-gradient-to-br from-on-tertiary-container to-[#389f9a] shadow-sm">
+      Restore Account
+    </button>
+</div>
+</div>
+</div>
+</body></html>

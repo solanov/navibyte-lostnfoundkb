@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Claimant Verification Modal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#0d6682",
+                        "on-secondary-container": "#05637f",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "surface-tint": "#38637a",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#bde9ff",
+                        "secondary-container": "#98defe",
+                        "on-surface": "#1b1c1c",
+                        "on-background": "#1b1c1c",
+                        "tertiary": "#002624",
+                        "surface-container-highest": "#e4e2e1",
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "surface-container-high": "#eae8e7",
+                        "on-tertiary": "#ffffff",
+                        "surface-container": "#f0eded",
+                        "surface-dim": "#dcd9d9",
+                        "primary-container": "#053b50",
+                        "primary-fixed-dim": "#a1cce6",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#c2e8ff",
+                        "tertiary-fixed": "#8df4ec",
+                        "surface-container-low": "#f5f3f3",
+                        "on-primary-container": "#7aa5be",
+                        "inverse-primary": "#a1cce6",
+                        "inverse-on-surface": "#f3f0f0",
+                        "on-tertiary-container": "#44afa9",
+                        "surface-bright": "#fbf9f8",
+                        "on-secondary-fixed": "#001f2a",
+                        "background": "#fbf9f8",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "inverse-surface": "#303030",
+                        "surface": "#fbf9f8",
+                        "tertiary-container": "#003e3b",
+                        "outline": "#71787d",
+                        "on-surface-variant": "#41484c",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e4e2e1",
+                        "on-tertiary-fixed": "#00201e",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c1c7cd",
+                        "on-primary-fixed": "#001e2c",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "primary": "#002433"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface antialiased flex h-screen overflow-hidden">
+<!-- Intent implies task-focused UI. Suppressing main nav shells as per documentation -->
+<!-- Background (simulated Secure Vault underneath modal) -->
+<div class="flex-1 p-8 blur-sm pointer-events-none opacity-50 relative overflow-hidden bg-surface-container-low">
+<!-- Placeholder for background content to give context -->
+<h1 class="font-display font-bold text-3xl tracking-tight text-primary mb-6">Secure Vault</h1>
+<div class="grid grid-cols-3 gap-6">
+<div class="bg-surface-container-lowest h-64 rounded-xl"></div>
+<div class="bg-surface-container-lowest h-64 rounded-xl"></div>
+<div class="bg-surface-container-lowest h-64 rounded-xl"></div>
+</div>
+</div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#002433]/30 backdrop-blur-md">
+<!-- Modal Container (Intake Form Style) -->
+<div class="bg-surface-container-lowest w-full max-w-3xl rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] overflow-hidden flex flex-col max-h-[90vh]">
+<!-- Modal Header (primary_container per guidelines) -->
+<div class="bg-primary-container px-8 py-6 flex justify-between items-center shrink-0">
+<div>
+<h2 class="font-headline font-bold text-2xl tracking-tight text-on-primary">Claim Audit Protocol</h2>
+<p class="font-body text-sm text-on-primary-container mt-1">Verification Step 2 of 2</p>
+</div>
+<button class="text-on-primary-container hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-2xl">close</span>
+</button>
+</div>
+<!-- Modal Body (Scrollable) -->
+<div class="p-8 overflow-y-auto flex-1 bg-surface-container-lowest space-y-8">
+<!-- Top Half: Unredacted Photo & Hidden Note -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Photo Evidence -->
+<div class="space-y-3">
+<label class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-semibold">Visual Evidence</label>
+<div class="bg-surface-container h-64 rounded-lg overflow-hidden relative group outline outline-1 outline-outline-variant/15">
+<img alt="High-fidelity photograph of a premium leather satchel for item verification" class="w-full h-full object-cover" data-alt="A clear, high-fidelity close-up photograph of a professional leather satchel, showing detailed texture and stitching, used for administrative item verification in a bright, professional environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBz-Z_8xSdePSuxH7sWgBpXJFT_LPxBfKCM83LvLcOpj8UIdsiniSFtp0rrt_urqRBHlUpplBa2HQD7FNilo1P0ciwJ692xijTjmdIOQRSgJVIKoaE0jt1xrjXL1KALfYWVJdYhfN7KoN4AxlYCSO09IebT2iJJ3-V0ncz-MsqisejLNLvXWj1W1Qe0ScUrldarD6YSa2moOv9N386PDBpjO_5lPiTLAOnTdBZT9fTjUO9sw3A7q539hRZGswADkd0cuu_4MEYJDybC"/>
+<!-- Contextual Chip overlay -->
+<div class="absolute top-4 right-4 bg-tertiary-fixed text-on-tertiary-fixed font-label text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                                Unredacted View
+                            </div>
+</div>
+</div>
+<!-- Hidden Note -->
+<div class="space-y-3">
+<label class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-semibold">Security Artifact</label>
+<div class="bg-surface-container-low h-64 rounded-lg p-6 relative overflow-hidden outline outline-1 outline-outline-variant/15">
+<!-- Simulated #176B87 note using closest theme color secondary (#0d6682) to follow theme rules -->
+<div class="absolute top-0 left-0 w-2 h-full bg-secondary"></div>
+<h3 class="font-headline font-semibold text-lg text-secondary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">lock</span>
+                                Hidden Note
+                            </h3>
+<div class="font-body text-base text-on-surface leading-relaxed">
+<p class="mb-3">Item contains a small scratch near the bottom right corner, obscured from public view.</p>
+<p>Owner identified by custom engraved initials 'J.A.' on the internal casing.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Half: Claimant Info & Verification -->
+<div class="bg-surface-container-low rounded-lg p-6 space-y-6 outline outline-1 outline-outline-variant/15">
+<!-- Read-only Info -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-surface-variant/50">
+<div>
+<label class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-1 block">Claimant Name</label>
+<p class="font-body text-lg font-medium text-primary">Julianne Alverez</p>
+</div>
+<div>
+<label class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-1 block">Student ID</label>
+<p class="font-body text-lg font-medium text-primary font-mono">#AC-8820-91B</p>
+</div>
+</div>
+<!-- Checkboxes -->
+<div class="space-y-4">
+<label class="flex items-start gap-4 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="peer h-5 w-5 rounded-sm border-outline-variant text-on-tertiary-container focus:ring-on-tertiary-container focus:ring-offset-surface-container-low bg-surface-container-lowest transition-all" type="checkbox"/>
+</div>
+<span class="font-body text-sm text-on-surface-variant group-hover:text-on-surface transition-colors mt-0.5">
+                                I confirm visual features match the hidden note description exactly.
+                            </span>
+</label>
+<label class="flex items-start gap-4 cursor-pointer group">
+<div class="relative flex items-center">
+<input class="peer h-5 w-5 rounded-sm border-outline-variant text-on-tertiary-container focus:ring-on-tertiary-container focus:ring-offset-surface-container-low bg-surface-container-lowest transition-all" type="checkbox"/>
+</div>
+<span class="font-body text-sm text-on-surface-variant group-hover:text-on-surface transition-colors mt-0.5">
+                                Digital E-Signature provided &amp; identity verified via institutional credentials.
+                            </span>
+</label>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="bg-surface-container-lowest p-6 flex justify-end items-center gap-6 shrink-0 relative z-10">
+<!-- Using ghost outline to avoid hard lines, providing padding instead -->
+<div class="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-surface-variant to-transparent opacity-50"></div>
+<button class="font-body text-sm font-medium text-secondary hover:text-primary transition-colors">
+                    Cancel Audit
+                </button>
+<!-- Primary Button: High-gloss, md shape, on-tertiary-container, white text -->
+<button class="bg-on-tertiary-container text-on-primary font-body text-sm font-medium px-8 py-3 rounded-md hover:brightness-110 hover:shadow-lg transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+                    Mark as Returned
+                </button>
+</div>
+</div>
+</div>
+</body></html>

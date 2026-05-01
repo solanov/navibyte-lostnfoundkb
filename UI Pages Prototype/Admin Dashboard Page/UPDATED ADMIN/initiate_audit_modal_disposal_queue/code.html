@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Item Disposal Audit Modal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Public+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed-dim": "#70d7d0",
+                      "inverse-surface": "#303030",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-bright": "#fbf9f8",
+                      "on-secondary-fixed": "#001f2a",
+                      "primary": "#002433",
+                      "surface-container": "#f0eded",
+                      "secondary-container": "#98defe",
+                      "primary-fixed-dim": "#a1cce6",
+                      "on-tertiary-container": "#44afa9",
+                      "tertiary-fixed": "#8df4ec",
+                      "on-error": "#ffffff",
+                      "tertiary": "#002624",
+                      "surface": "#fbf9f8",
+                      "error-container": "#ffdad6",
+                      "on-primary": "#ffffff",
+                      "surface-dim": "#dcd9d9",
+                      "surface-container-highest": "#e4e2e1",
+                      "tertiary-container": "#003e3b",
+                      "on-surface": "#1b1c1c",
+                      "surface-container-high": "#eae8e7",
+                      "on-surface-variant": "#41484c",
+                      "inverse-primary": "#a1cce6",
+                      "background": "#fbf9f8",
+                      "primary-container": "#053b50",
+                      "inverse-on-surface": "#f3f0f0",
+                      "surface-variant": "#e4e2e1",
+                      "error": "#ba1a1a",
+                      "surface-container-low": "#f5f3f3",
+                      "on-secondary-fixed-variant": "#004d64",
+                      "on-error-container": "#93000a",
+                      "outline-variant": "#c1c7cd",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-fixed": "#001e2c",
+                      "secondary": "#0d6682",
+                      "surface-tint": "#38637a",
+                      "on-secondary-container": "#05637f",
+                      "on-primary-fixed-variant": "#1d4c61",
+                      "secondary-fixed-dim": "#8ad0ef",
+                      "on-background": "#1b1c1c",
+                      "outline": "#71787d",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed": "#c2e8ff",
+                      "on-tertiary-fixed-variant": "#00504c",
+                      "secondary-fixed": "#bde9ff",
+                      "on-primary-container": "#7aa5be",
+                      "on-tertiary-fixed": "#00201e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {},
+              "fontFamily": {
+                      "headline": [
+                              "Public Sans"
+                      ],
+                      "display": [
+                              "Public Sans"
+                      ],
+                      "body": [
+                              "Inter"
+                      ],
+                      "label": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {}
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased min-h-screen">
+<!-- Background Context (Blurred out for modal) -->
+<div aria-hidden="true" class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+<!-- Simulated background content to provide context for the modal overlay -->
+<div class="h-full w-full bg-surface-container flex flex-col blur-sm opacity-50">
+<!-- Simulated Top Nav -->
+<header class="h-16 bg-white/85 flex justify-between items-center px-8 border-b border-surface-container-highest">
+<div class="font-headline font-bold text-xl text-primary tracking-tighter">Academic Curator</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Simulated Side Nav -->
+<nav class="w-64 bg-surface-container-low border-r border-surface-container-highest p-6 hidden md:block">
+<ul class="space-y-4">
+<li class="h-10 bg-surface-container-highest rounded-lg"></li>
+<li class="h-10 bg-surface-container-highest rounded-lg opacity-60"></li>
+<li class="h-10 bg-surface-container-highest rounded-lg opacity-60"></li>
+</ul>
+</nav>
+<!-- Simulated Main Content -->
+<main class="flex-1 p-8">
+<h1 class="text-3xl font-headline font-bold text-primary mb-8">Disposal Queue</h1>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="h-48 bg-surface-container-lowest rounded-xl shadow-sm"></div>
+<div class="h-48 bg-surface-container-lowest rounded-xl shadow-sm"></div>
+<div class="h-48 bg-surface-container-lowest rounded-xl shadow-sm"></div>
+</div>
+</main>
+</div>
+</div>
+</div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/20 backdrop-blur-[8px]">
+<!-- Modal Container -->
+<div class="w-full max-w-3xl bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] overflow-hidden flex flex-col max-h-[90vh]">
+<!-- Modal Header (Institutional Intake style) -->
+<div class="bg-primary-container px-8 py-6 flex justify-between items-start">
+<div>
+<h2 class="font-headline text-2xl font-bold tracking-tight text-white mb-1">Item Disposal Audit</h2>
+<p class="font-body text-sm text-on-primary-container">Final Authorization Required</p>
+</div>
+<button aria-label="Close modal" class="text-on-primary-container hover:text-white transition-colors">
+<span class="material-symbols-outlined text-2xl" data-icon="close">close</span>
+</button>
+</div>
+<!-- Modal Body -->
+<div class="p-8 overflow-y-auto flex-1">
+<!-- Alert Banner -->
+<div class="bg-error-container text-on-error-container p-4 rounded-lg flex items-center gap-3 mb-8 outline outline-1 outline-error/20">
+<span class="material-symbols-outlined text-error" data-icon="warning" data-weight="fill" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="font-body font-semibold text-sm tracking-wide uppercase text-error">Overdue: 42 Days</span>
+</div>
+<!-- Item Summary Card -->
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col md:flex-row gap-6 mb-10 group relative overflow-hidden transition-all duration-300 hover:bg-surface-bright hover:-translate-y-1">
+<div class="w-32 h-32 md:w-40 md:h-40 rounded-lg overflow-hidden bg-surface flex-shrink-0 border border-outline-variant/15">
+<img alt="Item thumbnail" class="w-full h-full object-cover" data-alt="A professional studio photograph of a folded black golf umbrella. The lighting is soft and directional, creating subtle highlights on the dark fabric and matte black handle. The item rests against a clean, stark white background, emphasizing its sleek, utilitarian design. The mood is clinical and precise, fitting an institutional archive. The overall aesthetic is high-contrast and minimalist, aligning with a premium digital curation platform." src="https://lh3.googleusercontent.com/aida/ADBb0uiUHVV5Xu_mLL1JhoYZjaV_xcOjYJ93sTVFEgjnMKj6iEERHihRVwyHndcDoW-NStxs6jxrwwIO8LuFSWu7m7P1leVa2Jo6khbsk4NC3QZQZot3e5RgZnmP2kYATeLp_PQHbAQMEEUA32Hjq_iXX1nkAy1Jw3cWsMc_S1RRpozbwymJXdnWGr0SzSoOldysJxAYZVuiMijNjjmM0bwD7bW6q4NMdw2ycg9Owyq_CFVxDqAsEfPzxSHlur37K6ZbMd8SL0h-iD0kIpw"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<h3 class="font-headline text-xl font-semibold text-primary mb-2">Black Golf Umbrella</h3>
+<div class="flex flex-wrap gap-x-8 gap-y-4 mt-2">
+<div>
+<span class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-1">Ref ID</span>
+<span class="font-body text-base font-medium text-on-surface">AQ-7490</span>
+</div>
+<div>
+<span class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-1">Location</span>
+<span class="font-body text-base font-medium text-on-surface">Bin C-01</span>
+</div>
+<div>
+<span class="block font-label text-xs uppercase tracking-widest text-on-surface-variant mb-1">Status</span>
+<span class="inline-block bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-DEFAULT font-label text-xs uppercase tracking-widest font-semibold mt-1">Found</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Disposal Method Selector -->
+<div class="mb-10">
+<h4 class="font-headline text-lg font-semibold text-primary mb-4">Disposal Method</h4>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Option 1 -->
+<label class="cursor-pointer">
+<input class="peer sr-only" name="disposal_method" type="radio" value="surplus"/>
+<div class="p-6 rounded-xl border border-outline-variant/20 bg-surface-container-lowest text-center hover:bg-surface-container-low transition-colors peer-checked:bg-secondary-container/20 peer-checked:border-on-tertiary-container peer-checked:shadow-[0_4px_12px_rgba(68,175,169,0.15)]">
+<span class="material-symbols-outlined text-3xl text-secondary mb-3" data-icon="storefront">storefront</span>
+<span class="block font-body font-medium text-on-surface">University Surplus</span>
+</div>
+</label>
+<!-- Option 2 -->
+<label class="cursor-pointer">
+<input checked="" class="peer sr-only" name="disposal_method" type="radio" value="charity"/>
+<div class="p-6 rounded-xl border border-outline-variant/20 bg-surface-container-lowest text-center hover:bg-surface-container-low transition-colors peer-checked:bg-secondary-container/20 peer-checked:border-on-tertiary-container peer-checked:shadow-[0_4px_12px_rgba(68,175,169,0.15)]">
+<span class="material-symbols-outlined text-3xl text-on-tertiary-container mb-3" data-icon="volunteer_activism" data-weight="fill" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+<span class="block font-body font-medium text-on-surface">Charitable Donation</span>
+</div>
+</label>
+<!-- Option 3 -->
+<label class="cursor-pointer">
+<input class="peer sr-only" name="disposal_method" type="radio" value="permanent"/>
+<div class="p-6 rounded-xl border border-outline-variant/20 bg-surface-container-lowest text-center hover:bg-surface-container-low transition-colors peer-checked:bg-error-container/30 peer-checked:border-error peer-checked:shadow-[0_4px_12px_rgba(186,26,26,0.15)]">
+<span class="material-symbols-outlined text-3xl text-on-surface-variant mb-3" data-icon="delete">delete</span>
+<span class="block font-body font-medium text-on-surface">Permanent Disposal</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Notes Area -->
+<div>
+<label class="block font-headline text-lg font-semibold text-primary mb-3" for="audit_notes">Reason &amp; Authorization Notes</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant/20 rounded-xl p-4 font-body text-on-surface focus:ring-2 focus:ring-on-tertiary-container focus:border-transparent transition-shadow outline-none resize-none placeholder:text-on-surface-variant/50" id="audit_notes" placeholder="Enter authorization details, condition context, or secondary approver notes here..." rows="4"></textarea>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-8 py-6 bg-surface-container-low flex justify-end gap-4 border-t border-outline-variant/15">
+<button class="px-6 py-3 font-body font-semibold text-secondary hover:bg-surface-container-highest transition-colors rounded-lg" type="button">Cancel</button>
+<button class="px-8 py-3 bg-gradient-to-br from-primary to-primary-container text-on-primary font-body font-semibold rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95" type="button">Confirm Disposal</button>
+</div>
+</div>
+</div>
+</body></html>
