@@ -14,7 +14,7 @@ const publicSans = Public_Sans({
 
 export const metadata: Metadata = {
   title: "New Era University Knowledge Board",
-  description: "The Academic Curator for NEU",
+  description: "Navibyte Lost & Found Knowledge Board",
 };
 
 export default function RootLayout({

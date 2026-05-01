@@ -1,6 +1,5 @@
 import Link from "next/link";
-
-export default function TopNav() {
+import Image from "next/image";export default function TopNav() {
   return (
     <header className="fixed top-0 w-full z-50 bg-[#053B50] backdrop-blur-md bg-opacity-85 shadow-[0_20px_40px_rgba(0,36,51,0.06)] flex justify-between items-center px-4 md:px-8 py-4">
       {/* Mobile Hamburger Menu */}
@@ -9,16 +8,16 @@ export default function TopNav() {
       </button>
 
       {/* Desktop Logo & Title */}
-      <div className="hidden md:flex items-center gap-2">
-        <span className="material-symbols-outlined text-white text-2xl">school</span>
-        <span className="text-xl font-black text-white tracking-[-2%] font-headline">
-          Lost & Found
+      <div className="hidden md:flex items-center gap-3">
+        <Image src="/navibyte-logo-v2.svg" alt="Navibyte Logo" width={40} height={40} className="drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] transform hover:scale-110 transition-all duration-300 will-change-transform" />
+        <span className="text-xl font-black text-white tracking-[-2%] font-headline drop-shadow-md">
+          Navibyte KB
         </span>
       </div>
 
       {/* Mobile Centered Title */}
-      <h1 className="md:hidden font-headline tracking-tight font-black uppercase tracking-wider text-center flex-grow text-xl text-white">
-        Lost & Found
+      <h1 className="md:hidden font-headline tracking-tight font-black uppercase tracking-wider text-center flex-grow text-xl text-white drop-shadow-md">
+        Navibyte KB
       </h1>
 
       {/* Mobile Profile Image */}

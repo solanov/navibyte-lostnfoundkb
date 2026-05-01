@@ -2,6 +2,7 @@
 
 import { supabase } from "@/src/lib/supabase";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function Login() {
@@ -42,11 +43,9 @@ export default function Login() {
             <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-[#64CCC5]/8 translate-y-1/3 -translate-x-1/3" />
           </div>
           <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-10">
-              <div className="w-10 h-10 rounded-xl bg-[#64CCC5]/20 border border-[#64CCC5]/30 flex items-center justify-center">
-                <span className="material-symbols-outlined text-[#64CCC5] text-xl">account_balance</span>
-              </div>
-              <span className="text-white font-headline font-black tracking-tighter text-xl">NEU Lost &amp; Found KB</span>
+            <div className="flex items-center gap-4 mb-12">
+              <Image src="/navibyte-logo-v2.svg" alt="Navibyte Logo" width={64} height={64} className="drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)] transform hover:scale-110 transition-all duration-500 will-change-transform" />
+              <span className="text-white font-headline font-black tracking-tighter text-3xl drop-shadow-lg">Navibyte KB</span>
             </div>
             <h2 className="text-white font-headline text-4xl font-extrabold leading-tight tracking-tight mb-5">
               Secure <br /><span className="text-[#64CCC5]">Knowledge</span><br />Vault
@@ -72,9 +71,9 @@ export default function Login() {
 
         <div className="w-full md:w-1/2 p-8 md:p-14 flex flex-col justify-center bg-white">
           <div className="mb-8">
-            <div className="flex items-center gap-2 mb-1 md:hidden">
-              <span className="material-symbols-outlined text-[#64CCC5] text-lg">account_balance</span>
-              <span className="text-[#053B50] font-headline font-black text-sm tracking-tight">NEU Lost &amp; Found KB</span>
+            <div className="flex items-center gap-3 mb-2 md:hidden">
+              <Image src="/navibyte-logo-v2.svg" alt="Navibyte Logo" width={36} height={36} className="drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] transform hover:scale-105 transition-all duration-300 will-change-transform" />
+              <span className="text-[#053B50] font-headline font-black text-xl tracking-tight">Navibyte KB</span>
             </div>
             <h1 className="text-[#053B50] font-headline font-black text-3xl tracking-tight">Login to Knowledge Board</h1>
             <p className="text-gray-400 text-sm font-body mt-1">Use your institutional NEU Google account.</p>
