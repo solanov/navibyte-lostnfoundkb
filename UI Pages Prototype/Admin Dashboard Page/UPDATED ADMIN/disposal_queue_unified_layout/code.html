@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Disposal Queue - The Academic Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#c2e8ff",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "surface-bright": "#fbf9f8",
+                        "surface": "#fbf9f8",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#002433",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "inverse-on-surface": "#f3f0f0",
+                        "secondary-container": "#98defe",
+                        "on-secondary-container": "#05637f",
+                        "outline-variant": "#c1c7cd",
+                        "on-tertiary-fixed": "#00201e",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e4e2e1",
+                        "background": "#fbf9f8",
+                        "surface-container-highest": "#e4e2e1",
+                        "primary-container": "#053b50",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#8df4ec",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#bde9ff",
+                        "surface-dim": "#dcd9d9",
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "surface-container-low": "#f5f3f3",
+                        "surface-tint": "#38637a",
+                        "on-surface-variant": "#41484c",
+                        "primary-fixed-dim": "#a1cce6",
+                        "on-surface": "#1b1c1c",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "tertiary": "#002624",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-fixed": "#001f2a",
+                        "on-tertiary-container": "#44afa9",
+                        "tertiary-container": "#003e3b",
+                        "on-primary-fixed": "#001e2c",
+                        "on-primary-container": "#7aa5be",
+                        "secondary": "#0d6682",
+                        "outline": "#71787d",
+                        "on-background": "#1b1c1c",
+                        "surface-container": "#f0eded",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#303030",
+                        "inverse-primary": "#a1cce6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .display { font-family: 'Public Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen antialiased flex">
+<!-- SideNavBar -->
+<nav class="bg-white dark:bg-slate-900 text-[#002433] dark:text-slate-100 font-['Inter'] font-medium uppercase tracking-[5%] text-[11px] fixed left-0 top-0 h-screen w-72 pt-20 z-50 bg-[#f5f3f3] dark:bg-slate-800/50 shadow-xl shadow-[#002433]/5 hidden md:flex flex-col gap-2 p-6">
+<div class="mb-8 px-4 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+</div>
+<div>
+<h2 class="font-headline font-bold text-primary text-sm tracking-tight capitalize">Admin Console</h2>
+<p class="text-on-surface-variant text-[10px] uppercase tracking-wider">System Oversight</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 flex-grow">
+<!-- Inactive Tab 1 -->
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="enhanced_encryption">enhanced_encryption</span>
+<span>Secure Vault</span>
+</a>
+<!-- Inactive Tab 2 -->
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>User Management</span>
+</a>
+<!-- Active Tab: Disposal Queue -->
+<a class="flex items-center gap-3 bg-[#44afa9]/10 text-[#44afa9] font-bold px-4 py-3 rounded-md translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="delete_sweep" data-weight="fill" style="font-variation-settings: 'FILL' 1;">delete_sweep</span>
+<span>Disposal Queue</span>
+</a>
+<!-- Inactive Tab 4 -->
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-DEFAULT" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span>Audit Trail</span>
+</a>
+</div>
+<div class="mt-auto px-4 pb-4">
+<button class="w-full bg-primary-container text-on-primary font-bold py-3 rounded-md hover:bg-primary transition-colors text-xs tracking-wider">Generate Report</button>
+</div>
+</nav>
+<!-- TopNavBar -->
+<header class="bg-[#053B50]/85 dark:bg-slate-950/85 backdrop-blur-xl text-white font-['Public_Sans'] tracking-tight text-sm fixed top-0 w-full z-[60] shadow-[0_20px_40px_rgba(0,36,51,0.06)] flex justify-between items-center h-16 px-8 transition-all duration-200">
+<div class="flex items-center gap-8">
+<span class="text-lg font-bold tracking-[-2%] text-white">The Academic Curator</span>
+</div>
+<div class="flex-grow max-w-md mx-8">
+<div class="relative flex items-center w-full h-10 rounded-full focus-within:shadow-lg bg-white/10 overflow-hidden">
+<div class="grid place-items-center h-full w-12 text-white/50">
+<span class="material-symbols-outlined text-sm" data-icon="search">search</span>
+</div>
+<input class="peer h-full w-full outline-none text-sm text-white bg-transparent pr-2 placeholder-white/50 border-none focus:ring-0" id="search" placeholder="Search vault..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-white hover:text-[#44afa9] transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-white hover:text-[#44afa9] transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-lowest overflow-hidden border border-white/20 ml-2">
+<img alt="Admin Profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoN1NpyYuBqRS9mTcHnsXgoVDOPIZE8-mTFOxpJsif_qa5MKusvXRr4qJRPzxZaUqMfiTrd2uWi5WYcqtkQQV56VqikkBeB5a15FTa-d-V_lO6QrAbQ0zJUFZuvFaH2qAJp0wFkk9_0PFwzufNjT9BiGRRvOgd-F6aCYIy9Obky246MNhISlRzMcajjBkQDtxoKZBEVr3Gql83vKbhAua_fvPilRb0Xgc3ZmKxSMGoI61ocCDxc4dvylvYoQdzxRMjU7juGLD-YNrG"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-0 md:ml-72 mt-16 p-8 lg:p-12 bg-surface-container">
+<!-- Page Header & Utility Bar -->
+<div class="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+<div>
+<h1 class="font-display text-4xl font-extrabold text-primary tracking-tight mb-2">Disposal Queue</h1>
+<p class="font-body text-on-surface-variant text-sm">Review and authorize items pending permanent disposal.</p>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-lowest p-2 rounded-lg shadow-sm border border-outline-variant/15">
+<label class="flex items-center gap-2 cursor-pointer px-3 py-1">
+<input class="rounded text-on-tertiary-container focus:ring-on-tertiary-container border-outline-variant w-4 h-4 bg-surface" type="checkbox"/>
+<span class="font-body text-sm font-medium text-primary">Select All</span>
+</label>
+<div class="w-px h-6 bg-outline-variant/30"></div>
+<button class="bg-primary text-on-primary font-body text-sm font-medium px-4 py-2 rounded-md hover:bg-primary-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="print">print</span>
+                    Batch Print
+                </button>
+</div>
+</div>
+<!-- Utility Bar - Section Title -->
+<div class="mb-4">
+<h2 class="font-headline font-bold text-error tracking-tight text-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-error" data-icon="warning" data-weight="fill" style="font-variation-settings: 'FILL' 1;">warning</span>
+                Overdue Assets
+            </h2>
+</div>
+<!-- Data Table Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(0,36,51,0.03)] border border-outline-variant/15 overflow-hidden">
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high border-b border-outline-variant/10 text-xs uppercase tracking-wider font-semibold text-primary font-body">
+<th class="p-4 w-12 text-center">
+<span class="material-symbols-outlined text-outline" data-icon="check_box_outline_blank">check_box_outline_blank</span>
+</th>
+<th class="p-4">Asset Details</th>
+<th class="p-4">Status</th>
+<th class="p-4">Location</th>
+<th class="p-4 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-body text-sm">
+<!-- Row 1 -->
+<tr class="border-b border-outline-variant/5 hover:bg-error-container/10 transition-colors group">
+<td class="p-4 text-center">
+<input class="rounded text-on-tertiary-container focus:ring-on-tertiary-container border-outline-variant w-4 h-4 bg-surface cursor-pointer" type="checkbox"/>
+</td>
+<td class="p-4">
+<div class="flex items-start gap-4">
+<div class="w-16 h-16 rounded-md bg-surface-container overflow-hidden border border-outline-variant/20 flex-shrink-0">
+<img alt="A detailed studio shot of an abandoned antique pocket watch resting on a sterile white archival surface. The watch is tarnished silver with a cracked glass face. Lighting is clinical, bright, and highly controlled, emphasizing the object's isolation and need for institutional disposal. The overall aesthetic is clean, light-mode, and documentary." class="w-full h-full object-cover" data-alt="A detailed studio shot of an abandoned antique pocket watch resting on a sterile white archival surface. The watch is tarnished silver with a cracked glass face. Lighting is clinical, bright, and highly controlled, emphasizing the object's isolation and need for institutional disposal. The overall aesthetic is clean, light-mode, and documentary." src="https://lh3.googleusercontent.com/aida/ADBb0uiUHVV5Xu_mLL1JhoYZjaV_xcOjYJ93sTVFEgjnMKj6iEERHihRVwyHndcDoW-NStxs6jxrwwIO8LuFSWu7m7P1leVa2Jo6khbsk4NC3QZQZot3e5RgZnmP2kYATeLp_PQHbAQMEEUA32Hjq_iXX1nkAy1Jw3cWsMc_S1RRpozbwymJXdnWGr0SzSoOldysJxAYZVuiMijNjjmM0bwD7bW6q4NMdw2ycg9Owyq_CFVxDqAsEfPzxSHlur37K6ZbMd8SL0h-iD0kIpw"/>
+</div>
+<div class="flex flex-col justify-center">
+<span class="font-bold text-primary mb-1">Antique Pocket Watch</span>
+<span class="text-xs text-on-surface-variant">ID: AC-982-TMP</span>
+<span class="text-[10px] uppercase tracking-wider text-outline mt-1 font-semibold">Unclaimed &gt; 120 Days</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<div class="flex flex-col gap-1">
+<span class="font-bold text-error">45 Days Overdue</span>
+<span class="text-xs text-on-surface-variant">Final Notice Sent</span>
+</div>
+</td>
+<td class="p-4">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-surface-container text-primary text-xs font-medium border border-outline-variant/15">
+<span class="material-symbols-outlined text-[14px]" data-icon="inventory_2">inventory_2</span>
+                                    Bin 4B
+                                </div>
+</td>
+<td class="p-4 text-right">
+<button class="text-error border border-error/30 bg-transparent hover:bg-error hover:text-white transition-colors px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide">
+                                    Initiate Audit
+                                </button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-outline-variant/5 hover:bg-error-container/10 transition-colors group bg-surface-container-lowest">
+<td class="p-4 text-center">
+<input class="rounded text-on-tertiary-container focus:ring-on-tertiary-container border-outline-variant w-4 h-4 bg-surface cursor-pointer" type="checkbox"/>
+</td>
+<td class="p-4">
+<div class="flex items-start gap-4">
+<div class="w-16 h-16 rounded-md bg-surface-container overflow-hidden border border-outline-variant/20 flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-outline/50 text-2xl" data-icon="image_not_supported">image_not_supported</span>
+</div>
+<div class="flex flex-col justify-center">
+<span class="font-bold text-primary mb-1">Unmarked Canvas Tote</span>
+<span class="text-xs text-on-surface-variant">ID: AC-112-LST</span>
+<span class="text-[10px] uppercase tracking-wider text-outline mt-1 font-semibold">Unclaimed &gt; 90 Days</span>
+</div>
+</div>
+</td>
+<td class="p-4">
+<div class="flex flex-col gap-1">
+<span class="font-bold text-error">12 Days Overdue</span>
+<span class="text-xs text-on-surface-variant">Pending Review</span>
+</div>
+</td>
+<td class="p-4">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-surface-container text-primary text-xs font-medium border border-outline-variant/15">
+<span class="material-symbols-outlined text-[14px]" data-icon="inventory_2">inventory_2</span>
+                                    Bin 2A
+                                </div>
+</td>
+<td class="p-4 text-right">
+<button class="text-error border border-error/30 bg-transparent hover:bg-error hover:text-white transition-colors px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide">
+                                    Initiate Audit
+                                </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-surface-container-lowest border-t border-outline-variant/15 p-4 flex justify-between items-center text-sm text-on-surface-variant font-body">
+<span>Showing 2 of 24 items requiring action</span>
+<div class="flex gap-2">
+<button class="px-3 py-1 rounded border border-outline-variant/30 hover:bg-surface-container transition-colors disabled:opacity-50">Prev</button>
+<button class="px-3 py-1 rounded border border-outline-variant/30 hover:bg-surface-container transition-colors">Next</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

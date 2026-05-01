@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Academic Curator - Identity Verification</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Public+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed": "#001f2a",
+                        "inverse-primary": "#a1cce6",
+                        "surface-container-low": "#f5f3f3",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#eae8e7",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#fbf9f8",
+                        "outline-variant": "#c1c7cd",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#05637f",
+                        "surface-tint": "#38637a",
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "inverse-on-surface": "#f3f0f0",
+                        "surface-dim": "#dcd9d9",
+                        "primary-fixed": "#c2e8ff",
+                        "background": "#fbf9f8",
+                        "secondary-container": "#98defe",
+                        "on-tertiary-container": "#44afa9",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#002433",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-tertiary-fixed": "#00201e",
+                        "tertiary-container": "#003e3b",
+                        "on-primary-container": "#7aa5be",
+                        "inverse-surface": "#303030",
+                        "tertiary": "#002624",
+                        "on-primary-fixed": "#001e2c",
+                        "primary-container": "#053b50",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e4e2e1",
+                        "primary-fixed-dim": "#a1cce6",
+                        "on-surface": "#1b1c1c",
+                        "outline": "#71787d",
+                        "on-surface-variant": "#41484c",
+                        "surface-bright": "#fbf9f8",
+                        "secondary-fixed": "#bde9ff",
+                        "on-background": "#1b1c1c",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "surface-container": "#f0eded",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "tertiary-fixed": "#8df4ec",
+                        "secondary": "#0d6682",
+                        "on-error": "#ffffff"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface-container font-body text-on-surface antialiased overflow-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/85 backdrop-blur-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] flex items-center justify-between px-8 py-4">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-slate-900 font-headline">The Academic Curator</span>
+<div class="hidden md:flex gap-6">
+<a class="text-slate-600 hover:text-slate-900 transition-all duration-300 hover:opacity-80 font-['Public_Sans'] tracking-tight font-bold text-sm" href="#">Dashboard</a>
+<a class="text-slate-600 hover:text-slate-900 transition-all duration-300 hover:opacity-80 font-['Public_Sans'] tracking-tight font-bold text-sm" href="#">Analytics</a>
+<a class="text-slate-600 hover:text-slate-900 transition-all duration-300 hover:opacity-80 font-['Public_Sans'] tracking-tight font-bold text-sm" href="#">Inventory</a>
+<a class="text-slate-600 hover:text-slate-900 transition-all duration-300 hover:opacity-80 font-['Public_Sans'] tracking-tight font-bold text-sm" href="#">Reports</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-600 hover:text-slate-900 transition-all duration-300 hover:opacity-80 scale-95 active:scale-90 flex items-center justify-center">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-600 hover:text-slate-900 transition-all duration-300 hover:opacity-80 scale-95 active:scale-90 flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden flex-shrink-0">
+<img alt="Administrator profile" class="w-full h-full object-cover" data-alt="A professional headshot of an academic administrator in soft, balanced studio lighting. The aesthetic is clean, modern, and light-mode appropriate." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCc4bqqVnWP2LOYReE6-luPj_bZWljyO_ZK_8pSbk6zdZhq0kuQ4Efoq0JmL-lT04cr7BK98njCTDJRnSo7CElkZirOnZ8rrMI7qk5qrONezhHBLXEV9mLS4CDM0DQcfKuXir_1jk38VFy-H3UsjxjkylhwmqMWPtX3sEXY9qZh5JRIHFfxX-sdWfN5XkoylPceLEIiVfhvt3Fn1W-s0IXLB3J13HYkz_fBUchnnuhAv9yJKwCyyEiH1J-N5O2ddLvMc-EgQ15eCRsw"/>
+</div>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 pt-20 bg-slate-50 flex flex-col gap-2 p-4 border-r border-transparent">
+<div class="mb-6 px-4">
+<h2 class="text-xs font-headline font-bold text-slate-500 uppercase tracking-widest mb-1">Admin Console</h2>
+<p class="text-[10px] text-slate-400 font-label uppercase tracking-widest">Institutional Access</p>
+</div>
+<button class="w-full mb-4 bg-primary text-on-primary rounded-DEFAULT py-3 px-4 font-label text-sm font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">add</span>
+            New Entry
+        </button>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="font-['Inter'] text-sm uppercase tracking-widest">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-xl">inventory_2</span>
+<span class="font-['Inter'] text-sm uppercase tracking-widest">Found Items</span>
+</a>
+<!-- Active State: Lost Claims mapping to user's "Secure Vault" intent -->
+<a class="flex items-center gap-3 px-4 py-3 bg-white text-teal-600 font-bold rounded-l-xl shadow-sm cursor-pointer transition-colors" href="#">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">search_check</span>
+<span class="font-['Inter'] text-sm uppercase tracking-widest">Lost Claims</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-xl">group</span>
+<span class="font-['Inter'] text-sm uppercase tracking-widest">User Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-xl">history_edu</span>
+<span class="font-['Inter'] text-sm uppercase tracking-widest">Audit Logs</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-1 pt-4 border-t border-transparent">
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors text-xs" href="#">
+<span class="material-symbols-outlined text-lg">cloud_done</span>
+<span class="font-['Inter'] uppercase tracking-widest">System Status</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors text-xs" href="#">
+<span class="material-symbols-outlined text-lg">help_center</span>
+<span class="font-['Inter'] uppercase tracking-widest">Support</span>
+</a>
+</div>
+<!-- Decorative Image in Sidebar representing secure data aesthetic -->
+<div class="absolute bottom-0 left-0 w-full h-48 opacity-10 pointer-events-none overflow-hidden mix-blend-multiply">
+<img alt="Abstract representation of a secure vault" class="w-full h-full object-cover" data-alt="A vertical, abstract digital artwork representing a highly secure, institutional digital vault. The composition features faint, glowing geometric grids and subtle lines of data streaming across a minimalist, light-grey background. The mood is highly analytical, secure, and modern, utilizing a soft light-mode aesthetic with muted cool tones." src="https://lh3.googleusercontent.com/aida/ADBb0uiUHVV5Xu_mLL1JhoYZjaV_xcOjYJ93sTVFEgjnMKj6iEERHihRVwyHndcDoW-NStxs6jxrwwIO8LuFSWu7m7P1leVa2Jo6khbsk4NC3QZQZot3e5RgZnmP2kYATeLp_PQHbAQMEEUA32Hjq_iXX1nkAy1Jw3cWsMc_S1RRpozbwymJXdnWGr0SzSoOldysJxAYZVuiMijNjjmM0bwD7bW6q4NMdw2ycg9Owyq_CFVxDqAsEfPzxSHlur37K6ZbMd8SL0h-iD0kIpw"/>
+</div>
+</aside>
+<!-- Main Canvas (Background Dashboard) -->
+<main class="ml-64 pt-20 p-8 h-screen overflow-y-auto blur-sm scale-[0.98] transition-all duration-300 opacity-60">
+<div class="max-w-5xl mx-auto">
+<header class="mb-12">
+<h1 class="font-headline text-4xl text-primary font-bold tracking-tight mb-2">Secure Vault Dashboard</h1>
+<p class="font-body text-on-surface-variant">Active claims and verified inventory awaiting resolution.</p>
+</header>
+<div class="grid grid-cols-3 gap-6">
+<!-- Dummy Background Content to provide depth -->
+<div class="bg-surface-container-lowest p-6 rounded-xl h-64 outline outline-1 outline-outline-variant/15"></div>
+<div class="bg-surface-container-lowest p-6 rounded-xl h-64 outline outline-1 outline-outline-variant/15 col-span-2"></div>
+</div>
+</div>
+</main>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center bg-primary/20 backdrop-blur-sm p-4">
+<!-- Modal Container: Surface-lowest, rounded, custom shadow for ambient depth -->
+<div class="w-full max-w-xl bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] overflow-hidden flex flex-col">
+<!-- Modal Header: Primary Container to signify secure institutional intake -->
+<header class="bg-primary-container px-8 py-6 text-on-primary relative overflow-hidden">
+<div class="relative z-10">
+<p class="font-label text-xs uppercase tracking-widest text-on-primary-container mb-2 font-semibold">Step 1 of 2: Identity Verification</p>
+<h2 class="font-headline text-3xl font-bold tracking-tighter text-on-primary">Claim Audit Protocol</h2>
+</div>
+<!-- Subtle gradient accent in header to add dimension -->
+<div class="absolute inset-0 bg-gradient-to-br from-primary to-transparent opacity-50 z-0"></div>
+</header>
+<!-- Modal Body -->
+<div class="px-8 py-8 flex flex-col gap-8 bg-surface-container-lowest">
+<!-- Section 1: Search -->
+<section class="flex flex-col gap-4">
+<h3 class="font-headline text-lg font-bold text-primary tracking-tight border-b-2 border-transparent">Student Identity Search</h3>
+<div class="flex gap-4 items-end">
+<div class="flex-1 flex flex-col gap-2">
+<label class="font-label text-sm font-semibold text-on-surface-variant" for="institutional_email">Institutional Email</label>
+<!-- Input styling: subtle background, no solid dark border -->
+<input class="w-full bg-surface-container-low text-on-surface font-body text-sm px-4 py-3 rounded-DEFAULT border-0 ring-1 ring-inset ring-outline-variant/20 focus:ring-2 focus:ring-inset focus:ring-primary transition-all" id="institutional_email" placeholder="student@neu.edu.ph" type="email" value="student@neu.edu.ph"/>
+</div>
+<button class="bg-secondary text-on-secondary font-label font-semibold text-sm px-6 py-3 rounded-DEFAULT h-[44px] hover:bg-secondary/90 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">search</span>
+                            Search Student
+                        </button>
+</div>
+</section>
+<!-- Section 2: Result Card -->
+<section class="flex flex-col gap-4">
+<div class="bg-surface p-6 rounded-lg outline outline-1 outline-outline-variant/15 flex items-start gap-5 transition-colors hover:bg-surface-container-low duration-300">
+<!-- Avatar placeholder -->
+<div class="w-14 h-14 rounded-full bg-surface-variant overflow-hidden flex-shrink-0 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-2xl">person</span>
+</div>
+<div class="flex-1 flex flex-col gap-1">
+<div class="flex items-center justify-between w-full">
+<h4 class="font-headline text-xl font-bold text-primary">Julianne Alverez</h4>
+<!-- Contextual Chip for verified status -->
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-label text-xs uppercase tracking-widest font-bold px-3 py-1 rounded-DEFAULT flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Verified
+                                </span>
+</div>
+<p class="font-body text-sm text-on-surface-variant">Student ID: <span class="font-mono text-xs tracking-wider ml-1 bg-surface-container px-2 py-0.5 rounded">#AC-8820-91B</span></p>
+<p class="font-label text-xs uppercase tracking-widest text-outline mt-2">Identity Match Found</p>
+</div>
+</div>
+<!-- Action Prompt -->
+<div class="bg-surface-container-low p-4 rounded-DEFAULT border-l-4 border-on-tertiary-container flex items-start gap-3 mt-2">
+<span class="material-symbols-outlined text-on-tertiary-container mt-0.5">info</span>
+<p class="font-body text-sm text-on-surface-variant leading-relaxed">Confirmed identity found. Proceed to Step 2 for Visual Evidence challenge.</p>
+</div>
+</section>
+</div>
+<!-- Modal Footer -->
+<footer class="px-8 py-6 bg-surface-container flex items-center justify-end gap-6 mt-auto">
+<button class="font-label text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">Cancel</button>
+<!-- Primary Action: High gloss, on-tertiary-container background -->
+<button class="bg-[#64CCC5] text-on-primary font-label text-sm font-semibold px-8 py-3 rounded-DEFAULT hover:opacity-90 transition-opacity flex items-center gap-2 shadow-md">Proceed to Visual Evidence <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</footer>
+</div>
+</div>
+</body></html>

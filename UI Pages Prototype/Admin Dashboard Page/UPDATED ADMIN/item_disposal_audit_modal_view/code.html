@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Item Disposal Audit Modal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed-variant": "#00504c",
+                "on-surface-variant": "#41484c",
+                "surface-container-low": "#f5f3f3",
+                "secondary": "#0d6682",
+                "error-container": "#ffdad6",
+                "surface-variant": "#e4e2e1",
+                "on-secondary": "#ffffff",
+                "on-secondary-fixed": "#001f2a",
+                "primary-fixed": "#c2e8ff",
+                "surface-dim": "#dcd9d9",
+                "on-tertiary-container": "#44afa9",
+                "on-primary-fixed-variant": "#1d4c61",
+                "tertiary-fixed-dim": "#70d7d0",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-container": "#7aa5be",
+                "primary": "#002433",
+                "tertiary-container": "#003e3b",
+                "error": "#ba1a1a",
+                "tertiary-fixed": "#8df4ec",
+                "surface-bright": "#fbf9f8",
+                "inverse-primary": "#a1cce6",
+                "surface": "#fbf9f8",
+                "on-secondary-fixed-variant": "#004d64",
+                "tertiary": "#002624",
+                "on-tertiary-fixed": "#00201e",
+                "on-tertiary": "#ffffff",
+                "surface-container-highest": "#e4e2e1",
+                "surface-container-high": "#eae8e7",
+                "on-background": "#1b1c1c",
+                "inverse-surface": "#303030",
+                "on-primary-fixed": "#001e2c",
+                "outline": "#71787d",
+                "surface-tint": "#38637a",
+                "primary-container": "#053b50",
+                "secondary-fixed-dim": "#8ad0ef",
+                "outline-variant": "#c1c7cd",
+                "secondary-fixed": "#bde9ff",
+                "on-surface": "#1b1c1c",
+                "on-secondary-container": "#05637f",
+                "on-error": "#ffffff",
+                "secondary-container": "#98defe",
+                "surface-container": "#f0eded",
+                "on-error-container": "#93000a",
+                "primary-fixed-dim": "#a1cce6",
+                "inverse-on-surface": "#f3f0f0",
+                "background": "#fbf9f8"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {},
+        "fontFamily": {
+                "headline": [
+                        "Public Sans"
+                ],
+                "display": [
+                        "Public Sans"
+                ],
+                "body": [
+                        "Inter"
+                ],
+                "label": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {}
+},
+    },
+  }
+</script>
+</head>
+<body class="bg-background text-on-surface font-body h-screen flex flex-col overflow-hidden antialiased">
+<!-- Background Dashboard Context (Blurred/Darkened) -->
+<div class="absolute inset-0 z-0 bg-surface-container flex">
+<!-- Mock SideNav (Blurred) -->
+<div class="h-screen w-64 bg-surface-container-low flex flex-col p-4 space-y-2 blur-sm opacity-50">
+<div class="text-lg font-bold text-primary mb-8 tracking-tighter font-headline">Secure Vault</div>
+<div class="h-10 bg-surface-container-highest rounded-DEFAULT w-full mb-2"></div>
+<div class="h-10 bg-surface-container-highest rounded-DEFAULT w-full mb-2"></div>
+<div class="h-10 bg-surface-container-highest rounded-DEFAULT w-full mb-2"></div>
+</div>
+<!-- Mock Main Content Area (Blurred) -->
+<div class="flex-1 p-8 blur-sm opacity-40">
+<div class="h-12 w-64 bg-surface-container-highest rounded-DEFAULT mb-8"></div>
+<div class="grid grid-cols-3 gap-6 mb-8">
+<div class="h-32 bg-surface-container-lowest rounded-DEFAULT shadow-sm"></div>
+<div class="h-32 bg-surface-container-lowest rounded-DEFAULT shadow-sm"></div>
+<div class="h-32 bg-surface-container-lowest rounded-DEFAULT shadow-sm"></div>
+</div>
+<div class="h-96 bg-surface-container-lowest rounded-DEFAULT shadow-sm w-full"></div>
+</div>
+</div>
+<!-- Modal Overlay Backdrop -->
+<div class="absolute inset-0 z-40 bg-primary/40 backdrop-blur-sm flex justify-center items-center p-4 md:p-8">
+<!-- Modal Container -->
+<div class="bg-surface-container-lowest w-full max-w-3xl rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] flex flex-col overflow-hidden border border-outline-variant/15">
+<!-- Modal Header (Intake Style) -->
+<div class="bg-primary-container px-6 py-5 flex justify-between items-center text-on-primary">
+<div>
+<h2 class="font-headline font-bold text-xl tracking-tight">Item Disposal Audit</h2>
+<p class="font-body text-sm text-on-primary-container mt-1">Final Authorization Required</p>
+</div>
+<button class="text-on-primary-container hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-2xl">close</span>
+</button>
+</div>
+<!-- Modal Body -->
+<div class="p-6 md:p-8 flex flex-col space-y-8 overflow-y-auto">
+<!-- Alert Banner -->
+<div class="bg-error-container text-on-error-container px-4 py-3 rounded-lg flex items-center space-x-3 border-l-4 border-error">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="font-body font-semibold text-sm">Overdue: 42 Days</span>
+</div>
+<!-- Item Context Card (Asymmetrical Layout) -->
+<div class="bg-surface p-5 rounded-lg flex flex-col md:flex-row gap-6 items-start border border-outline-variant/15">
+<!-- Thumbnail -->
+<div class="w-full md:w-48 h-32 bg-surface-container-highest rounded-DEFAULT overflow-hidden shrink-0">
+<img alt="Laptop thumbnail" class="w-full h-full object-cover" data-alt="A close-up, slightly blurred photograph of a silver laptop sitting on an institutional grey desk in a sterile, brightly lit warehouse environment. The lighting is harsh and cool, emphasizing the 'lost and found' or 'evidence room' aesthetic. The overall palette relies heavily on deep navy, sterile whites, and metallic silvers, fitting a professional archival system." src="https://lh3.googleusercontent.com/aida/ADBb0uiUHVV5Xu_mLL1JhoYZjaV_xcOjYJ93sTVFEgjnMKj6iEERHihRVwyHndcDoW-NStxs6jxrwwIO8LuFSWu7m7P1leVa2Jo6khbsk4NC3QZQZot3e5RgZnmP2kYATeLp_PQHbAQMEEUA32Hjq_iXX1nkAy1Jw3cWsMc_S1RRpozbwymJXdnWGr0SzSoOldysJxAYZVuiMijNjjmM0bwD7bW6q4NMdw2ycg9Owyq_CFVxDqAsEfPzxSHlur37K6ZbMd8SL0h-iD0kIpw"/>
+</div>
+<!-- Details -->
+<div class="flex-1 flex flex-col space-y-4">
+<div>
+<div class="flex items-center space-x-2 mb-1">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-2 py-0.5 rounded text-xs font-label uppercase tracking-widest font-semibold">Flagged for Disposal</span>
+</div>
+<h3 class="font-headline font-bold text-lg text-primary">MacBook Pro 16" (2021)</h3>
+<p class="font-body text-sm text-on-surface-variant">Serial: C02F543GMD6M</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<span class="block font-label text-xs uppercase tracking-wider text-outline mb-1">Reference ID</span>
+<span class="font-body font-medium text-sm text-primary">REF-112X</span>
+</div>
+<div>
+<span class="block font-label text-xs uppercase tracking-wider text-outline mb-1">Current Location</span>
+<span class="font-body font-medium text-sm text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span> Bin A-04
+                                </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Disposal Method Selection -->
+<div>
+<h3 class="font-headline font-semibold text-primary text-base mb-4 tracking-tight">Disposal Method</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Option 1 -->
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="disposal_method" type="radio" value="surplus"/>
+<div class="bg-surface-container-low border-2 border-transparent peer-checked:border-on-tertiary-container peer-checked:bg-surface-bright rounded-lg p-4 transition-all duration-200 hover:bg-surface-container h-full flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-3xl text-primary mb-2 opacity-70 peer-checked:opacity-100 peer-checked:text-on-tertiary-container">storefront</span>
+<span class="font-body font-semibold text-sm text-primary">University Surplus</span>
+<p class="font-body text-xs text-on-surface-variant mt-2 leading-relaxed">Transfer to internal inventory for resale or department reuse.</p>
+</div>
+</label>
+<!-- Option 2 -->
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="disposal_method" type="radio" value="charity"/>
+<div class="bg-surface-container-low border-2 border-transparent peer-checked:border-on-tertiary-container peer-checked:bg-surface-bright rounded-lg p-4 transition-all duration-200 hover:bg-surface-container h-full flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-3xl text-primary mb-2 opacity-70 peer-checked:opacity-100 peer-checked:text-on-tertiary-container">volunteer_activism</span>
+<span class="font-body font-semibold text-sm text-primary">Charitable Donation</span>
+<p class="font-body text-xs text-on-surface-variant mt-2 leading-relaxed">Allocate to approved external partner organizations.</p>
+</div>
+</label>
+<!-- Option 3 (Permanent) -->
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="disposal_method" type="radio" value="permanent"/>
+<div class="bg-surface-container-low border-2 border-transparent peer-checked:border-error peer-checked:bg-error-container/20 rounded-lg p-4 transition-all duration-200 hover:bg-surface-container h-full flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-3xl text-primary mb-2 opacity-70 peer-checked:opacity-100 peer-checked:text-error">delete_forever</span>
+<span class="font-body font-semibold text-sm text-primary">Permanent Disposal</span>
+<p class="font-body text-xs text-on-surface-variant mt-2 leading-relaxed">Secure destruction or e-waste recycling processing.</p>
+</div>
+</label>
+</div>
+</div>
+<!-- Authorization Notes -->
+<div>
+<label class="block font-headline font-semibold text-primary text-base mb-2 tracking-tight" for="auth_notes">Reason &amp; Authorization Notes</label>
+<textarea class="w-full bg-surface-container-lowest border-2 border-outline-variant/40 rounded-lg p-4 font-body text-sm text-on-surface focus:border-primary focus:ring-0 transition-colors" id="auth_notes" placeholder="Provide detailed reasoning for this disposal action. Include related ticket numbers if applicable..." rows="4"></textarea>
+<p class="font-body text-xs text-outline mt-2">This note will be permanently attached to the item's audit log.</p>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="bg-surface-container-low px-6 py-4 flex flex-col-reverse md:flex-row justify-end items-center md:space-x-4 border-t border-outline-variant/15">
+<button class="w-full md:w-auto font-body font-medium text-sm text-secondary hover:text-primary transition-colors py-3 md:py-2" type="button">
+                    Cancel
+                </button>
+<button class="w-full md:w-auto bg-gradient-to-br from-primary to-primary-container text-on-primary font-body font-semibold text-sm px-6 py-2.5 rounded-DEFAULT hover:opacity-90 transition-opacity mb-3 md:mb-0 shadow-sm flex items-center justify-center space-x-2" type="button">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>Confirm Disposal</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>
