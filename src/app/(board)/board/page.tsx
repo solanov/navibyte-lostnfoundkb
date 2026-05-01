@@ -1,6 +1,6 @@
 import TopNav from '@/src/components/layout/TopNav';
 import Sidebar from '@/src/components/layout/SideNav';
-import ItemCard from '@/src/components/ui/ItemCard';
+import ItemCard from '@/src/components/pages/ItemCard';
 import BottomNavBar from '@/src/components/layout/BottomNavBar';
 import Link from 'next/link';
 import { supabase } from '@/src/lib/supabase';

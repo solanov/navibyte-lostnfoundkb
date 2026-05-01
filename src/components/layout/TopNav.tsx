@@ -12,13 +12,13 @@ export default function TopNav() {
       <div className="hidden md:flex items-center gap-2">
         <span className="material-symbols-outlined text-white text-2xl">school</span>
         <span className="text-xl font-black text-white tracking-[-2%] font-headline">
-          The Academic Curator
+          Lost & Found
         </span>
       </div>
 
       {/* Mobile Centered Title */}
       <h1 className="md:hidden font-headline tracking-tight font-black uppercase tracking-wider text-center flex-grow text-xl text-white">
-        The Academic Curator
+        Lost & Found
       </h1>
 
       {/* Mobile Profile Image */}
