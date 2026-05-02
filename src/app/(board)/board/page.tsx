@@ -1,11 +1,24 @@
-import TopNav from '@/src/components/layout/TopNav';
 import Sidebar from '@/src/components/layout/SideNav';
-import ItemCard from '@/src/components/pages/ItemCard';
+import LostItemsSection from '@/src/components/pages/LostItemsSection';
 import BottomNavBar from '@/src/components/layout/BottomNavBar';
 import Link from 'next/link';
 import { supabase } from '@/src/lib/supabase';
 
 export const dynamic = 'force-dynamic';
+
+interface LostItemWithCategory {
+  post_id: string;
+  general_description: string;
+  date_lost?: string;
+  zone: string;
+  status: string;
+  image_url?: string | null;
+  reported_by: string;
+  categories?: {
+    name: string;
+    icon_identifier: string;
+  };
+}
 
 export default async function PublicBoard() {
   const { data: lostItems, error } = await supabase
@@ -23,7 +36,7 @@ export default async function PublicBoard() {
     console.error("Error fetching board items:", error);
   }
 
-  const items = lostItems || [];
+  const items: LostItemWithCategory[] = lostItems || [];
 
   return (
     <div className="bg-background text-foreground min-h-screen font-body selection:bg-primary-fixed selection:text-primary pb-24 md:pb-0">
@@ -63,34 +76,8 @@ export default async function PublicBoard() {
               </div>
             </div>
 
-            {/* Bento-Style Grid Feed */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {items.length === 0 ? (
-                <div className="col-span-1 md:col-span-2 py-12 text-center text-outline-variant">
-                  <span className="material-symbols-outlined text-5xl mb-4 opacity-50">inbox</span>
-                  <p className="font-medium">No items found in the archive.</p>
-                </div>
-              ) : (
-                items.map((item) => {
-                  const [title] = (item.general_description || '').split('\n\n');
-                  // @ts-ignore - Supabase type inference for joins can be tricky without generated types
-                  const icon = item.categories?.icon_identifier || 'help_outline';
-                  const reference = `AC-${item.post_id.substring(0, 4).toUpperCase()}`;
-
-                  return (
-                    <ItemCard 
-                      key={item.post_id}
-                      status={item.status}
-                      icon={icon}
-                      title={title || 'Unknown Item'}
-                      location={item.zone || 'Unknown Location'}
-                      reference={reference}
-                      imageUrl={item.image_url}
-                    />
-                  );
-                })
-              )}
-            </div>
+            {/* Lost Items with Interactive Modal */}
+            <LostItemsSection items={items} />
 
             {/* Pagination */}
             {items.length > 0 && (
