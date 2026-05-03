@@ -22,7 +22,7 @@ export async function verifyClaimAction(
   
   await adminClient.from("audit_logs").insert({
     post_id: postId,
-    staff_id: profile.user_id,
+    actor_id: profile.user_id,
     action: "CLAIM_VERIFIED",
     previous_state: previousState,
     new_state: newState,
@@ -51,10 +51,54 @@ export async function disposeItemAction(
 
   await adminClient.from("audit_logs").insert({
     post_id: postId,
-    staff_id: profile.user_id,
+    actor_id: profile.user_id,
     action: "DISPOSAL_APPROVED",
     previous_state: previousState,
     new_state: newState,
+  });
+
+  return { success: true };
+}
+
+export async function adminDeletePostAction(
+  accessToken: string,
+  postId: string,
+  deletionReason: string
+) {
+  const { adminClient, profile } = await verifyAdminAccess(accessToken);
+
+  // Fetch current state for audit trail
+  const { data: current } = await adminClient
+    .from("lost_items")
+    .select("status, last_handled_by, deleted_by, deletion_reason")
+    .eq("post_id", postId)
+    .single();
+
+  const previousState = current ?? { status: "unknown" };
+
+  const { error: updateError } = await adminClient
+    .from("lost_items")
+    .update({
+      status: "Purged",
+      deleted_by: profile.user_id,
+      deletion_reason: deletionReason,
+      deleted_at: new Date().toISOString(),
+      last_handled_by: profile.user_id,
+    })
+    .eq("post_id", postId);
+
+  if (updateError) throw new Error(updateError.message);
+
+  await adminClient.from("audit_logs").insert({
+    post_id: postId,
+    actor_id: profile.user_id,
+    action: "POST_DELETED_BY_ADMIN",
+    previous_state: previousState,
+    new_state: {
+      status: "Purged",
+      deleted_by: profile.user_id,
+      deletion_reason: deletionReason,
+    },
   });
 
   return { success: true };

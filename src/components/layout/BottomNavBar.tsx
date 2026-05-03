@@ -25,6 +25,10 @@ export default function BottomNavBar() {
         <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: isMessagesActive ? "'FILL' 1" : "'FILL' 0" }}>forum</span>
         <span className="font-label text-[11px] font-semibold uppercase tracking-widest">Messages</span>
       </Link>
+      <Link href="/board/archive" className={linkClass(pathname === '/board/archive')}>
+        <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: pathname === '/board/archive' ? "'FILL' 1" : "'FILL' 0" }}>inventory_2</span>
+        <span className="font-label text-[11px] font-semibold uppercase tracking-widest">Archive</span>
+      </Link>
       <Link href="#" className="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#44afa9] transition-all">
         <span className="material-symbols-outlined mb-1">account_circle</span>
         <span className="font-label text-[11px] font-semibold uppercase tracking-widest">Profile</span>

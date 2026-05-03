@@ -46,6 +46,10 @@ export default function SideNav() {
       </nav>
 
       <div className="mt-auto pb-24 flex flex-col gap-3">
+        <Link href="/board/archive" className="flex items-center justify-center gap-2 w-full py-3 rounded-md font-bold text-sm tracking-wide text-primary bg-surface-container-low hover:bg-outline-variant/20 active:scale-95 transition-all">
+          <span className="material-symbols-outlined text-lg">inventory_2</span>
+          My Archive
+        </Link>
         <Link href="/create" className="flex items-center justify-center w-full btn-tertiary text-on-tertiary py-3 rounded-md font-bold text-sm tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition-all">
           Create Entry
         </Link>

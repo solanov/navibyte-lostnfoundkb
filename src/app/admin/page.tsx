@@ -4,9 +4,9 @@ import { supabase } from "@/src/lib/supabase";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { fetchAdminData } from "./actions/fetchData";
-import { verifyClaimAction, disposeItemAction } from "./actions/items";
+import { verifyClaimAction, disposeItemAction, adminDeletePostAction } from "./actions/items";
 import { updateUserBlockAction } from "./actions/users";
 
 type AdminTab = "vault" | "users" | "disposal" | "audit" | "reports";
@@ -40,13 +40,17 @@ type LostItem = {
   last_handled_by: string | null;
   created_timestamp: string;
   last_edited_timestamp: string;
+  deleted_by?: string | null;
+  deletion_reason?: string | null;
+  deleted_at?: string | null;
+  returned_at?: string | null;
   categories: CategoryRow | CategoryRow[] | null;
 };
 
 type AuditLog = {
   log_id: number;
   post_id: string | null;
-  staff_id: string | null;
+  actor_id: string | null;
   action: string;
   previous_state: Record<string, unknown> | null;
   new_state: Record<string, unknown> | null;
@@ -59,6 +63,8 @@ type ModalState =
   | { type: "restore"; user: AdminProfile }
   | { type: "history"; user: AdminProfile }
   | { type: "dispose"; item: LostItem }
+  | { type: "adminDelete"; item: LostItem }
+  | { type: "reviewPost"; item: LostItem }
   | null;
 
 const tabs: Array<{ id: AdminTab; label: string; icon: string }> = [
@@ -237,6 +243,32 @@ export default function AdminDashboard() {
     setBusy(false);
   }
 
+  async function adminDeletePost(item: LostItem, reason: string) {
+    if (!profile) return;
+    setBusy(true);
+    setError(null);
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
+
+    if (!accessToken) {
+      setError("Authentication token missing.");
+      setBusy(false);
+      return;
+    }
+
+    try {
+      await adminDeletePostAction(accessToken, item.post_id, reason);
+      setNotice("Post deleted and moved to Purged.");
+      setModal(null);
+      await loadAdminData();
+    } catch (err: any) {
+      setError(err.message);
+    }
+
+    setBusy(false);
+  }
+
   function exportReport(type: string, startDate: string, endDate: string) {
     const rows = reportRows(type, startDate, endDate, items, users, auditLogs);
     const csv = rows.map((row) => row.map(csvCell).join(",")).join("\n");
@@ -355,7 +387,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === "vault" && <VaultView items={activeItems} onVerify={(item) => setModal({ type: "verify", item })} />}
+          {activeTab === "vault" && <VaultView items={activeItems} onVerify={(item) => setModal({ type: "verify", item })} onReview={(item) => setModal({ type: "reviewPost", item })} onDelete={(item) => setModal({ type: "adminDelete", item })} />}
           {activeTab === "users" && <UsersView users={filteredUsers} items={items} onSuspend={(user) => setModal({ type: "suspend", user })} onRestore={(user) => setModal({ type: "restore", user })} onHistory={(user) => setModal({ type: "history", user })} />}
           {activeTab === "disposal" && <DisposalView items={disposalItems} onDispose={(item) => setModal({ type: "dispose", item })} />}
           {activeTab === "audit" && <AuditView logs={auditLogs} />}
@@ -368,11 +400,13 @@ export default function AdminDashboard() {
       {modal?.type === "restore" && <AccountModal mode="restore" user={modal.user} busy={busy} onClose={() => setModal(null)} onSubmit={updateUserBlock} />}
       {modal?.type === "history" && <HistoryModal user={modal.user} items={items.filter((item) => item.reported_by === modal.user.user_id)} onClose={() => setModal(null)} />}
       {modal?.type === "dispose" && <DisposeModal item={modal.item} busy={busy} onClose={() => setModal(null)} onSubmit={disposeItem} />}
+      {modal?.type === "adminDelete" && <AdminDeleteModal item={modal.item} busy={busy} onClose={() => setModal(null)} onSubmit={adminDeletePost} />}
+      {modal?.type === "reviewPost" && <ReviewPostModal item={modal.item} onClose={() => setModal(null)} />}
     </div>
   );
 }
 
-function VaultView({ items, onVerify }: { items: LostItem[]; onVerify: (item: LostItem) => void }) {
+function VaultView({ items, onVerify, onReview, onDelete }: { items: LostItem[]; onVerify: (item: LostItem) => void; onReview: (item: LostItem) => void; onDelete: (item: LostItem) => void }) {
   return (
     <>
       <PageHeader eyebrow="Secure Repository" title="Secure Vault" description="Central repository for high-value assets requiring administrative oversight and unredacted verification." />
@@ -403,11 +437,12 @@ function VaultView({ items, onVerify }: { items: LostItem[]; onVerify: (item: Lo
                 <BinBadge bin={item.bin_number} />
                 <StatusPill status={item.status} />
               </div>
-              <div className="flex justify-start md:col-span-2 md:justify-end">
-                <button onClick={() => onVerify(item)} disabled={item.status === "Returned"} className="flex items-center gap-2 rounded-md bg-gradient-to-br from-[#44afa9] to-[#389691] px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50">
-                  <span className="material-symbols-outlined text-base">verified</span>
-                  Verify
-                </button>
+              <div className="flex justify-start md:col-span-2 md:justify-end pr-2">
+                <EllipsisMenu 
+                  onVerify={item.status !== "Returned" ? () => onVerify(item) : undefined}
+                  onReview={() => onReview(item)}
+                  onDelete={() => onDelete(item)}
+                />
               </div>
             </div>
           ))}
@@ -538,7 +573,7 @@ function AuditView({ logs }: { logs: AuditLog[] }) {
             <thead className="bg-surface-container-high text-xs font-bold uppercase tracking-wider text-on-surface-variant">
               <tr>
                 <th className="px-6 py-4">Timestamp</th>
-                <th className="px-6 py-4">Admin/Staff ID</th>
+                <th className="px-6 py-4">Admin/Actor ID</th>
                 <th className="px-6 py-4">Action Taken</th>
                 <th className="px-6 py-4">Target</th>
                 <th className="px-6 py-4">Notes</th>
@@ -548,7 +583,7 @@ function AuditView({ logs }: { logs: AuditLog[] }) {
               {logs.map((log) => (
                 <tr key={log.log_id} className="transition hover:bg-surface-container-low/50">
                   <td className="px-6 py-4 font-mono text-xs text-on-surface-variant">{formatDateTime(log.created_at)}</td>
-                  <td className="px-6 py-4 font-mono text-xs text-primary">{shortId(log.staff_id)}</td>
+                  <td className="px-6 py-4 font-mono text-xs text-primary">{shortId(log.actor_id)}</td>
                   <td className="px-6 py-4 font-bold text-primary">{log.action.replaceAll("_", " ")}</td>
                   <td className="px-6 py-4 font-mono text-xs text-on-surface-variant">{shortId(log.post_id)}</td>
                   <td className="px-6 py-4 text-on-surface-variant">{stateSummary(log.new_state)}</td>
@@ -735,6 +770,163 @@ function DisposeModal({ item, busy, onClose, onSubmit }: { item: LostItem; busy:
   );
 }
 
+function AdminDeleteModal({ item, busy, onClose, onSubmit }: { item: LostItem; busy: boolean; onClose: () => void; onSubmit: (item: LostItem, reason: string) => void }) {
+  const [reason, setReason] = useState("");
+
+  return (
+    <ModalShell title="Delete Post" subtitle={reference(item.post_id)} onClose={onClose}>
+      <div className="space-y-5">
+        <div className="rounded-lg bg-red-50 p-4 text-sm leading-7 text-red-800">
+          This operation changes the item status to Purged and hides it from the public board. The original poster will see this deletion reason in their archive.
+        </div>
+        <textarea value={reason} onChange={(event) => setReason(event.target.value)} placeholder="Administrative deletion reason (required)..." className="min-h-32 w-full rounded-lg border border-outline-variant/30 bg-surface p-4 outline-none focus:ring-2 focus:ring-[#44afa9]" />
+        <div className="flex justify-end gap-3">
+          <button onClick={onClose} className="rounded-md px-5 py-3 font-bold text-on-surface-variant transition hover:bg-surface-container-low">Cancel</button>
+          <button onClick={() => onSubmit(item, reason)} disabled={busy || !reason.trim()} className="rounded-md bg-red-600 px-5 py-3 font-bold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50">
+            Delete Post
+          </button>
+        </div>
+      </div>
+    </ModalShell>
+  );
+}
+
+function ReviewPostModal({ item, onClose }: { item: LostItem; onClose: () => void }) {
+  const [title, ...descParts] = (item.general_description || "").split("\n\n");
+  const description = descParts.join("\n\n");
+
+  return (
+    <ModalShell title="Review Post" subtitle={reference(item.post_id)} onClose={onClose}>
+      <div className="space-y-6">
+        <div>
+          {item.image_url ? (
+            <div className="h-64 overflow-hidden rounded-lg border border-outline-variant/15 bg-surface-container shadow-sm">
+              <img src={item.image_url} alt={title} className="h-full w-full object-cover" />
+            </div>
+          ) : (
+            <div className="grid h-64 place-items-center rounded-lg border border-outline-variant/15 bg-surface-container-low text-on-surface-variant">
+              <span className="material-symbols-outlined text-5xl">image_not_supported</span>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-between">
+          <h3 className="font-headline text-xl font-bold text-primary">{title || "Item Details"}</h3>
+          <StatusPill status={item.status} />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-lg bg-surface-container-low p-4">
+            <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Location</span>
+            <p className="font-semibold text-primary">{item.zone || "Unknown"}</p>
+          </div>
+          <div className="rounded-lg bg-surface-container-low p-4">
+            <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Category</span>
+            <p className="font-semibold text-primary">{categoryName(item)}</p>
+          </div>
+          <div className="rounded-lg bg-surface-container-low p-4">
+            <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Color</span>
+            <p className="font-semibold text-primary">{item.color || "None"}</p>
+          </div>
+          <div className="rounded-lg bg-surface-container-low p-4">
+            <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Bin Number</span>
+            <p className="font-semibold text-primary">{item.bin_number || "None"}</p>
+          </div>
+        </div>
+        {description && (
+          <div className="rounded-lg bg-surface-container-low p-4">
+            <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Detailed Description</span>
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-on-surface">{description}</p>
+          </div>
+        )}
+        {item.hidden_note && (
+          <div className="rounded-lg border border-[#44afa9]/30 bg-[#8df4ec]/10 p-4">
+            <span className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#44afa9]">
+              <span className="material-symbols-outlined text-sm">lock</span>
+              Hidden Security Note
+            </span>
+            <p className="text-sm leading-relaxed text-primary">{item.hidden_note}</p>
+          </div>
+        )}
+        <div className="flex justify-end pt-2">
+          <button onClick={onClose} className="rounded-md bg-surface-container-low px-5 py-3 font-bold text-primary transition hover:bg-surface-container-high">Close Review</button>
+        </div>
+      </div>
+    </ModalShell>
+  );
+}
+
+function EllipsisMenu({ onVerify, onReview, onDelete }: { onVerify?: () => void; onReview: () => void; onDelete: () => void }) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    if (open) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    if (open) document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [open]);
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="grid h-10 w-10 place-items-center rounded-full text-on-surface-variant transition hover:bg-surface-container-low hover:text-primary"
+      >
+        <span className="material-symbols-outlined text-2xl">more_horiz</span>
+      </button>
+      {open && (
+        <div className="absolute right-0 top-12 z-50 w-48 overflow-hidden rounded-lg border border-outline-variant/20 bg-white shadow-lg">
+          <div className="flex flex-col py-1">
+            {onVerify && (
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  onVerify();
+                }}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-surface-container-low text-left"
+              >
+                <span className="material-symbols-outlined text-[20px]">verified</span>
+                Verify Claim
+              </button>
+            )}
+            <button
+              onClick={() => {
+                setOpen(false);
+                onReview();
+              }}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-surface-container-low text-left"
+            >
+              <span className="material-symbols-outlined text-[20px]">visibility</span>
+              Review Post
+            </button>
+            <div className="my-1 h-px w-full bg-outline-variant/20" />
+            <button
+              onClick={() => {
+                setOpen(false);
+                onDelete();
+              }}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 text-left"
+            >
+              <span className="material-symbols-outlined text-[20px]">delete</span>
+              Delete Post
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PageHeader({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
   return (
     <header className="mb-8">
@@ -907,7 +1099,7 @@ function reportRows(type: string, startDate: string, endDate: string, items: Los
       ["Timestamp", "Staff ID", "Action", "Post ID", "Notes"],
       ...logs
         .filter((log) => inRange(log.created_at, start, end))
-        .map((log) => [log.created_at, log.staff_id ?? "", log.action, log.post_id ?? "", stateSummary(log.new_state)]),
+        .map((log) => [log.created_at, log.actor_id ?? "", log.action, log.post_id ?? "", stateSummary(log.new_state)]),
     ];
   }
 

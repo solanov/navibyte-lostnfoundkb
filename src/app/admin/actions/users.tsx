@@ -20,7 +20,7 @@ export async function updateUserBlockAction(
 
   await adminClient.from("audit_logs").insert({
     post_id: null,
-    staff_id: profile.user_id,
+    actor_id: profile.user_id,
     action: blocked ? "ACCOUNT_SUSPENDED" : "ACCOUNT_RESTORED",
     previous_state: { user_id: targetUserId, is_blocked: targetUserBlockedStatus },
     new_state: { user_id: targetUserId, is_blocked: blocked, reason },

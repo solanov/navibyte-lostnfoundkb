@@ -26,6 +26,10 @@ export async function fetchAdminData(accessToken: string) {
         last_handled_by,
         created_timestamp,
         last_edited_timestamp,
+        deleted_by,
+        deletion_reason,
+        deleted_at,
+        returned_at,
         categories (
           name,
           icon_identifier
@@ -34,7 +38,7 @@ export async function fetchAdminData(accessToken: string) {
       .order("created_timestamp", { ascending: false }),
     adminClient
       .from("audit_logs")
-      .select("log_id,post_id,staff_id,action,previous_state,new_state,created_at")
+      .select("log_id,post_id,actor_id,action,previous_state,new_state,created_at")
       .order("created_at", { ascending: false })
       .limit(200),
   ]);
