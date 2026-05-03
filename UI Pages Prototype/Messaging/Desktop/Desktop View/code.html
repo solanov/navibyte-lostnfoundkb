@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Messaging - Sarah Jenkins</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary": "#a33200",
+                      "surface-container-low": "#f2f4f6",
+                      "on-tertiary-container": "#fff6f4",
+                      "secondary-fixed": "#d3e4fe",
+                      "tertiary-container": "#cc4204",
+                      "inverse-primary": "#b3c5ff",
+                      "secondary": "#505f76",
+                      "on-secondary-container": "#54647a",
+                      "on-tertiary-fixed-variant": "#832600",
+                      "on-secondary-fixed": "#0b1c30",
+                      "on-primary-fixed": "#001849",
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed": "#ffdbd0",
+                      "surface-container": "#eceef0",
+                      "surface-container-high": "#e6e8ea",
+                      "surface": "#f7f9fb",
+                      "tertiary-fixed-dim": "#ffb59d",
+                      "on-surface": "#191c1e",
+                      "on-primary-fixed-variant": "#003fa4",
+                      "on-error-container": "#93000a",
+                      "surface-tint": "#0054d6",
+                      "on-primary-container": "#f8f7ff",
+                      "on-background": "#191c1e",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "on-tertiary-fixed": "#390c00",
+                      "on-secondary": "#ffffff",
+                      "inverse-on-surface": "#eff1f3",
+                      "error": "#ba1a1a",
+                      "background": "#f7f9fb",
+                      "primary-fixed-dim": "#b3c5ff",
+                      "surface-variant": "#e0e3e5",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "primary-fixed": "#dae1ff",
+                      "outline": "#727687",
+                      "surface-dim": "#d8dadc",
+                      "inverse-surface": "#2d3133",
+                      "error-container": "#ffdad6",
+                      "primary": "#0050cb",
+                      "on-tertiary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "secondary-container": "#d0e1fb",
+                      "on-surface-variant": "#424656",
+                      "outline-variant": "#c2c6d8",
+                      "primary-container": "#0066ff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-bright": "#f7f9fb",
+                      "surface-container-highest": "#e0e3e5"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xs": "0.25rem",
+                      "margin": "1.5rem",
+                      "lg": "1.5rem",
+                      "sm": "0.5rem",
+                      "xl": "2rem",
+                      "md": "1rem",
+                      "gutter": "1rem"
+              },
+              "fontFamily": {
+                      "h2": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "h1": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "h2": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "h1": [
+                              "30px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface h-screen w-full flex overflow-hidden light">
+<!-- Sidebar / Conversation List -->
+<aside class="w-80 h-full border-r border-outline-variant bg-surface-container-low flex flex-col flex-shrink-0">
+<!-- Header -->
+<div class="px-6 py-6 flex items-center justify-between">
+<h1 class="font-h1 text-h1 text-on-surface">Messages</h1>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="edit_square">edit_square</span>
+</button>
+</div>
+<!-- Search Bar -->
+<div class="px-6 pb-4">
+<div class="relative flex items-center w-full h-10 rounded-full bg-surface-container-highest px-4 border border-outline-variant text-on-surface-variant">
+<span class="material-symbols-outlined text-lg mr-2" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-body-md placeholder:text-outline p-0" placeholder="Search" type="text"/>
+</div>
+</div>
+<!-- Conversation List -->
+<div class="flex-1 overflow-y-auto">
+<!-- Active Item -->
+<div class="relative flex items-center px-6 h-[72px] bg-surface cursor-pointer">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-primary rounded-r-full"></div>
+<div class="relative mr-4">
+<img alt="Sarah Jenkins" class="w-12 h-12 rounded-full object-cover" data-alt="A professional headshot of a young woman with a warm smile, wearing a dark blazer over a light shirt. The lighting is soft and natural, emphasizing a corporate modern aesthetic. The background is slightly blurred to keep focus on the subject. High quality, crisp resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9-bCXFqUy1k9PEU1nWbRnrlmXBNgPRj_DW1h-Y2XGgvT21QonX_q6ojCJPqt9omOeQVkdt7SxMoPPXIHVtcZqkmPXD5r9_tvT0AVRWO4vJSs4SQfXrsidawaUU6ebG6WsqObvd6mQ3l0D_RtWO9SN0PcNMoYQBZI7ywno3XIKL1LyRW76aNK9hPhDkRyX3zL8e9y2z0UmEsSnBqD2oaSHwXWVjUy0loiGoqzZXXVkGyiC6WMfn5KYJHpC5oSuFpj6CreFuLA9dd0F"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-surface"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<span class="font-label-md text-label-md text-on-surface truncate font-semibold">Sarah Jenkins</span>
+<span class="font-label-sm text-label-sm text-primary whitespace-nowrap ml-2">10:42 AM</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">The quarterly review looks solid. Let's sync at 2 PM.</p>
+</div>
+</div>
+<!-- Inactive Item 1 -->
+<div class="relative flex items-center px-6 h-[72px] hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="relative mr-4">
+<img alt="Michael Chen" class="w-12 h-12 rounded-full object-cover" data-alt="A candid portrait of a professional man with short dark hair, wearing a casual button-down shirt. The setting appears to be a brightly lit modern office space with minimalist decor. The lighting is high-key and clean, matching a corporate modern light-mode theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGUELbLVbiNiVlOeqAOCskTkyThwou8GvWocKQojoR5WFKQkOja1ljDM1pnP2vb_dvjbyiUcweNyuqpE4L6YFkg_oHGWVIR3UfkIgNfUz3_7HNeTxoSAn0s_ug7XwONtDDwF6p-VsQrNHmhwj4EdJxj1B0v06gtNZ1Zs2VNusXsV6dJHByqIhiNueFNgceWQS2LGCSOWDsU0LdN53eljy4H3owuqE-ZQoc-yzBKNRud2nf2pm0oWZSg0sG8F64OrARZL4wTlvRbnlo"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<span class="font-label-md text-label-md text-on-surface truncate">Michael Chen</span>
+<span class="font-label-sm text-label-sm text-outline whitespace-nowrap ml-2">Yesterday</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">I'll have those design assets ready by tomorrow morning.</p>
+</div>
+</div>
+<!-- Inactive Item 2 -->
+<div class="relative flex items-center px-6 h-[72px] hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="relative mr-4">
+<div class="w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-h2 text-h2">
+                        MT
+                    </div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<span class="font-label-md text-label-md text-on-surface truncate">Marketing Team</span>
+<span class="font-label-sm text-label-sm text-outline whitespace-nowrap ml-2">Tuesday</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant truncate">Elena: Can someone review the new copy?</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Chat Area -->
+<main class="flex-1 flex flex-col bg-surface-container-lowest min-w-0">
+<!-- Chat Header -->
+<header class="flex justify-between items-center w-full px-6 h-[72px] border-b border-outline-variant bg-surface-container-lowest flex-shrink-0">
+<div class="flex items-center gap-4">
+<img alt="Sarah Jenkins" class="w-10 h-10 rounded-full object-cover" data-alt="A professional headshot of a young woman with a warm smile, wearing a dark blazer over a light shirt. The lighting is soft and natural, emphasizing a corporate modern aesthetic. The background is slightly blurred to keep focus on the subject. High quality, crisp resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAi-9vcn8lHb2af7emKznvIwJZjlxheD0tetxWHC3PewcR5PauAA_v976SUsM-DQ-RVFGNFu-0JVU_OiV1bCbRdE9HJ7HJgEc2KD23IpAF9COWTTgpoiuSbE294gK_btqDshhs1G4Fw4aL0Xd27aVFvQPxIEwaW1mtx6xWCOOVw7_Rsqi8FYRORiZ_7PZ1P0E3G9-6uvHCB3eneGLcqAUM2lSel03Rhhk2ovGjAnRgysaizo5KIZRDJ8uy6Lct5Z3jI94C6EUhl4DLB"/>
+<div>
+<h2 class="font-h2 text-h2 text-on-surface">Sarah Jenkins</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span> Active now
+                    </p>
+</div>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Chat Canvas -->
+<div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6 bg-surface-container-lowest">
+<!-- Time Divider -->
+<div class="flex justify-center my-2">
+<span class="font-label-sm text-label-sm text-outline bg-surface px-4 py-1 rounded-full border border-outline-variant">Today</span>
+</div>
+<!-- Received Message Group -->
+<div class="flex flex-col gap-2 max-w-[75%] self-start">
+<div class="bg-surface-container-low text-on-surface p-4 rounded-xl rounded-tl-sm border border-outline-variant shadow-sm">
+<p class="font-body-md text-body-md">Good morning! I've reviewed the Q3 reports. Everything looks solid.</p>
+</div>
+<div class="bg-surface-container-low text-on-surface p-4 rounded-xl rounded-tl-sm border border-outline-variant shadow-sm">
+<p class="font-body-md text-body-md">The quarterly review looks solid. Let's sync at 2 PM.</p>
+</div>
+<span class="font-label-sm text-label-sm text-outline ml-1">10:42 AM</span>
+</div>
+<!-- Sent Message -->
+<div class="flex flex-col gap-2 max-w-[75%] self-end">
+<div class="bg-primary text-on-primary p-4 rounded-xl rounded-tr-sm shadow-sm">
+<p class="font-body-md text-body-md">Morning Sarah. Sounds good. I'll prep the slide deck for the marketing section before we meet.</p>
+</div>
+<div class="flex items-center justify-end gap-1 mr-1">
+<span class="font-label-sm text-label-sm text-outline">10:45 AM</span>
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="done_all" data-weight="fill">done_all</span>
+</div>
+</div>
+</div>
+<!-- Message Input Area -->
+<div class="px-6 py-4 border-t border-outline-variant bg-surface-container-lowest flex-shrink-0">
+<div class="flex items-center gap-3 w-full bg-surface-container-low border border-outline-variant rounded-full px-2 py-1 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="mood">mood</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder:text-outline py-2 px-2 min-w-0" placeholder="Type a message..." type="text"/>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="attach_file">attach_file</span>
+</button>
+<button class="p-2 bg-primary text-on-primary hover:bg-on-primary-fixed-variant transition-colors rounded-full flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="send" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+</main>
+</body></html>

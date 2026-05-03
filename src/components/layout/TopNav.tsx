@@ -1,5 +1,52 @@
+"use client";
+
 import Link from "next/link";
-import Image from "next/image";export default function TopNav() {
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { supabase } from "@/src/lib/supabase";
+
+export default function TopNav() {
+  const pathname = usePathname();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const isBoardActive = pathname === "/board" || pathname === "/";
+  const isMessagesActive = pathname?.startsWith("/messages");
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchAvatar = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!isMounted) return;
+      if (user) {
+        setAvatarUrl(
+          user.user_metadata?.avatar_url || 
+          user.user_metadata?.picture || 
+          null
+        );
+      }
+    };
+
+    fetchAvatar();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      fetchAvatar();
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const linkClass = (active: boolean) =>
+    `font-headline tracking-tight font-bold text-lg pb-1 transition-colors ${
+      active
+        ? "text-white border-b-2 border-tertiary"
+        : "text-white/70 hover:text-white"
+    }`;
+
   return (
     <header className="fixed top-0 w-full z-50 bg-[#053B50] backdrop-blur-md bg-opacity-85 shadow-[0_20px_40px_rgba(0,36,51,0.06)] flex justify-between items-center px-4 md:px-8 py-4">
       {/* Mobile Hamburger Menu */}
@@ -21,18 +68,22 @@ import Image from "next/image";export default function TopNav() {
       </h1>
 
       {/* Mobile Profile Image */}
-      <div className="md:hidden w-10 h-10 rounded-full overflow-hidden bg-surface-container flex items-center justify-center border border-white/20">
-        <span className="material-symbols-outlined text-white">account_circle</span>
+      <div className="md:hidden w-10 h-10 rounded-full overflow-hidden bg-surface-container flex items-center justify-center border border-white/20 shrink-0">
+        {avatarUrl ? (
+          <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+        ) : (
+          <span className="material-symbols-outlined text-white">account_circle</span>
+        )}
       </div>
       
       {/* Desktop Navigation Links & Search */}
       <div className="hidden md:flex items-center gap-8">
         <div className="flex items-center gap-6">
-          <Link href="/board" className="font-headline tracking-tight font-bold text-lg text-white border-b-2 border-tertiary pb-1">
+          <Link href="/board" className={linkClass(isBoardActive)}>
             Home
           </Link>
-          <Link href="#" className="font-headline tracking-tight font-bold text-lg text-white/70 hover:text-white transition-colors">
-            Archive
+          <Link href="/messages" className={linkClass(isMessagesActive)}>
+            Messages
           </Link>
         </div>
         
@@ -49,8 +100,12 @@ import Image from "next/image";export default function TopNav() {
             <button className="p-2 text-white hover:bg-white/10 rounded-full transition-all duration-200 scale-95 active:scale-90">
               <span className="material-symbols-outlined">notifications</span>
             </button>
-            <button className="p-2 text-white hover:bg-white/10 rounded-full transition-all duration-200 scale-95 active:scale-90">
-              <span className="material-symbols-outlined">account_circle</span>
+            <button className="p-1 text-white hover:bg-white/10 rounded-full transition-all duration-200 scale-95 active:scale-90 flex items-center justify-center h-10 w-10 overflow-hidden">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Profile" className="w-full h-full rounded-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  <span className="material-symbols-outlined">account_circle</span>
+                )}
             </button>
           </div>
         </div>
