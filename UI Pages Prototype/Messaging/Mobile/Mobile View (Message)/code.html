@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chat Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Custom scrollbar for webkit to keep it clean */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e0e3e5; /* surface-variant */
+            border-radius: 4px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#b3c5ff",
+                        "on-background": "#191c1e",
+                        "outline": "#727687",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eceef0",
+                        "primary-fixed": "#dae1ff",
+                        "on-secondary-fixed": "#0b1c30",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-primary-fixed": "#001849",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#191c1e",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-highest": "#e0e3e5",
+                        "inverse-on-surface": "#eff1f3",
+                        "outline-variant": "#c2c6d8",
+                        "surface-container-low": "#f2f4f6",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "surface-container-high": "#e6e8ea",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "inverse-primary": "#b3c5ff",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#424656",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "tertiary-fixed": "#ffdbd0",
+                        "surface-tint": "#0054d6",
+                        "tertiary-container": "#cc4204",
+                        "surface-variant": "#e0e3e5",
+                        "on-secondary-container": "#54647a",
+                        "primary": "#0050cb",
+                        "surface": "#f7f9fb",
+                        "background": "#f7f9fb",
+                        "primary-container": "#0066ff",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#003fa4",
+                        "on-tertiary-container": "#fff6f4",
+                        "on-tertiary-fixed": "#390c00",
+                        "secondary-container": "#d0e1fb",
+                        "secondary": "#505f76",
+                        "on-primary-container": "#f8f7ff",
+                        "inverse-surface": "#2d3133",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#a33200",
+                        "on-tertiary-fixed-variant": "#832600",
+                        "surface-bright": "#f7f9fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "2rem",
+                        "xs": "0.25rem",
+                        "lg": "1.5rem",
+                        "margin": "1.5rem",
+                        "sm": "0.5rem",
+                        "md": "1rem",
+                        "gutter": "1rem"
+                    },
+                    "fontFamily": {
+                        "h1": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "h2": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h1": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "h2": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface-container-highest min-h-screen flex items-center justify-center font-body-md text-body-md text-on-surface antialiased">
+<!-- Mobile Device Simulator Wrapper (for desktop viewing) -->
+<div class="w-full h-[884px] sm:h-[844px] sm:w-[390px] sm:rounded-2xl sm:border border-outline-variant bg-surface flex flex-col overflow-hidden sm:shadow-2xl relative">
+<!-- Top App Bar -->
+<header class="flex items-center px-sm py-sm h-16 bg-surface-container-lowest border-b border-outline-variant shrink-0 z-10">
+<button aria-label="Go back" class="p-sm text-primary hover:bg-surface-container rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<div class="flex items-center flex-1 min-w-0 ml-xs cursor-pointer">
+<div class="relative w-10 h-10 shrink-0">
+<img alt="Sarah Jenkins avatar" class="w-full h-full object-cover rounded-full border border-outline-variant" data-alt="A professional headshot of a young woman with a warm complexion and curly dark hair, wearing a crisp white blouse. She has a subtle, friendly smile. The lighting is soft and even, highlighting her features against a minimal, out-of-focus light gray background. The overall aesthetic is clean, corporate modern, and highly legible, suitable for a professional communication app avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw1mNMWl1i-kFJUua_PKA4SCiA8CWrk5O5M2hKbTG_Sikl6jKxn1NLTkK17iF0CoNwmHAyYMsAEn7vjQ28WvOTP27A0oH_isxKk03uJ6Qr5uAWiiRbHtFQwYa9D3pUdh1NpGsn9nyRCHDQchyYi2tWe7VNPmtYOXHwX-i28_IsdaMtnltbBMHFR52gMYjQv1Ks_dXFuHMMIjvqY0CtNe16IXBjWmafAPja9mkoVrBkG9bYfzKvrY7wGpPnHEIUfhYI5QirFwaGwG1z"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-surface-container-lowest rounded-full"></div>
+</div>
+<div class="ml-sm flex flex-col justify-center min-w-0">
+<h2 class="font-label-md text-label-md text-on-surface truncate">Sarah Jenkins</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Active now</span>
+</div>
+</div>
+</header>
+<!-- Chat Canvas Area -->
+<main class="flex-1 overflow-y-auto p-md flex flex-col gap-margin bg-background">
+<!-- Date Separator -->
+<div class="flex justify-center my-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-md py-xs rounded-full">Yesterday, 3:45 PM</span>
+</div>
+<!-- Received Message Group -->
+<div class="flex flex-col gap-xs items-start w-full">
+<div class="flex items-end max-w-[85%]">
+<div class="bg-surface-container text-on-surface px-md py-sm rounded-2xl rounded-bl-sm font-body-md text-body-md break-words shadow-sm">
+                        Hey! Are we still on for the project review meeting tomorrow?
+                    </div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant ml-1">11:45 AM</span>
+</div>
+<!-- Sent Message Group -->
+<div class="flex flex-col gap-xs items-end w-full">
+<div class="flex items-end max-w-[85%]">
+<div class="bg-primary text-on-primary px-md py-sm rounded-2xl rounded-br-sm font-body-md text-body-md break-words shadow-sm">
+                        Hi Sarah. Yes, definitely. I've updated the Figma files based on the latest feedback.
+                    </div>
+</div>
+<div class="flex items-center gap-1 mr-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">11:47 AM</span>
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 0;">done_all</span>
+</div>
+</div>
+<div class="flex flex-col gap-xs items-end w-full mt-[-8px]">
+<div class="flex items-end max-w-[85%]">
+<div class="bg-primary text-on-primary px-md py-sm rounded-2xl rounded-tr-sm rounded-br-sm font-body-md text-body-md break-words shadow-sm">
+                        I'll send over the link shortly so you can take a look before we meet.
+                    </div>
+</div>
+<div class="flex items-center gap-1 mr-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">11:48 AM</span>
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 0;">done_all</span>
+</div>
+</div>
+<!-- Date Separator -->
+<div class="flex justify-center my-xs">
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-md py-xs rounded-full">Today</span>
+</div>
+<!-- Received Message Group -->
+<div class="flex flex-col gap-xs items-start w-full">
+<div class="flex items-end max-w-[85%]">
+<div class="bg-surface-container text-on-surface px-md py-sm rounded-2xl rounded-bl-sm font-body-md text-body-md break-words shadow-sm">
+                        Perfect, thanks! I saw the updates, the new navigation structure looks much cleaner.
+                    </div>
+</div>
+</div>
+<div class="flex flex-col gap-xs items-start w-full mt-[-8px]">
+<div class="flex items-end max-w-[85%]">
+<div class="bg-surface-container text-on-surface px-md py-sm rounded-2xl rounded-tl-sm rounded-bl-sm font-body-md text-body-md break-words shadow-sm">
+                        Can we also quickly discuss the secondary color palette tokens during the call?
+                    </div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant ml-1">9:16 AM</span>
+</div>
+<!-- Sent Message Group -->
+<div class="flex flex-col gap-xs items-end w-full">
+<div class="flex items-end max-w-[85%]">
+<div class="bg-primary text-on-primary px-md py-sm rounded-2xl rounded-br-sm font-body-md text-body-md break-words shadow-sm">
+                        Absolutely. I've prepared a few variations using the surface-container variables we discussed.
+                    </div>
+</div>
+<div class="flex items-center gap-1 mr-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Just now</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">check</span>
+</div>
+</div>
+<!-- spacer to ensure bottom message isn't hidden behind input -->
+<div class="h-2 w-full"></div>
+</main>
+<!-- Bottom Input Area -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant p-sm flex items-end gap-sm shrink-0 z-10 pb-[env(safe-area-inset-bottom,0.5rem)]">
+<div class="flex-1 bg-surface-container-low border border-outline-variant focus-within:border-primary focus-within:ring-1 focus-within:ring-primary rounded-full flex items-center px-md py-2 transition-all min-h-[44px]">
+<input class="w-full bg-transparent border-none outline-none font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant p-0 focus:ring-0" placeholder="Message..." type="text"/>
+<button aria-label="Choose emoji" class="ml-sm text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">mood</span>
+</button>
+</div>
+<button aria-label="Send message" class="w-11 h-11 bg-primary text-on-primary rounded-full flex items-center justify-center shrink-0 hover:bg-primary-container hover:text-on-primary-container transition-colors mb-[2px]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</footer>
+</div>
+</body></html>
