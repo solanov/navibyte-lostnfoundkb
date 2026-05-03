@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import BottomNavBar from "@/src/components/layout/BottomNavBar";
+import ItemDetailModal from "@/src/components/pages/ItemDetailModal";
 import { supabase } from "@/src/lib/supabase";
 import { Message, useConversation } from "@/src/lib/useConversation";
 
@@ -96,6 +97,7 @@ export default function MessagesView() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
 
   const {
     messages,
@@ -461,6 +463,59 @@ export default function MessagesView() {
 
               <div className="flex-1 overflow-y-auto bg-background px-4 py-5 md:px-6">
                 <div className="mx-auto flex max-w-3xl flex-col gap-4">
+                  {/* Product Reference Card */}
+                  {selectedBundle.item && (
+                    <button
+                      onClick={() => setIsItemModalOpen(true)}
+                      className="group flex w-full items-center gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-3 text-left shadow-sm transition-all hover:border-[#44afa9]/40 hover:shadow-md active:scale-[0.99] md:p-4"
+                    >
+                      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-outline-variant/20 bg-surface-container-low md:h-16 md:w-16">
+                        {selectedBundle.item.image_url ? (
+                          <img
+                            src={selectedBundle.item.image_url}
+                            alt={getItemTitle(selectedBundle.item)}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-outline-variant">
+                            <span className="material-symbols-outlined text-2xl">
+                              {selectedBundle.item.categories?.icon_identifier || "help_outline"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold text-on-surface group-hover:text-primary">
+                          {getItemTitle(selectedBundle.item)}
+                        </p>
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          <span
+                            className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${
+                              (selectedBundle.item.status === "Found")
+                                ? "bg-tertiary-fixed text-on-tertiary-container"
+                                : "bg-[#ba1a1a] text-white"
+                            }`}
+                          >
+                            {selectedBundle.item.status === "Reported" ? "Lost" : selectedBundle.item.status}
+                          </span>
+                          {selectedBundle.item.zone && (
+                            <span className="flex items-center gap-0.5 text-[11px] font-semibold text-on-surface-variant">
+                              <span className="material-symbols-outlined text-[13px]">location_on</span>
+                              {selectedBundle.item.zone}
+                            </span>
+                          )}
+                          {selectedBundle.item.categories?.name && (
+                            <span className="text-[11px] font-semibold text-on-surface-variant">
+                              · {selectedBundle.item.categories.name}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="material-symbols-outlined shrink-0 text-lg text-outline-variant transition-colors group-hover:text-[#44afa9]">
+                        chevron_right
+                      </span>
+                    </button>
+                  )}
                   {messagesLoading && messages.length === 0 ? (
                     <div className="py-16 text-center text-sm font-medium text-on-surface-variant">
                       Loading messages...
@@ -555,6 +610,36 @@ export default function MessagesView() {
       </div>
 
       {!selectedConversationId && <BottomNavBar />}
+
+      {/* Item Detail Modal */}
+      <ItemDetailModal
+        isOpen={isItemModalOpen}
+        item={
+          selectedBundle?.item
+            ? {
+                post_id: selectedBundle.item.post_id,
+                general_description: selectedBundle.item.general_description || "",
+                zone: selectedBundle.item.zone || "Unknown",
+                status: selectedBundle.item.status || "Reported",
+                image_url: selectedBundle.item.image_url,
+                reported_by: selectedBundle.item.reported_by || undefined,
+                categories: selectedBundle.item.categories
+                  ? {
+                      name: selectedBundle.item.categories.name || "Uncategorized",
+                      icon_identifier: selectedBundle.item.categories.icon_identifier || "help_outline",
+                    }
+                  : undefined,
+              }
+            : null
+        }
+        onClose={() => setIsItemModalOpen(false)}
+        onClaimClick={() => {
+          setIsItemModalOpen(false);
+        }}
+        onContactClick={() => {
+          setIsItemModalOpen(false);
+        }}
+      />
     </div>
   );
 }
