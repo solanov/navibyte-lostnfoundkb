@@ -207,4 +207,54 @@ I learned that you should always double check and test the codes that the AI age
 
 - Security is by far the most important thing to consider in software development especially in todays era where you can just easily use ai to code. We should prioritize on learning security best practices since I think that is where AI agents usually overlook things.
 
+## Entry 8 - (04/29/2026)
 
+### **Task(s)**
+
+-Implemented admin page and core logic for admin and user roles.
+
+### **Prompt (or Summary) provided to the AI**
+
+- Guide me into creating a proper admin page for the lost and found system. It should have a dashboard that shows the statistics of the application, a page for user management, a page for item management, and a page for message management. 
+ 
+### **Output**
+
+- The AI agent gave me a very comprehensive guide on how to implement an admin page for the lost and found system. It provided an algorithm and proper routing codes for the feature.  
+ 
+### **What you changed/improved/rejected fom the AI's output**
+ 
+-I changed the flow of routing since the ai agent still passes through user dashboard.
+ 
+### **Reason (Why?)**
+ 
+- Users should be redirected to the admin dashboard directly after login if they are an admin.  
+ 
+### **What you learned or the decision you made as a result**
+ 
+- I learned that even a powerful AI agent can still make a mistake, so it's important to always double-check the output and make sure it's correct. 
+
+## Entry 9 - (05/02/2026)
+
+### **Task(s)**
+
+- Implemented user - user conversation.
+
+### **Prompt (or Summary) provided to the AI**
+
+- Implement a chat system between users. It should have a page for the user's conversations, a page for the user's messages, and a page for the user's chatroom.
+ 
+### **Output**
+
+- The AI agent had a hard time generating the chat system. It provided a lot of sample codes and algorithms but none of them worked. I watched tutorials from youtube and other resources to understand how to implement a chat system. 
+ 
+### **What you changed/improved/rejected fom the AI's output**
+ 
+- I didn't accept the output of the ai agent since I think its approach was too complicated and inefficient.
+ 
+### **Reason (Why?)**
+ 
+- Too complicated and inefficient approach.  
+ 
+### **What you learned or the decision you made as a result**
+ 
+- I learned that AI agents are great for generating ideas and sample codes, but they are not always the best for complex problems. Sometimes, it's better to rely on human intuition and creativity. 
