@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Report Generation - The Academic Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-fixed": "#00201e",
+                      "inverse-on-surface": "#f3f0f0",
+                      "tertiary-container": "#003e3b",
+                      "secondary-fixed": "#bde9ff",
+                      "outline-variant": "#c1c7cd",
+                      "error": "#ba1a1a",
+                      "primary-fixed-dim": "#a1cce6",
+                      "on-secondary-fixed": "#001f2a",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-fixed": "#001e2c",
+                      "tertiary": "#002624",
+                      "surface-tint": "#38637a",
+                      "surface-container-high": "#eae8e7",
+                      "on-secondary-fixed-variant": "#004d64",
+                      "secondary": "#0d6682",
+                      "on-primary-fixed-variant": "#1d4c61",
+                      "primary": "#002433",
+                      "outline": "#71787d",
+                      "on-background": "#1b1c1c",
+                      "surface-container": "#f0eded",
+                      "tertiary-fixed": "#8df4ec",
+                      "on-tertiary-fixed-variant": "#00504c",
+                      "on-secondary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "on-surface": "#1b1c1c",
+                      "inverse-primary": "#a1cce6",
+                      "surface-dim": "#dcd9d9",
+                      "surface-bright": "#fbf9f8",
+                      "secondary-fixed-dim": "#8ad0ef",
+                      "background": "#fbf9f8",
+                      "inverse-surface": "#303030",
+                      "on-primary-container": "#7aa5be",
+                      "surface": "#fbf9f8",
+                      "surface-container-low": "#f5f3f3",
+                      "surface-container-highest": "#e4e2e1",
+                      "on-error": "#ffffff",
+                      "primary-fixed": "#c2e8ff",
+                      "on-tertiary-container": "#44afa9",
+                      "secondary-container": "#98defe",
+                      "primary-container": "#053b50",
+                      "on-surface-variant": "#41484c",
+                      "error-container": "#ffdad6",
+                      "surface-variant": "#e4e2e1",
+                      "on-secondary-container": "#05637f",
+                      "tertiary-fixed-dim": "#70d7d0",
+                      "on-error-container": "#93000a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "fontFamily": {
+                      "headline": ["Public Sans", "sans-serif"],
+                      "display": ["Public Sans", "sans-serif"],
+                      "body": ["Inter", "sans-serif"],
+                      "label": ["Inter", "sans-serif"]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-filled {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface pb-24 pt-20 antialiased selection:bg-tertiary-fixed selection:text-on-tertiary-fixed md:pb-0">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-primary-container dark:bg-slate-900 shadow-sm flex items-center justify-between px-6 h-16 transition-colors">
+<div class="flex items-center gap-3">
+<span aria-hidden="true" class="material-symbols-outlined text-white text-2xl">account_balance</span>
+<h1 class="font-headline tracking-tight font-bold text-xl text-white">The Academic Curator</h1>
+</div>
+<div>
+<div class="w-8 h-8 rounded-full bg-white/20 overflow-hidden flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm">person</span>
+</div>
+</div>
+</header>
+<main class="px-4 max-w-md mx-auto mt-6 space-y-6">
+<div class="space-y-1">
+<h2 class="font-headline font-bold text-2xl text-primary tracking-tight">Generate Report</h2>
+<p class="text-on-surface-variant text-sm font-body">Configure parameters for archival extraction.</p>
+</div>
+<form class="space-y-6">
+<section class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_2px_12px_rgba(0,36,51,0.03)] border border-outline-variant/15 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-container"></div>
+<h3 class="font-headline font-bold text-lg text-primary mb-4">Report Parameters</h3>
+<div class="space-y-4">
+<div>
+<label class="block text-xs font-semibold text-primary uppercase tracking-wider mb-1.5 font-headline" for="reportType">Collection Type</label>
+<select class="w-full bg-surface-container-low border-none rounded-lg text-sm text-on-surface focus:ring-2 focus:ring-on-tertiary-container py-3 px-4 appearance-none" id="reportType">
+<option>High-Value Artifacts</option>
+<option>Standard Electronics</option>
+<option>Library Archives</option>
+<option>Unclaimed Property</option>
+</select>
+</div>
+<div>
+<label class="block text-xs font-semibold text-primary uppercase tracking-wider mb-1.5 font-headline" for="department">Department</label>
+<select class="w-full bg-surface-container-low border-none rounded-lg text-sm text-on-surface focus:ring-2 focus:ring-on-tertiary-container py-3 px-4 appearance-none" id="department">
+<option>All Departments</option>
+<option>School of Engineering</option>
+<option>College of Arts</option>
+<option>Administration Building</option>
+</select>
+</div>
+</div>
+</section>
+<section class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_2px_12px_rgba(0,36,51,0.03)] border border-outline-variant/15 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-container"></div>
+<h3 class="font-headline font-bold text-lg text-primary mb-4">Temporal Range</h3>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-semibold text-primary uppercase tracking-wider mb-1.5 font-headline" for="startDate">Start Date</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none rounded-lg text-sm text-on-surface focus:ring-2 focus:ring-on-tertiary-container py-3 pl-10 pr-3" id="startDate" type="date" value="2023-09-01"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">calendar_today</span>
+</div>
+</div>
+<div>
+<label class="block text-xs font-semibold text-primary uppercase tracking-wider mb-1.5 font-headline" for="endDate">End Date</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none rounded-lg text-sm text-on-surface focus:ring-2 focus:ring-on-tertiary-container py-3 pl-10 pr-3" id="endDate" type="date" value="2023-11-15"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">calendar_today</span>
+</div>
+</div>
+</div>
+</section>
+<section class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_2px_12px_rgba(0,36,51,0.03)] border border-outline-variant/15 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-container"></div>
+<h3 class="font-headline font-bold text-lg text-primary mb-4">Output Format</h3>
+<div class="grid grid-cols-3 gap-3">
+<label class="relative cursor-pointer group">
+<input checked="" class="peer sr-only" name="format" type="radio" value="pdf"/>
+<div class="flex flex-col items-center justify-center p-4 rounded-lg border-2 border-transparent bg-surface-container-low peer-checked:border-on-tertiary-container peer-checked:bg-surface-container-lowest transition-all">
+<span class="material-symbols-outlined text-[32px] mb-2 text-on-surface-variant group-hover:text-on-tertiary-container peer-checked:text-on-tertiary-container peer-checked:icon-filled">picture_as_pdf</span>
+<span class="text-xs font-semibold text-primary font-headline">PDF</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="peer sr-only" name="format" type="radio" value="csv"/>
+<div class="flex flex-col items-center justify-center p-4 rounded-lg border-2 border-transparent bg-surface-container-low peer-checked:border-on-tertiary-container peer-checked:bg-surface-container-lowest transition-all">
+<span class="material-symbols-outlined text-[32px] mb-2 text-on-surface-variant group-hover:text-on-tertiary-container peer-checked:text-on-tertiary-container peer-checked:icon-filled">csv</span>
+<span class="text-xs font-semibold text-primary font-headline">CSV</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="peer sr-only" name="format" type="radio" value="excel"/>
+<div class="flex flex-col items-center justify-center p-4 rounded-lg border-2 border-transparent bg-surface-container-low peer-checked:border-on-tertiary-container peer-checked:bg-surface-container-lowest transition-all">
+<span class="material-symbols-outlined text-[32px] mb-2 text-on-surface-variant group-hover:text-on-tertiary-container peer-checked:text-on-tertiary-container peer-checked:icon-filled">table_view</span>
+<span class="text-xs font-semibold text-primary font-headline">Excel</span>
+</div>
+</label>
+</div>
+</section>
+<button class="w-full bg-gradient-to-br from-on-tertiary-container to-[#38938e] text-white font-headline font-bold text-base py-4 rounded-lg shadow-[0_8px_16px_rgba(68,175,169,0.2)] active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined">analytics</span>
+                Generate Extract
+            </button>
+</form>
+<div class="mt-8 rounded-xl overflow-hidden aspect-[0.36] hidden">
+<img alt="A tall, abstract digital rendering representing data extraction and curation. Vertical streams of binary code and glowing geometric fragments float downwards against a deep, rich primary navy background (#002433). Soft, ambient lighting in vibrant teal (#44afa9) illuminates the data streams, creating a high-tech, modern academic feel. The composition is highly asymmetric, focusing on verticality and elegant data flow." class="w-full h-full object-cover" data-alt="A tall, abstract digital rendering representing data extraction and curation. Vertical streams of binary code and glowing geometric fragments float downwards against a deep, rich primary navy background (#002433). Soft, ambient lighting in vibrant teal (#44afa9) illuminates the data streams, creating a high-tech, modern academic feel. The composition is highly asymmetric, focusing on verticality and elegant data flow." src="https://lh3.googleusercontent.com/aida/ADBb0ugVvquat9Y2CyVdVqVi11CpaehdQBHpax2o7iqafzh6XbmaVEd8ClA6A7Y7GzB4ONUmVqJwrwOsdUKgt_9JVvwbe42i2ABlpZLDJOg8V9V6d3OJeTkjRoFhVGeWwzFvq5TDZmi4GWq8EUtK4ErEIQ9Y_At7Z-qnB_1S8aYHxQG6Kf6d2Jr2ce7fXi0hS7M1T4hvJ3aEl0OYuViACdKDwktLFVnB-kxs09FIlGiq9BuC6NSVPlnaiScNwOdpfMggTa5hGaVec8H2Wws"/>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full h-20 z-50 flex justify-around items-center px-4 pb-safe bg-white dark:bg-slate-900 rounded-t-xl shadow-[0_-4px_12px_rgba(0,0,0,0.03)] md:hidden">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#44afa9] active:translate-y-0.5 transition-transform w-16 h-14" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">inventory_2</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase">Vault</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#44afa9] active:translate-y-0.5 transition-transform w-16 h-14" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">group</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase">Users</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#44afa9] active:translate-y-0.5 transition-transform w-16 h-14" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">delete_sweep</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase">Queue</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#44afa9] bg-[#8df4ec]/10 rounded-xl px-4 py-1 active:translate-y-0.5 transition-transform w-16 h-14" href="#">
+<span class="material-symbols-outlined text-2xl mb-1 icon-filled">history_edu</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase text-[#44afa9] dark:text-[#44afa9]">Logs</span>
+</a>
+</nav>
+</body></html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Audit Trail - The Academic Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#00201e",
+                        "inverse-on-surface": "#f3f0f0",
+                        "tertiary-container": "#003e3b",
+                        "secondary-fixed": "#bde9ff",
+                        "outline-variant": "#c1c7cd",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#a1cce6",
+                        "on-secondary-fixed": "#001f2a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001e2c",
+                        "tertiary": "#002624",
+                        "surface-tint": "#38637a",
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "secondary": "#0d6682",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "primary": "#002433",
+                        "outline": "#71787d",
+                        "on-background": "#1b1c1c",
+                        "surface-container": "#f0eded",
+                        "tertiary-fixed": "#8df4ec",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#1b1c1c",
+                        "inverse-primary": "#a1cce6",
+                        "surface-dim": "#dcd9d9",
+                        "surface-bright": "#fbf9f8",
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "background": "#fbf9f8",
+                        "inverse-surface": "#303030",
+                        "on-primary-container": "#7aa5be",
+                        "surface": "#fbf9f8",
+                        "surface-container-low": "#f5f3f3",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#c2e8ff",
+                        "on-tertiary-container": "#44afa9",
+                        "secondary-container": "#98defe",
+                        "primary-container": "#053b50",
+                        "on-surface-variant": "#41484c",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e4e2e1",
+                        "on-secondary-container": "#05637f",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Public Sans"],
+                        "display": ["Public Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline, .font-display { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill-icon { font-variation-settings: 'FILL' 1; }
+        
+        /* Ambient shadows and transitions */
+        .ambient-shadow { box-shadow: 0 20px 40px rgba(0, 36, 51, 0.06); }
+        .ghost-border { border: 1px solid rgba(193, 199, 205, 0.15); } /* outline-variant at 15% */
+        .glass-nav { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        
+        /* Subtle scrollbar for data density */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e4e2e1; border-radius: 4px; }
+        
+        /* Safe area padding for mobile nav */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col pt-16 pb-24 selection:bg-tertiary-fixed selection:text-on-tertiary-fixed">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-primary-container flex items-center justify-between px-6 h-16 shadow-md transition-all duration-200">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-primary text-2xl">account_balance</span>
+<span class="font-headline tracking-tight font-bold text-xl text-on-primary">The Academic Curator</span>
+</div>
+<div>
+<!-- Abstract Avatar -->
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs uppercase tracking-wider shadow-sm">
+                UA
+            </div>
+</div>
+</header>
+<!-- Main Content Area: Audit Trail -->
+<main class="flex-grow flex flex-col w-full max-w-md mx-auto px-4 py-6 md:hidden">
+<!-- Page Header Context -->
+<div class="mb-6">
+<h1 class="font-headline font-extrabold text-3xl tracking-tight text-primary mb-1">System Logs</h1>
+<p class="font-body text-sm text-on-surface-variant">Chronological audit trail of administrative actions and inventory state changes.</p>
+</div>
+<!-- Filter/Action Row (Editorial Context) -->
+<div class="flex items-center justify-between mb-6">
+<div class="flex gap-2">
+<span class="bg-surface-container-low text-on-surface-variant font-label text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-full ghost-border">Last 24 Hrs</span>
+<span class="bg-surface-container-low text-on-surface-variant font-label text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-full ghost-border flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">filter_list</span> Filter</span>
+</div>
+<button class="text-secondary font-label text-xs uppercase tracking-wider font-semibold hover:text-primary transition-colors">Export .CSV</button>
+</div>
+<!-- Log List (High Density, Tonal Layers) -->
+<div class="flex flex-col gap-4 relative">
+<!-- Abstract Timeline Line (Subtle) -->
+<div class="absolute left-4 top-2 bottom-0 w-px bg-surface-container-high -z-10"></div>
+<!-- Log Entry 1 -->
+<div class="relative flex gap-4 items-start group">
+<!-- Status Node -->
+<div class="w-8 h-8 shrink-0 rounded-full bg-surface-container-lowest flex items-center justify-center ambient-shadow ghost-border mt-1">
+<span class="material-symbols-outlined text-primary text-[16px]">done_all</span>
+</div>
+<!-- Content Card -->
+<div class="flex-1 bg-surface-container-lowest rounded-xl p-4 ambient-shadow ghost-border transition-transform duration-200 group-hover:-translate-y-1 group-hover:bg-surface-bright">
+<div class="flex justify-between items-baseline mb-2">
+<span class="font-label text-[10px] font-bold tracking-widest text-secondary uppercase">14:02 EST</span>
+<span class="font-label text-[10px] tracking-wide text-on-surface-variant">Admin: UA-992</span>
+</div>
+<p class="font-body text-sm text-primary font-medium mb-2 leading-snug">Marked <span class="font-bold">REF-9941</span> (Calculus Textbook) as Returned to Student.</p>
+<div class="flex items-center gap-2 mt-3 pt-3 border-t border-surface-container-low border-opacity-50">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-label text-[9px] uppercase tracking-wider px-2 py-0.5 rounded">Verified ID</span>
+<span class="font-body text-[11px] text-outline truncate flex-1">IP: 192.168.1.45</span>
+</div>
+</div>
+</div>
+<!-- Log Entry 2 -->
+<div class="relative flex gap-4 items-start group">
+<!-- Status Node -->
+<div class="w-8 h-8 shrink-0 rounded-full bg-surface-container-lowest flex items-center justify-center ambient-shadow ghost-border mt-1">
+<span class="material-symbols-outlined text-secondary text-[16px]">inventory_2</span>
+</div>
+<!-- Content Card -->
+<div class="flex-1 bg-surface-container-lowest rounded-xl p-4 ambient-shadow ghost-border transition-transform duration-200 group-hover:-translate-y-1 group-hover:bg-surface-bright">
+<div class="flex justify-between items-baseline mb-2">
+<span class="font-label text-[10px] font-bold tracking-widest text-secondary uppercase">13:15 EST</span>
+<span class="font-label text-[10px] tracking-wide text-on-surface-variant">System Auto</span>
+</div>
+<p class="font-body text-sm text-primary font-medium mb-2 leading-snug">Moved <span class="font-bold">REF-8820</span> to Long-Term Storage Facility B.</p>
+<div class="flex items-center gap-2 mt-3 pt-3 border-t border-surface-container-low border-opacity-50">
+<span class="bg-surface-container-highest text-on-surface-variant font-label text-[9px] uppercase tracking-wider px-2 py-0.5 rounded">Automated Rule</span>
+<span class="font-body text-[11px] text-outline truncate flex-1">Policy: &gt;90 Days Unclaimed</span>
+</div>
+</div>
+</div>
+<!-- Log Entry 3 (Warning/Alert state) -->
+<div class="relative flex gap-4 items-start group">
+<!-- Status Node -->
+<div class="w-8 h-8 shrink-0 rounded-full bg-error-container flex items-center justify-center ambient-shadow ghost-border mt-1">
+<span class="material-symbols-outlined text-on-error-container text-[16px]">warning</span>
+</div>
+<!-- Content Card -->
+<div class="flex-1 bg-surface-container-lowest rounded-xl p-4 ambient-shadow ghost-border transition-transform duration-200 group-hover:-translate-y-1 group-hover:bg-surface-bright border-l-2 border-l-error">
+<div class="flex justify-between items-baseline mb-2">
+<span class="font-label text-[10px] font-bold tracking-widest text-error uppercase">11:45 EST</span>
+<span class="font-label text-[10px] tracking-wide text-on-surface-variant">Admin: UA-104</span>
+</div>
+<p class="font-body text-sm text-primary font-medium mb-2 leading-snug">Override requested for <span class="font-bold">REF-1002</span> disposal protocol.</p>
+<div class="mt-2 bg-surface-container p-2 rounded text-[11px] text-on-surface-variant font-body italic border-l border-outline-variant">
+                        "High-value item (Microscope). Extending hold period pending department chair approval."
+                    </div>
+<div class="flex items-center gap-2 mt-3 pt-3 border-t border-surface-container-low border-opacity-50">
+<span class="bg-error text-on-error font-label text-[9px] uppercase tracking-wider px-2 py-0.5 rounded">Override Logged</span>
+<span class="font-body text-[11px] text-outline truncate flex-1">IP: 10.0.4.11</span>
+</div>
+</div>
+</div>
+<!-- Log Entry 4 -->
+<div class="relative flex gap-4 items-start group">
+<!-- Status Node -->
+<div class="w-8 h-8 shrink-0 rounded-full bg-surface-container-lowest flex items-center justify-center ambient-shadow ghost-border mt-1">
+<span class="material-symbols-outlined text-primary text-[16px]">add_circle</span>
+</div>
+<!-- Content Card -->
+<div class="flex-1 bg-surface-container-lowest rounded-xl p-4 ambient-shadow ghost-border transition-transform duration-200 group-hover:-translate-y-1 group-hover:bg-surface-bright">
+<div class="flex justify-between items-baseline mb-2">
+<span class="font-label text-[10px] font-bold tracking-widest text-secondary uppercase">09:00 EST</span>
+<span class="font-label text-[10px] tracking-wide text-on-surface-variant">Admin: UA-992</span>
+</div>
+<p class="font-body text-sm text-primary font-medium mb-2 leading-snug">New item <span class="font-bold">REF-9942</span> (Leather Satchel) logged into Vault Main.</p>
+<div class="flex items-center gap-2 mt-3 pt-3 border-t border-surface-container-low border-opacity-50">
+<span class="font-body text-[11px] text-outline truncate flex-1">Tag Printed &amp; Affixed</span>
+</div>
+</div>
+</div>
+<!-- Abstract graphic to break up the list, utilizing the provided image in a subtle way -->
+<div class="my-4 rounded-xl overflow-hidden h-24 relative ghost-border ambient-shadow">
+<div class="absolute inset-0 bg-primary/80 z-10 mix-blend-multiply"></div>
+<img alt="Abstract representation of organized, archived data patterns in a dark, moody environment with soft teal and navy tones, representing the digital ledger." class="w-full h-full object-cover object-center" data-alt="A highly abstract, editorial-style macro photograph of architectural leading lines or stacked vellum paper in a dimly lit environment. The lighting is cinematic, utilizing deep navy blue (primary) and soft teal (on_tertiary_container) tones to create a moody, institutional atmosphere. The composition is asymmetrical, suggesting organized data or a secure archive, fitting the 'Academic Curator' aesthetic. No text or UI elements." src="https://lh3.googleusercontent.com/aida/ADBb0ugVvquat9Y2CyVdVqVi11CpaehdQBHpax2o7iqafzh6XbmaVEd8ClA6A7Y7GzB4ONUmVqJwrwOsdUKgt_9JVvwbe42i2ABlpZLDJOg8V9V6d3OJeTkjRoFhVGeWwzFvq5TDZmi4GWq8EUtK4ErEIQ9Y_At7Z-qnB_1S8aYHxQG6Kf6d2Jr2ce7fXi0hS7M1T4hvJ3aEl0OYuViACdKDwktLFVnB-kxs09FIlGiq9BuC6NSVPlnaiScNwOdpfMggTa5hGaVec8H2Wws"/>
+<div class="absolute inset-0 z-20 flex items-center justify-center p-4">
+<span class="font-headline text-xs uppercase tracking-widest text-white/70">Previous Day Entries</span>
+</div>
+</div>
+<!-- Log Entry 5 (Previous Day) -->
+<div class="relative flex gap-4 items-start group opacity-70">
+<!-- Status Node -->
+<div class="w-8 h-8 shrink-0 rounded-full bg-surface-container-lowest flex items-center justify-center ambient-shadow ghost-border mt-1">
+<span class="material-symbols-outlined text-outline text-[16px]">person_search</span>
+</div>
+<!-- Content Card -->
+<div class="flex-1 bg-surface-container-lowest rounded-xl p-4 ghost-border">
+<div class="flex justify-between items-baseline mb-2">
+<span class="font-label text-[10px] font-bold tracking-widest text-outline uppercase">Yesterday 16:30</span>
+<span class="font-label text-[10px] tracking-wide text-outline">Admin: UA-22</span>
+</div>
+<p class="font-body text-sm text-on-surface-variant font-medium leading-snug">Bulk search performed on 'Library 2nd Floor' tags.</p>
+</div>
+</div>
+</div>
+<!-- Bottom Spacing for Nav -->
+<div class="h-8"></div>
+</main>
+<!-- BottomNavBar (from JSON) -->
+<!-- Applying ACTIVE logic: The current page is "System Logs" or "Audit Trail", so "Logs" is the active tab. -->
+<nav class="fixed bottom-0 left-0 w-full h-20 z-50 flex justify-around items-center px-4 pb-safe bg-white dark:bg-slate-900 rounded-t-xl shadow-[0_-4px_12px_rgba(0,0,0,0.03)] border-t-0 md:hidden transition-all duration-200">
+<!-- Vault (Inactive) -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-tertiary transition-colors w-16 h-14" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">inventory_2</span>
+<span class="font-label text-[11px] font-medium tracking-wide uppercase">Vault</span>
+</a>
+<!-- Users (Inactive) -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-tertiary transition-colors w-16 h-14" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">group</span>
+<span class="font-label text-[11px] font-medium tracking-wide uppercase">Users</span>
+</a>
+<!-- Queue (Inactive) -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-tertiary transition-colors w-16 h-14" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">delete_sweep</span>
+<span class="font-label text-[11px] font-medium tracking-wide uppercase">Queue</span>
+</a>
+<!-- Logs (ACTIVE) -->
+<a class="flex flex-col items-center justify-center text-tertiary bg-tertiary-fixed/20 rounded-xl px-4 py-1 h-14 min-w-[64px] active:translate-y-0.5 transition-transform" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1 fill-icon">history_edu</span>
+<span class="font-label text-[11px] font-medium tracking-wide uppercase">Logs</span>
+</a>
+</nav>
+</body></html>
