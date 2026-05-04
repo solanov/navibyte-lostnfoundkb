@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>User Management - The Academic Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Public+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#00201e",
+                        "inverse-on-surface": "#f3f0f0",
+                        "tertiary-container": "#003e3b",
+                        "secondary-fixed": "#bde9ff",
+                        "outline-variant": "#c1c7cd",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#a1cce6",
+                        "on-secondary-fixed": "#001f2a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001e2c",
+                        "tertiary": "#002624",
+                        "surface-tint": "#38637a",
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "secondary": "#0d6682",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "primary": "#002433",
+                        "outline": "#71787d",
+                        "on-background": "#1b1c1c",
+                        "surface-container": "#f0eded",
+                        "tertiary-fixed": "#8df4ec",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#1b1c1c",
+                        "inverse-primary": "#a1cce6",
+                        "surface-dim": "#dcd9d9",
+                        "surface-bright": "#fbf9f8",
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "background": "#fbf9f8",
+                        "inverse-surface": "#303030",
+                        "on-primary-container": "#7aa5be",
+                        "surface": "#fbf9f8",
+                        "surface-container-low": "#f5f3f3",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#c2e8ff",
+                        "on-tertiary-container": "#44afa9",
+                        "secondary-container": "#98defe",
+                        "primary-container": "#053b50",
+                        "on-surface-variant": "#41484c",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e4e2e1",
+                        "on-secondary-container": "#05637f",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline, .font-display { font-family: 'Public Sans', sans-serif; }
+        .glass-nav { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .bg-gradient-btn { background: linear-gradient(135deg, #002433, #053b50); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.filled { font-variation-settings: 'FILL' 1; }
+        
+        /* Mobile specific adjustments to ensure content is visible under fixed bars */
+        .pt-top-nav { padding-top: 5rem; }
+        .pb-bottom-nav { padding-bottom: 7rem; }
+        .safe-pb { padding-bottom: env(safe-area-inset-bottom, 1rem); }
+        .safe-pt { padding-top: env(safe-area-inset-top, 0); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased md:hidden h-screen overflow-hidden flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-primary shadow-[0_20px_40px_rgba(0,36,51,0.06)] flex items-center justify-between px-6 h-16 safe-pt">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-white" data-icon="account_balance">account_balance</span>
+<span class="font-['Public_Sans'] tracking-tight font-bold text-xl tracking-tighter text-white">The Academic Curator</span>
+</div>
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-outline-variant/20">
+<span class="material-symbols-outlined text-on-primary-container text-sm">person</span>
+</div>
+</div>
+</header>
+<!-- Main Content Area (Scrollable) -->
+<main class="flex-1 overflow-y-auto pt-top-nav pb-bottom-nav px-4 bg-surface w-full">
+<div class="mb-6 flex justify-between items-end">
+<div>
+<h1 class="font-headline text-3xl font-bold tracking-tight text-primary leading-tight">Student Directory</h1>
+<p class="font-body text-sm text-on-surface-variant mt-1">Manage active scholars and access records.</p>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="relative w-full mb-6">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/30 text-on-surface text-sm rounded-lg pl-11 pr-4 py-3.5 focus:ring-1 focus:ring-primary focus:border-primary shadow-sm font-body" placeholder="Search by name, ID, or email..." type="text"/>
+<div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+<button class="bg-surface-container hover:bg-surface-container-high transition-colors p-1.5 rounded-md flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-lg">tune</span>
+</button>
+</div>
+</div>
+<!-- Student List -->
+<div class="space-y-4">
+<!-- Student Card 1 (Active) -->
+<div class="bg-surface-container-lowest rounded-xl p-5 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 shadow-sm border border-outline-variant/10">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant/15 flex-shrink-0">
+<span class="font-headline font-bold text-primary text-lg">EC</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-primary text-base leading-snug">Eleanor Chen</h3>
+<p class="font-body text-xs text-on-surface-variant">echen.24@neu.edu.ph</p>
+<p class="font-body text-[11px] text-outline mt-0.5 tracking-wide">ID: 2024-0891</p>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded bg-tertiary-fixed text-on-tertiary-fixed font-label text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Active</span>
+</div>
+<div class="flex gap-2 w-full mt-4">
+<button class="flex-1 bg-on-tertiary-container hover:bg-tertiary-container text-white font-label text-xs font-semibold py-2.5 px-3 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">block</span> Suspend
+                    </button>
+<button class="flex-1 bg-transparent border border-outline-variant/30 hover:bg-surface-container text-secondary font-label text-xs font-semibold py-2.5 px-3 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">history</span> History
+                    </button>
+</div>
+</div>
+<!-- Student Card 2 (Suspended) -->
+<div class="bg-surface-container-lowest rounded-xl p-5 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 opacity-80 shadow-sm border border-outline-variant/10">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant/15 flex-shrink-0">
+<span class="font-headline font-bold text-outline text-lg">MD</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-primary text-base leading-snug">Marcus Dubois</h3>
+<p class="font-body text-xs text-on-surface-variant">mdubois.22@neu.edu.ph</p>
+<p class="font-body text-[11px] text-outline mt-0.5 tracking-wide">ID: 2022-1402</p>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-container-high text-on-surface-variant font-label text-[10px] font-bold uppercase tracking-widest whitespace-nowrap border border-outline-variant/30">Suspended</span>
+</div>
+<div class="flex gap-2 w-full mt-4">
+<button class="flex-1 bg-surface-container-high hover:bg-outline-variant text-on-surface font-label text-xs font-semibold py-2.5 px-3 rounded-lg transition-colors flex items-center justify-center gap-1.5 border border-outline-variant/30">
+<span class="material-symbols-outlined text-[16px]">refresh</span> Restore
+                    </button>
+<button class="flex-1 bg-transparent border border-outline-variant/30 hover:bg-surface-container text-secondary font-label text-xs font-semibold py-2.5 px-3 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">history</span> History
+                    </button>
+</div>
+</div>
+<!-- Student Card 3 (Active) -->
+<div class="bg-surface-container-lowest rounded-xl p-5 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 shadow-sm border border-outline-variant/10">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center border border-outline-variant/15 flex-shrink-0">
+<span class="font-headline font-bold text-primary text-lg">SP</span>
+</div>
+<div>
+<h3 class="font-headline font-bold text-primary text-base leading-snug">Sophia Patel</h3>
+<p class="font-body text-xs text-on-surface-variant">spatel.25@neu.edu.ph</p>
+<p class="font-body text-[11px] text-outline mt-0.5 tracking-wide">ID: 2025-0114</p>
+</div>
+</div>
+<span class="inline-flex items-center px-2 py-1 rounded bg-tertiary-fixed text-on-tertiary-fixed font-label text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">Active</span>
+</div>
+<div class="flex gap-2 w-full mt-4">
+<button class="flex-1 bg-on-tertiary-container hover:bg-tertiary-container text-white font-label text-xs font-semibold py-2.5 px-3 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">block</span> Suspend
+                    </button>
+<button class="flex-1 bg-transparent border border-outline-variant/30 hover:bg-surface-container text-secondary font-label text-xs font-semibold py-2.5 px-3 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">history</span> History
+                    </button>
+</div>
+</div>
+<!-- Contextual Graphic / Filler to show scrolling capability if needed -->
+<div class="w-full h-32 rounded-xl bg-surface-container-low border border-outline-variant/10 overflow-hidden relative flex items-center justify-center mt-6">
+<img alt="Abstract architectural view of a university campus building facade with modern glass panels reflecting a soft, light-mode sky. The scene is bright and airy, utilizing a palette of off-whites, cool greys, and subtle hints of institutional navy blue. The mood is calm, academic, and structured, fitting a high-end editorial aesthetic." class="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-multiply" data-alt="Abstract architectural view of a university campus building facade with modern glass panels reflecting a soft, light-mode sky. The scene is bright and airy, utilizing a palette of off-whites, cool greys, and subtle hints of institutional navy blue. The mood is calm, academic, and structured, fitting a high-end editorial aesthetic." src="https://lh3.googleusercontent.com/aida/ADBb0ugVvquat9Y2CyVdVqVi11CpaehdQBHpax2o7iqafzh6XbmaVEd8ClA6A7Y7GzB4ONUmVqJwrwOsdUKgt_9JVvwbe42i2ABlpZLDJOg8V9V6d3OJeTkjRoFhVGeWwzFvq5TDZmi4GWq8EUtK4ErEIQ9Y_At7Z-qnB_1S8aYHxQG6Kf6d2Jr2ce7fXi0hS7M1T4hvJ3aEl0OYuViACdKDwktLFVnB-kxs09FIlGiq9BuC6NSVPlnaiScNwOdpfMggTa5hGaVec8H2Wws"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low to-transparent"></div>
+<p class="font-body text-xs text-on-surface-variant z-10 font-medium">End of Directory</p>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full h-20 z-50 flex justify-around items-center px-4 pb-safe bg-surface-container-lowest rounded-t-xl shadow-[0_-4px_12px_rgba(0,0,0,0.03)] border-t border-outline-variant/10">
+<!-- Vault (Inactive) -->
+<a class="flex flex-col items-center justify-center text-outline hover:text-on-tertiary-container active:translate-y-0.5 transition-transform w-16 h-14" href="#">
+<span class="material-symbols-outlined mb-1 text-xl" data-icon="inventory_2">inventory_2</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase">Vault</span>
+</a>
+<!-- Users (Active) -->
+<a class="flex flex-col items-center justify-center text-on-tertiary-container bg-tertiary-fixed/20 rounded-xl px-4 py-1 active:translate-y-0.5 transition-transform w-16 h-14" href="#">
+<span class="material-symbols-outlined mb-1 text-xl filled" data-icon="group" data-weight="fill">group</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase">Users</span>
+</a>
+<!-- Queue (Inactive) -->
+<a class="flex flex-col items-center justify-center text-outline hover:text-on-tertiary-container active:translate-y-0.5 transition-transform w-16 h-14" href="#">
+<span class="material-symbols-outlined mb-1 text-xl" data-icon="delete_sweep">delete_sweep</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase">Queue</span>
+</a>
+<!-- Logs (Inactive) -->
+<a class="flex flex-col items-center justify-center text-outline hover:text-on-tertiary-container active:translate-y-0.5 transition-transform w-16 h-14" href="#">
+<span class="material-symbols-outlined mb-1 text-xl" data-icon="history_edu">history_edu</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase">Logs</span>
+</a>
+</nav>
+</body></html>
