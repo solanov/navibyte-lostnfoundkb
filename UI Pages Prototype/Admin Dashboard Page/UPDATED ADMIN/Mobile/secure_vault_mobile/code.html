@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Secure Vault - The Academic Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-container-lowest": "#ffffff",
+                "on-tertiary-fixed": "#00201e",
+                "inverse-on-surface": "#f3f0f0",
+                "tertiary-container": "#003e3b",
+                "secondary-fixed": "#bde9ff",
+                "outline-variant": "#c1c7cd",
+                "error": "#ba1a1a",
+                "primary-fixed-dim": "#a1cce6",
+                "on-secondary-fixed": "#001f2a",
+                "on-tertiary": "#ffffff",
+                "on-primary-fixed": "#001e2c",
+                "tertiary": "#002624",
+                "surface-tint": "#38637a",
+                "surface-container-high": "#eae8e7",
+                "on-secondary-fixed-variant": "#004d64",
+                "secondary": "#0d6682",
+                "on-primary-fixed-variant": "#1d4c61",
+                "primary": "#002433",
+                "outline": "#71787d",
+                "on-background": "#1b1c1c",
+                "surface-container": "#f0eded",
+                "tertiary-fixed": "#8df4ec",
+                "on-tertiary-fixed-variant": "#00504c",
+                "on-secondary": "#ffffff",
+                "on-primary": "#ffffff",
+                "on-surface": "#1b1c1c",
+                "inverse-primary": "#a1cce6",
+                "surface-dim": "#dcd9d9",
+                "surface-bright": "#fbf9f8",
+                "secondary-fixed-dim": "#8ad0ef",
+                "background": "#fbf9f8",
+                "inverse-surface": "#303030",
+                "on-primary-container": "#7aa5be",
+                "surface": "#fbf9f8",
+                "surface-container-low": "#f5f3f3",
+                "surface-container-highest": "#e4e2e1",
+                "on-error": "#ffffff",
+                "primary-fixed": "#c2e8ff",
+                "on-tertiary-container": "#44afa9",
+                "secondary-container": "#98defe",
+                "primary-container": "#053b50",
+                "on-surface-variant": "#41484c",
+                "error-container": "#ffdad6",
+                "surface-variant": "#e4e2e1",
+                "on-secondary-container": "#05637f",
+                "tertiary-fixed-dim": "#70d7d0",
+                "on-error-container": "#93000a"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {},
+        "fontFamily": {
+                "headline": [
+                        "Public Sans"
+                ],
+                "display": [
+                        "Public Sans"
+                ],
+                "body": [
+                        "Inter"
+                ],
+                "label": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {}
+},
+    },
+  }
+</script>
+<style>
+  body {
+    -webkit-tap-highlight-color: transparent;
+  }
+</style>
+</head>
+<body class="bg-background text-on-surface font-body antialiased pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#053B50] shadow-md md:hidden flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<button class="text-white hover:bg-white/10 transition-colors scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</button>
+<h1 class="font-headline tracking-tight font-bold text-xl text-white">The Academic Curator</h1>
+</div>
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-white/10 overflow-hidden border border-white/20">
+<span class="material-symbols-outlined text-white/70 flex items-center justify-center h-full w-full">person</span>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-20 px-4 md:px-8 max-w-7xl mx-auto md:pt-8 min-h-screen">
+<!-- Header Section -->
+<div class="mb-8 md:mb-12 md:hidden">
+<h2 class="font-headline text-3xl font-bold text-primary tracking-tight mb-2">Vault</h2>
+<p class="font-body text-on-surface-variant">Secure asset management and auditing.</p>
+</div>
+<!-- Filters/Search Bar -->
+<div class="mb-6 flex gap-2">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant">search</span>
+<input class="w-full pl-10 pr-4 py-3 rounded-lg bg-surface-container-low border-0 outline-none focus:ring-2 focus:ring-primary-container text-on-surface placeholder:text-outline-variant font-body" placeholder="Search REF ID or Note..." type="text"/>
+</div>
+<button class="px-4 py-3 bg-surface-container-low rounded-lg text-secondary flex items-center justify-center hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+<!-- Asset Feed -->
+<div class="space-y-6">
+<!-- Standard Asset Card -->
+<article class="bg-surface-container-lowest rounded-xl p-4 flex flex-col gap-4 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+<div class="absolute inset-0 bg-gradient-to-br from-transparent to-surface-container-low/50 pointer-events-none"></div>
+<div class="flex gap-4 relative z-10">
+<!-- Thumbnail -->
+<div class="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-surface-container border border-outline-variant/15 relative">
+<img alt="Asset Thumbnail" class="w-full h-full object-cover" data-alt="A close-up photograph of an antique, brass microscope sitting on a polished mahogany desk in a softly lit, institutional archive. The lighting is warm and directional, casting long shadows and highlighting the intricate mechanical details of the brass. The mood is academic and historical, fitting a high-end editorial aesthetic with deep shadows and pristine highlights." src="https://lh3.googleusercontent.com/aida/ADBb0ugVvquat9Y2CyVdVqVi11CpaehdQBHpax2o7iqafzh6XbmaVEd8ClA6A7Y7GzB4ONUmVqJwrwOsdUKgt_9JVvwbe42i2ABlpZLDJOg8V9V6d3OJeTkjRoFhVGeWwzFvq5TDZmi4GWq8EUtK4ErEIQ9Y_At7Z-qnB_1S8aYHxQG6Kf6d2Jr2ce7fXi0hS7M1T4hvJ3aEl0OYuViACdKDwktLFVnB-kxs09FIlGiq9BuC6NSVPlnaiScNwOdpfMggTa5hGaVec8H2Wws"/>
+</div>
+<!-- Details -->
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<span class="font-label text-[11px] font-semibold tracking-[0.05em] uppercase text-on-surface-variant">Ref ID: AC-2023-891</span>
+<span class="font-label text-[10px] text-outline">Oct 12, 2023</span>
+</div>
+<h3 class="font-headline font-bold text-primary text-lg leading-tight mb-2">Vintage Microscope</h3>
+<p class="font-body text-sm text-[#176B87] bg-[#176B87]/5 p-2 rounded-DEFAULT italic line-clamp-2">"Found in Lab 4B. Requires calibration and cleaning. Hold for Biology Dept."</p>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="flex justify-between items-center mt-2 pt-4 border-t border-outline-variant/15 relative z-10">
+<div class="flex items-center gap-1.5 bg-tertiary-fixed/20 px-2.5 py-1 rounded-DEFAULT">
+<span class="material-symbols-outlined text-[14px] text-on-tertiary-fixed-variant">check_circle</span>
+<span class="font-label text-xs font-medium text-on-tertiary-fixed-variant">Verified</span>
+</div>
+<button class="bg-[#64CCC5] text-white font-body font-medium px-4 py-2 rounded-md hover:bg-[#64CCC5]/90 transition-colors shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">verified</span> Verify
+          </button>
+</div>
+</article>
+<!-- Overdue Asset Card (Critical) -->
+<article class="bg-surface-container-lowest rounded-xl p-4 flex flex-col gap-4 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300 ring-1 ring-error/20">
+<div class="absolute top-0 left-0 w-1 h-full bg-error"></div>
+<div class="flex gap-4 relative z-10 ml-2">
+<!-- Thumbnail -->
+<div class="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-surface-container border border-outline-variant/15 relative">
+<div class="absolute inset-0 bg-error/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-error text-3xl opacity-50">warning</span>
+</div>
+</div>
+<!-- Details -->
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<span class="font-label text-[11px] font-semibold tracking-[0.05em] uppercase text-error">Ref ID: AC-2023-442</span>
+<span class="font-label text-[10px] text-error font-medium">32 Days Overdue</span>
+</div>
+<h3 class="font-headline font-bold text-primary text-lg leading-tight mb-2">Unclaimed Laptop</h3>
+<p class="font-body text-sm text-[#176B87] bg-[#176B87]/5 p-2 rounded-DEFAULT italic line-clamp-2">"Contains sensitive data. Needs IT wipe before long-term storage."</p>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="flex justify-between items-center mt-2 pt-4 border-t border-outline-variant/15 relative z-10 ml-2">
+<div class="flex items-center gap-1.5 bg-error-container/50 px-2.5 py-1 rounded-DEFAULT">
+<span class="material-symbols-outlined text-[14px] text-error">schedule</span>
+<span class="font-label text-xs font-medium text-error">Action Required</span>
+</div>
+<button class="bg-gradient-to-br from-error to-[#93000a] text-white font-body font-medium px-4 py-2 rounded-md shadow-[0_4px_12px_rgba(186,26,26,0.2)] flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">gavel</span> Audit Now
+          </button>
+</div>
+</article>
+<!-- Standard Asset Card -->
+<article class="bg-surface-container-lowest rounded-xl p-4 flex flex-col gap-4 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+<div class="absolute inset-0 bg-gradient-to-br from-transparent to-surface-container-low/50 pointer-events-none"></div>
+<div class="flex gap-4 relative z-10">
+<!-- Thumbnail -->
+<div class="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-surface-container border border-outline-variant/15 relative flex items-center justify-center">
+<span class="material-symbols-outlined text-outline-variant text-4xl font-light">library_books</span>
+</div>
+<!-- Details -->
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<span class="font-label text-[11px] font-semibold tracking-[0.05em] uppercase text-on-surface-variant">Ref ID: AC-2023-905</span>
+<span class="font-label text-[10px] text-outline">Oct 15, 2023</span>
+</div>
+<h3 class="font-headline font-bold text-primary text-lg leading-tight mb-2">Rare Manuscript Folio</h3>
+<p class="font-body text-sm text-[#176B87] bg-[#176B87]/5 p-2 rounded-DEFAULT italic line-clamp-2">"Transferred from Special Collections. Needs climate-controlled vaulting."</p>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="flex justify-between items-center mt-2 pt-4 border-t border-outline-variant/15 relative z-10">
+<div class="flex items-center gap-1.5 bg-surface-container-high px-2.5 py-1 rounded-DEFAULT">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">hourglass_empty</span>
+<span class="font-label text-xs font-medium text-on-surface-variant">Pending</span>
+</div>
+<button class="bg-[#64CCC5] text-white font-body font-medium px-4 py-2 rounded-md hover:bg-[#64CCC5]/90 transition-colors shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">verified</span> Verify
+          </button>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full h-20 z-50 flex justify-around items-center px-4 pb-safe bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_12px_rgba(0,0,0,0.03)] rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-[#44afa9] bg-[#8df4ec]/10 rounded-xl px-4 py-1 hover:text-[#44afa9] active:translate-y-0.5 transition-transform">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-label text-[11px] font-medium tracking-wide uppercase">Vault</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#44afa9] active:translate-y-0.5 transition-transform">
+<span class="material-symbols-outlined mb-1">group</span>
+<span class="font-label text-[11px] font-medium tracking-wide uppercase">Users</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#44afa9] active:translate-y-0.5 transition-transform">
+<span class="material-symbols-outlined mb-1">delete_sweep</span>
+<span class="font-label text-[11px] font-medium tracking-wide uppercase">Queue</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-[#44afa9] active:translate-y-0.5 transition-transform">
+<span class="material-symbols-outlined mb-1">history_edu</span>
+<span class="font-label text-[11px] font-medium tracking-wide uppercase">Logs</span>
+</button>
+</nav>
+</body></html>

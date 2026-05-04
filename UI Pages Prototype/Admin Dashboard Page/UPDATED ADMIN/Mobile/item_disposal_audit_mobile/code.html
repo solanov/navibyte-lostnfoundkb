@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Item Disposal Audit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-container-lowest": "#ffffff",
+                "on-tertiary-fixed": "#00201e",
+                "inverse-on-surface": "#f3f0f0",
+                "tertiary-container": "#003e3b",
+                "secondary-fixed": "#bde9ff",
+                "outline-variant": "#c1c7cd",
+                "error": "#ba1a1a",
+                "primary-fixed-dim": "#a1cce6",
+                "on-secondary-fixed": "#001f2a",
+                "on-tertiary": "#ffffff",
+                "on-primary-fixed": "#001e2c",
+                "tertiary": "#002624",
+                "surface-tint": "#38637a",
+                "surface-container-high": "#eae8e7",
+                "on-secondary-fixed-variant": "#004d64",
+                "secondary": "#0d6682",
+                "on-primary-fixed-variant": "#1d4c61",
+                "primary": "#002433",
+                "outline": "#71787d",
+                "on-background": "#1b1c1c",
+                "surface-container": "#f0eded",
+                "tertiary-fixed": "#8df4ec",
+                "on-tertiary-fixed-variant": "#00504c",
+                "on-secondary": "#ffffff",
+                "on-primary": "#ffffff",
+                "on-surface": "#1b1c1c",
+                "inverse-primary": "#a1cce6",
+                "surface-dim": "#dcd9d9",
+                "surface-bright": "#fbf9f8",
+                "secondary-fixed-dim": "#8ad0ef",
+                "background": "#fbf9f8",
+                "inverse-surface": "#303030",
+                "on-primary-container": "#7aa5be",
+                "surface": "#fbf9f8",
+                "surface-container-low": "#f5f3f3",
+                "surface-container-highest": "#e4e2e1",
+                "on-error": "#ffffff",
+                "primary-fixed": "#c2e8ff",
+                "on-tertiary-container": "#44afa9",
+                "secondary-container": "#98defe",
+                "primary-container": "#053b50",
+                "on-surface-variant": "#41484c",
+                "error-container": "#ffdad6",
+                "surface-variant": "#e4e2e1",
+                "on-secondary-container": "#05637f",
+                "tertiary-fixed-dim": "#70d7d0",
+                "on-error-container": "#93000a"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {},
+        "fontFamily": {
+                "headline": [
+                        "Public Sans"
+                ],
+                "display": [
+                        "Public Sans"
+                ],
+                "body": [
+                        "Inter"
+                ],
+                "label": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {}
+},
+    },
+  }
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  h1, h2, h3, h4, h5, h6 { font-family: 'Public Sans', sans-serif; }
+</style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- Mobile Full Screen Modal Overlay -->
+<div class="fixed inset-0 z-50 flex flex-col bg-surface-container-lowest w-full h-full md:hidden">
+<!-- Modal Header (Intake Style) -->
+<header class="bg-primary-container text-on-primary-container p-6 flex flex-col gap-4 rounded-b-xl relative z-10">
+<div class="flex items-center justify-between">
+<h1 class="font-headline font-bold text-2xl tracking-tight text-white">Item Disposal Audit</h1>
+<button aria-label="Close Modal" class="text-on-primary-container hover:text-white transition-colors">
+<span class="material-symbols-outlined text-2xl">close</span>
+</button>
+</div>
+<!-- Contextual Status Chip -->
+<div class="flex items-center gap-2">
+<span class="bg-error text-on-error font-label text-[11px] font-bold tracking-[0.05em] uppercase px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+          Overdue
+        </span>
+<span class="text-on-primary-container font-body text-sm">Action required immediately</span>
+</div>
+</header>
+<!-- Modal Content Canvas -->
+<main class="flex-1 overflow-y-auto p-6 flex flex-col gap-8 bg-surface-container-low pb-32">
+<!-- Item Details Section -->
+<section class="flex gap-4 items-start bg-surface-container-lowest p-4 rounded-xl border border-outline-variant/15">
+<div class="w-20 h-28 shrink-0 rounded-lg overflow-hidden relative">
+<img alt="Item Thumbnail" class="w-full h-full object-cover" data-alt="A close-up view of an abandoned, high-end scientific calculator resting on a sleek, minimalist concrete surface. The lighting is bright and institutional, casting soft shadows that highlight the object's metallic details. The overall mood is sterile and academic, utilizing a color palette dominated by pristine whites, deep blacks, and subtle institutional blues to convey a modern light-mode aesthetic." src="https://lh3.googleusercontent.com/aida/ADBb0ugVvquat9Y2CyVdVqVi11CpaehdQBHpax2o7iqafzh6XbmaVEd8ClA6A7Y7GzB4ONUmVqJwrwOsdUKgt_9JVvwbe42i2ABlpZLDJOg8V9V6d3OJeTkjRoFhVGeWwzFvq5TDZmi4GWq8EUtK4ErEIQ9Y_At7Z-qnB_1S8aYHxQG6Kf6d2Jr2ce7fXi0hS7M1T4hvJ3aEl0OYuViACdKDwktLFVnB-kxs09FIlGiq9BuC6NSVPlnaiScNwOdpfMggTa5hGaVec8H2Wws"/>
+</div>
+<div class="flex flex-col gap-1">
+<h2 class="font-headline font-bold text-lg text-primary tracking-tight leading-tight">Advanced Scientific Calculator - TI-84 Plus</h2>
+<p class="font-label text-[11px] font-medium tracking-wide uppercase text-on-surface-variant mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span>
+            Vault: Chemistry Bldg, Rm 402
+          </p>
+<p class="font-body text-sm text-on-surface-variant mt-2 line-clamp-2">Item has exceeded the mandatory 90-day retention period. Primary owner has not responded to final notification.</p>
+</div>
+</section>
+<!-- Disposal Options Grid -->
+<section class="flex flex-col gap-4">
+<h3 class="font-headline font-bold text-lg text-primary tracking-tight">Select Resolution Route</h3>
+<div class="grid grid-cols-1 gap-3">
+<!-- Option 1: University Surplus -->
+<label class="relative cursor-pointer group">
+<input class="peer sr-only" name="disposal_route" type="radio"/>
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-4 flex items-center gap-4 transition-all duration-200 peer-checked:border-tertiary-fixed peer-checked:bg-surface hover:bg-surface-bright">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center shrink-0 text-primary peer-checked:bg-tertiary-fixed peer-checked:text-on-tertiary-fixed transition-colors">
+<span class="material-symbols-outlined">account_balance</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body font-semibold text-primary">University Surplus</h4>
+<p class="font-body text-xs text-on-surface-variant mt-0.5">Transfer to internal department reuse.</p>
+</div>
+<div class="w-5 h-5 rounded-full border-2 border-outline-variant peer-checked:border-tertiary-fixed peer-checked:border-[6px] transition-all"></div>
+</div>
+</label>
+<!-- Option 2: Charitable Donation -->
+<label class="relative cursor-pointer group">
+<input checked="" class="peer sr-only" name="disposal_route" type="radio"/>
+<div class="bg-surface border border-tertiary-fixed rounded-xl p-4 flex items-center gap-4 transition-all duration-200">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0 text-on-tertiary-fixed">
+<span class="material-symbols-outlined">volunteer_activism</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body font-semibold text-primary">Charitable Donation</h4>
+<p class="font-body text-xs text-on-surface-variant mt-0.5">Approve for external community donation.</p>
+</div>
+<div class="w-5 h-5 rounded-full border-tertiary-fixed border-[6px] transition-all"></div>
+</div>
+</label>
+<!-- Option 3: Permanent Disposal -->
+<label class="relative cursor-pointer group">
+<input class="peer sr-only" name="disposal_route" type="radio"/>
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-4 flex items-center gap-4 transition-all duration-200 peer-checked:border-tertiary-fixed peer-checked:bg-surface hover:bg-surface-bright">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center shrink-0 text-primary peer-checked:bg-error peer-checked:text-on-error transition-colors">
+<span class="material-symbols-outlined">delete_forever</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body font-semibold text-primary">Permanent Disposal</h4>
+<p class="font-body text-xs text-on-surface-variant mt-0.5">E-waste recycling or standard trash.</p>
+</div>
+<div class="w-5 h-5 rounded-full border-2 border-outline-variant peer-checked:border-error peer-checked:border-[6px] transition-all"></div>
+</div>
+</label>
+</div>
+</section>
+<!-- Auditor Notes Section -->
+<section class="flex flex-col gap-3">
+<h3 class="font-headline font-bold text-lg text-primary tracking-tight">Audit Justification</h3>
+<div class="relative">
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-xl p-4 font-body text-sm text-on-surface focus:outline-none focus:border-tertiary-fixed focus:ring-1 focus:ring-tertiary-fixed transition-colors min-h-[120px] placeholder:text-outline" placeholder="Enter reason for selected disposal route..."></textarea>
+</div>
+</section>
+</main>
+<!-- Fixed Bottom Action Bar -->
+<footer class="fixed bottom-0 left-0 w-full bg-surface-container-lowest border-t border-outline-variant/15 p-4 z-20 pb-safe">
+<button class="w-full bg-primary text-white font-body font-semibold text-base py-4 rounded-lg flex items-center justify-center gap-2 transition-opacity">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+        Confirm Disposal
+      </button>
+</footer>
+</div>
+</body></html>
