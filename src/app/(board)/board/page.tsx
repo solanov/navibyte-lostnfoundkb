@@ -30,6 +30,7 @@ export default async function PublicBoard() {
         icon_identifier
       )
     `)
+    .not('status', 'in', '("Returned","Purged")')
     .order('created_timestamp', { ascending: false });
 
   if (error) {

@@ -5,6 +5,7 @@ import { supabase } from '@/src/lib/supabase';
 import ItemCard from './ItemCard';
 import ConversationModal from './ConversationModal';
 import ItemDetailModal from './ItemDetailModal';
+import { userDeletePostAction, markAsReturnedAction } from '@/src/app/admin/actions/posts';
 
 interface LostItem {
   post_id: string;
@@ -131,6 +132,48 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
     setConversationItem(null);
   };
 
+  const handleDeletePost = async () => {
+    if (!selectedItem || !currentUserId) return;
+    
+    const confirmDelete = window.confirm("Are you sure you want to delete this post? It will be moved to your archive.");
+    if (!confirmDelete) return;
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      
+      if (!accessToken) throw new Error("Authentication token missing.");
+
+      await userDeletePostAction(accessToken, selectedItem.post_id);
+      alert("Post deleted successfully.");
+      handleCloseModal();
+      window.location.reload();
+    } catch (err: any) {
+      alert(`Error deleting post: ${err.message}`);
+    }
+  };
+
+  const handleMarkReturned = async () => {
+    if (!selectedItem || !currentUserId) return;
+    
+    const confirmReturn = window.confirm("Mark this item as returned? It will be hidden from the public board.");
+    if (!confirmReturn) return;
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      
+      if (!accessToken) throw new Error("Authentication token missing.");
+
+      await markAsReturnedAction(accessToken, selectedItem.post_id);
+      alert("Item marked as returned.");
+      handleCloseModal();
+      window.location.reload();
+    } catch (err: any) {
+      alert(`Error updating item: ${err.message}`);
+    }
+  };
+
   return (
     <>
       {/* Items Grid */}
@@ -168,12 +211,14 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
         )}
       </div>
 
-      {/* Modal */}
       <ItemDetailModal
         isOpen={isModalOpen}
         item={selectedItem}
+        isOwner={currentUserId === selectedItem?.reported_by}
         onClaimClick={handleClaimItem}
         onContactClick={handleContactPoster}
+        onDeletePost={handleDeletePost}
+        onMarkReturned={handleMarkReturned}
         onClose={handleCloseModal}
       />
 

@@ -21,6 +21,9 @@ interface ItemDetailModalProps {
   onClose: () => void;
   onClaimClick: () => void;
   onContactClick: () => void;
+  isOwner?: boolean;
+  onDeletePost?: () => void;
+  onMarkReturned?: () => void;
 }
 
 export default function ItemDetailModal({
@@ -29,6 +32,9 @@ export default function ItemDetailModal({
   onClose,
   onClaimClick,
   onContactClick,
+  isOwner,
+  onDeletePost,
+  onMarkReturned,
 }: ItemDetailModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -230,24 +236,53 @@ export default function ItemDetailModal({
 
         {/* Action Buttons - Fixed Footer */}
         <div className="sticky bottom-0 bg-surface-container-lowest border-t border-outline-variant/20 px-6 py-4 flex gap-3">
-          <button
-            onClick={onContactClick}
-            className="flex-1 bg-surface-container-low text-primary border border-outline-variant/30 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all active:scale-95"
-          >
-            <span className="flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined text-lg">mail</span>
-              Contact
-            </span>
-          </button>
-          <button
-            onClick={onClaimClick}
-            className="flex-1 bg-secondary text-white px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:brightness-110 transition-all active:scale-95"
-          >
-            <span className="flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined text-lg">check_circle</span>
-              Claim Item
-            </span>
-          </button>
+          {isOwner ? (
+            <>
+              {item.status !== 'Returned' && item.status !== 'Purged' && onMarkReturned && (
+                <button
+                  onClick={onMarkReturned}
+                  className="flex-1 bg-surface-container-low text-primary border border-outline-variant/30 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all active:scale-95"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="material-symbols-outlined text-lg">verified</span>
+                    Mark as Returned
+                  </span>
+                </button>
+              )}
+              {onDeletePost && (
+                <button
+                  onClick={onDeletePost}
+                  className="flex-1 bg-red-50 text-red-600 border border-red-200 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-red-100 transition-all active:scale-95"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="material-symbols-outlined text-lg">delete</span>
+                    Delete Post
+                  </span>
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <button
+                onClick={onContactClick}
+                className="flex-1 bg-surface-container-low text-primary border border-outline-variant/30 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all active:scale-95"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined text-lg">mail</span>
+                  Contact
+                </span>
+              </button>
+              <button
+                onClick={onClaimClick}
+                className="flex-1 bg-secondary text-white px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:brightness-110 transition-all active:scale-95"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined text-lg">check_circle</span>
+                  Claim Item
+                </span>
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
