@@ -4,7 +4,19 @@ import ColorSwatch from './ColorSwatch';
 import { useState, useRef, useEffect } from "react";
 import { supabase } from '@/src/lib/supabase';
 
-export default function EntryForm() {
+interface EntryFormProps {
+  onSuccess?: () => void;
+  variant?: 'page' | 'modal';
+}
+
+const fallbackCategories = [
+  { id: 1, label: 'Wallet', icon: 'account_balance_wallet' },
+  { id: 2, label: 'Keys', icon: 'vpn_key' },
+  { id: 3, label: 'ID', icon: 'badge' },
+  { id: 4, label: 'Tech', icon: 'devices' },
+];
+
+export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProps) {
   const [entryType, setEntryType] = useState<'lost' | 'found'>('lost');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -24,26 +36,36 @@ export default function EntryForm() {
   useEffect(() => {
     async function fetchOrSeedCategories() {
       try {
-        let { data, error } = await supabase.from('categories').select('*').eq('is_active', true);
-        if (!error && (!data || data.length === 0)) {
-          // Seed categories
-          const defaultCats = [
-            { name: 'Wallet', icon_identifier: 'account_balance_wallet', is_active: true },
-            { name: 'Keys', icon_identifier: 'vpn_key', is_active: true },
-            { name: 'ID', icon_identifier: 'badge', is_active: true },
-            { name: 'Tech', icon_identifier: 'devices', is_active: true },
-          ];
-          await supabase.from('categories').insert(defaultCats);
-          const res = await supabase.from('categories').select('*').eq('is_active', true);
-          data = res.data;
+        const { data, error } = await supabase
+          .from('categories')
+          .select('category_id,name,icon_identifier,is_active')
+          .eq('is_active', true)
+          .order('name', { ascending: true });
+
+        if (error) {
+          throw error;
         }
-        if (data) {
-          setCategories(data.map(c => ({ id: c.category_id, label: c.name, icon: c.icon_identifier })));
+
+        const mappedCategories = (data || [])
+          .map((category) => ({
+            id: category.category_id,
+            label: category.name,
+            icon: category.icon_identifier || 'help_outline',
+          }))
+          .filter((category) => Boolean(category.id) && Boolean(category.label));
+
+        if (mappedCategories.length > 0) {
+          setCategories(mappedCategories);
+          return;
         }
+
+        setCategories(fallbackCategories);
       } catch (err) {
         console.error("Error fetching categories:", err);
+        setCategories(fallbackCategories);
       }
     }
+
     fetchOrSeedCategories();
   }, []);
 
@@ -141,17 +163,24 @@ export default function EntryForm() {
       setPreview(null);
       setSelectedCategory(null);
       setSelectedColor(null);
-    } catch (err: any) {
+      onSuccess?.();
+    } catch (err) {
       console.error(err);
-      alert(err.message || "An error occurred during submission.");
+      alert(err instanceof Error ? err.message : "An error occurred during submission.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="w-full max-w-2xl bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] overflow-hidden">
-      <div className="p-8 lg:p-12">
+    <div
+      className={
+        variant === 'modal'
+          ? 'w-full bg-surface-container-lowest'
+          : 'w-full max-w-2xl bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] overflow-hidden'
+      }
+    >
+      <div className={variant === 'modal' ? 'p-6' : 'p-8 lg:p-12'}>
         <form className="space-y-8" onSubmit={handleSubmit}>
           
           {/* Lost/Found Toggle */}
@@ -276,6 +305,7 @@ export default function EntryForm() {
             >
               {preview ? (
                 <div className="absolute inset-0 w-full h-full">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={preview} alt="Preview" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <span className="text-white font-bold text-sm bg-black/50 px-4 py-2 rounded-md backdrop-blur-sm">Click to change</span>
