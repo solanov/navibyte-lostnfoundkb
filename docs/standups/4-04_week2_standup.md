@@ -6,6 +6,7 @@
 
 - Presentation of Wireframes
 - Discuss Sprint Planning
+- Weekly Standup
 
 ### **Scrum**: Vinz Solano
 
