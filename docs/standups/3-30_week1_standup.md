@@ -9,6 +9,7 @@
 - Test Cases
 - UI Elements
 - Github Repository Structure
+- Weekly Standup
 
 ### **Scrum**: Vinz Solano
 
