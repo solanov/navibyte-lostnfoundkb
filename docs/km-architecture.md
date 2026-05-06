@@ -50,4 +50,4 @@ The data retrieval logic is facilitated by strict requirements intended to maxim
 | Standard | Description |
 | :--- | :--- |
 | **Backend Enforcement** | Validation rules reject any submissions that deviate from the predefined taxonomy, preventing the injection of unstructured "human noise" into the database. |
-| **Privacy Advocacy** | The user interface includes mandatory disclaimers and reminders advising users to redact or avoid capturing Personally Identifiable Information (PII) during the image upload process. |
+| **Privacy Advocacy** | The user interface includes mandatory disclaimers and reminders advising users to  avoid capturing Personally Identifiable Information (PII) during the image upload process. |
