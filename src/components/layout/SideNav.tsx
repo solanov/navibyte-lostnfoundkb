@@ -1,13 +1,22 @@
+"use client";
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/src/lib/supabase';
 
 export default function SideNav() {
+  const router = useRouter();
+  
   const filters = [
     { label: 'Categories', icon: 'category', active: true },
     { label: 'Colors', icon: 'palette', active: false },
     { label: 'Buildings', icon: 'apartment', active: false },
-    { label: 'Timeline', icon: 'history_toggle_off', active: false },
-    { label: 'Storage Bins', icon: 'inventory_2', active: false },
   ];
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
 
   return (
     <aside className="hidden md:flex fixed flex-col gap-6 p-6 overflow-y-auto bg-surface-container-lowest h-screen w-72 left-0 top-0 pt-24 border-r border-outline-variant/30">
@@ -36,10 +45,21 @@ export default function SideNav() {
         ))}
       </nav>
 
-      <div className="mt-auto pb-24">
+      <div className="mt-auto pb-24 flex flex-col gap-3">
+        <Link href="/board/archive" className="flex items-center justify-center gap-2 w-full py-3 rounded-md font-bold text-sm tracking-wide text-primary bg-surface-container-low hover:bg-outline-variant/20 active:scale-95 transition-all">
+          <span className="material-symbols-outlined text-lg">inventory_2</span>
+          My Archive
+        </Link>
         <Link href="/create" className="flex items-center justify-center w-full btn-tertiary text-on-tertiary py-3 rounded-md font-bold text-sm tracking-wide shadow-lg hover:brightness-110 active:scale-95 transition-all">
           Create Entry
         </Link>
+        <button 
+          onClick={handleLogout}
+          className="flex items-center justify-center gap-2 w-full py-3 rounded-md font-bold text-sm tracking-wide text-error border border-error/30 hover:bg-error/10 active:scale-95 transition-all"
+        >
+          <span className="material-symbols-outlined text-lg">logout</span>
+          Logout
+        </button>
       </div>
     </aside>
   );

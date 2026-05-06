@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Restore Account Modal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed": "#00201e",
+                    "inverse-on-surface": "#f3f0f0",
+                    "tertiary-container": "#003e3b",
+                    "secondary-fixed": "#bde9ff",
+                    "outline-variant": "#c1c7cd",
+                    "error": "#ba1a1a",
+                    "primary-fixed-dim": "#a1cce6",
+                    "on-secondary-fixed": "#001f2a",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#001e2c",
+                    "tertiary": "#002624",
+                    "surface-tint": "#38637a",
+                    "surface-container-high": "#eae8e7",
+                    "on-secondary-fixed-variant": "#004d64",
+                    "secondary": "#0d6682",
+                    "on-primary-fixed-variant": "#1d4c61",
+                    "primary": "#002433",
+                    "outline": "#71787d",
+                    "on-background": "#1b1c1c",
+                    "surface-container": "#f0eded",
+                    "tertiary-fixed": "#8df4ec",
+                    "on-tertiary-fixed-variant": "#00504c",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#1b1c1c",
+                    "inverse-primary": "#a1cce6",
+                    "surface-dim": "#dcd9d9",
+                    "surface-bright": "#fbf9f8",
+                    "secondary-fixed-dim": "#8ad0ef",
+                    "background": "#fbf9f8",
+                    "inverse-surface": "#303030",
+                    "on-primary-container": "#7aa5be",
+                    "surface": "#fbf9f8",
+                    "surface-container-low": "#f5f3f3",
+                    "surface-container-highest": "#e4e2e1",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#c2e8ff",
+                    "on-tertiary-container": "#44afa9",
+                    "secondary-container": "#98defe",
+                    "primary-container": "#053b50",
+                    "on-surface-variant": "#41484c",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e4e2e1",
+                    "on-secondary-container": "#05637f",
+                    "tertiary-fixed-dim": "#70d7d0",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": [
+                            "Public Sans"
+                    ],
+                    "display": [
+                            "Public Sans"
+                    ],
+                    "body": [
+                            "Inter"
+                    ],
+                    "label": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {}
+    },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body antialiased selection:bg-tertiary-fixed selection:text-on-tertiary-fixed min-h-screen flex items-center justify-center relative">
+<!-- Modal Overlay -->
+<div aria-hidden="true" class="fixed inset-0 bg-primary/40 backdrop-blur-md z-40"></div>
+<!-- Full Screen Modal Container (Mobile optimized) -->
+<main class="relative z-50 w-full h-full md:w-full md:max-w-md md:h-auto bg-surface-container-lowest md:rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between p-6 bg-primary-container sticky top-0 z-10">
+<h1 class="text-on-primary font-headline font-bold text-xl tracking-tight">Restore Account</h1>
+<button aria-label="Close modal" class="text-on-primary-container hover:text-white transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">close</span>
+</button>
+</header>
+<!-- Content Body -->
+<div class="flex-1 overflow-y-auto p-6 space-y-8 bg-surface">
+<!-- Context & Warning -->
+<div class="bg-surface-container-low p-5 rounded-lg border border-outline-variant/15">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-on-tertiary-container mt-0.5" style="font-variation-settings: 'FILL' 1;">info</span>
+<div>
+<h2 class="font-headline font-semibold text-primary mb-1">Restoration Process</h2>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+                            You are initiating a manual override to restore access to this account. Ensure identity verification has been completed offline before proceeding.
+                        </p>
+</div>
+</div>
+</div>
+<!-- User Details Card -->
+<section class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_12px_rgba(0,36,51,0.03)] border border-outline-variant/10 relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+<h3 class="font-headline text-xs tracking-[0.05em] uppercase text-on-surface-variant mb-6 font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 0;">person</span>
+                    Target Account
+                </h3>
+<div class="flex items-center gap-5 mb-6">
+<div class="w-16 h-16 rounded-full bg-surface-container-highest overflow-hidden border-2 border-surface-container-lowest shadow-sm">
+<img alt="Profile Avatar" class="w-full h-full object-cover" data-alt="A professional headshot portrait of a university student or faculty member used as an avatar. The image should be cleanly lit with a neutral background, conveying an academic or professional setting. The overall style should align with a high-end digital platform, utilizing soft natural lighting to create a welcoming yet serious institutional feel." src="https://lh3.googleusercontent.com/aida/ADBb0ugVvquat9Y2CyVdVqVi11CpaehdQBHpax2o7iqafzh6XbmaVEd8ClA6A7Y7GzB4ONUmVqJwrwOsdUKgt_9JVvwbe42i2ABlpZLDJOg8V9V6d3OJeTkjRoFhVGeWwzFvq5TDZmi4GWq8EUtK4ErEIQ9Y_At7Z-qnB_1S8aYHxQG6Kf6d2Jr2ce7fXi0hS7M1T4hvJ3aEl0OYuViACdKDwktLFVnB-kxs09FIlGiq9BuC6NSVPlnaiScNwOdpfMggTa5hGaVec8H2Wws"/>
+</div>
+<div>
+<h4 class="font-headline font-bold text-lg text-primary">Eleanor Vance</h4>
+<p class="text-on-surface-variant text-sm">ID: AC-88291-X</p>
+<span class="inline-flex items-center mt-2 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-error-container text-on-error-container border border-error-container/20">
+                            Suspended
+                        </span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
+<div>
+<p class="font-headline text-on-surface-variant mb-1 text-xs uppercase tracking-wider font-medium">Department</p>
+<p class="font-headline text-primary font-medium">Architecture</p>
+</div>
+<div>
+<p class="font-headline text-on-surface-variant mb-1 text-xs uppercase tracking-wider font-medium">Role</p>
+<p class="font-headline text-primary font-medium">Graduate Researcher</p>
+</div>
+<div class="col-span-2">
+<p class="font-headline text-on-surface-variant mb-1 text-xs uppercase tracking-wider font-medium">Last Known Activity</p>
+<p class="font-headline text-primary font-medium">14 days ago via Main Campus IP</p>
+</div>
+</div>
+</section>
+<!-- Input Form -->
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="block font-headline text-sm font-semibold text-primary" for="restoration-reason">Restoration Authorization Notes</label>
+<p class="text-xs text-on-surface-variant mb-2 font-body">Provide institutional context for the account's reinstatement. This will be logged in the permanent audit trail.</p>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-4 text-on-surface font-body focus:ring-2 focus:ring-on-tertiary-container focus:border-on-tertiary-container transition-shadow resize-none placeholder:text-outline-variant/60" id="restoration-reason" placeholder="e.g., Verified identity via Dept Head. Previous suspension was due to an automated security flag..." rows="4"></textarea>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/15">
+<div class="flex h-6 items-center">
+<input aria-describedby="verify-identity-description" class="h-5 w-5 rounded border-outline-variant/40 text-on-tertiary-container focus:ring-on-tertiary-container bg-surface cursor-pointer" id="verify-identity" name="verify-identity" type="checkbox"/>
+</div>
+<div class="text-sm leading-tight">
+<label class="font-headline font-medium text-primary cursor-pointer select-none" for="verify-identity">Confirm offline verification</label>
+</div>
+</div>
+</form>
+</div>
+<!-- Sticky Footer Actions -->
+<footer class="p-6 bg-surface-container-lowest border-t border-outline-variant/10 shadow-[0_-10px_20px_rgba(0,36,51,0.02)] sticky bottom-0 z-10 flex flex-col gap-3">
+<button class="w-full flex items-center justify-center gap-2 bg-gradient-to-br from-on-tertiary-container to-tertiary-fixed text-on-primary font-headline font-semibold text-sm rounded-md py-4 px-6 hover:shadow-md transition-all duration-200 active:scale-[0.98]" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">lock_open</span>
+                Restore Account Access
+            </button>
+<button class="w-full flex items-center justify-center text-secondary font-headline font-medium text-sm rounded-md py-3 px-6 bg-transparent border border-outline-variant/20 hover:bg-surface-container-low transition-colors duration-200" type="button">
+                Cancel
+            </button>
+</footer>
+</main>
+</body></html>

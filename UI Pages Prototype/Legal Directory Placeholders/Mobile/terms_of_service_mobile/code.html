@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Terms of Service - The Academic Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+  }
+</style>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        fontFamily: {
+          headline: ["Public Sans", "sans-serif"],
+          body: ["Public Sans", "sans-serif"],
+          label: ["Public Sans", "sans-serif"]
+        }
+      }
+    }
+  }
+</script>
+</head>
+<body class="bg-[#EEEEEE] font-body text-gray-800 antialiased min-h-screen flex flex-col">
+<!-- TopNavBar (Simulated for intent, no Bottom/Side Nav due to transactional intent) -->
+<header class="bg-[#053B50] text-white flex justify-between items-center w-full px-6 h-16 docked full-width top-0 sticky z-50 shadow-sm border-none">
+<div class="text-xl font-black tracking-tighter font-headline">The Academic Curator</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-white">notifications</span>
+<span class="material-symbols-outlined text-white">account_circle</span>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col p-4 md:p-8">
+<div class="bg-[#FFFFFF] rounded-lg p-8 flex flex-col gap-8 shadow-sm">
+<div>
+<h1 class="font-headline font-bold text-3xl text-[#053B50] tracking-tight mb-2">Terms of Service &amp; Operational Mandates</h1>
+<p class="font-body text-sm text-gray-500 uppercase tracking-[0.05em]">Last Updated: October 2023</p>
+</div>
+<div class="prose max-w-none text-gray-700 leading-relaxed">
+<p class="mb-6">
+                By accessing The Academic Curator, you agree to abide by the institutional mandates set forth by the governing body. These operational guidelines ensure the integrity, security, and efficient management of all cataloged assets.
+            </p>
+<h2 class="font-headline font-semibold text-xl text-[#053B50] mb-4">1. Thirty-Day Retention Lifecycle</h2>
+<p class="mb-4">
+                All items logged within the system, both physical articles and digital records, are subject to a strict thirty-day retention lifecycle from the date of initial entry.
+            </p>
+<ul class="list-disc pl-5 mb-6 space-y-2">
+<li>Automated notifications will be dispatched to claimant accounts 7 days prior to the expiration date.</li>
+<li>Physical assets unclaimed post-retention will be marked for authorized institutional disposal or donation.</li>
+<li>Digital records associated with expired items will be permanently purged from the active database to maintain archival efficiency.</li>
+</ul>
+<h2 class="font-headline font-semibold text-xl text-[#053B50] mb-4">2. Administrative Access</h2>
+<p class="mb-6">
+                Access to the Curator Logs, Archive Management tools, and cross-departmental analytics is strictly restricted. Only authorized institutional personnel with verified credentials may execute structural changes to the database. Unauthorized attempts to modify entry statuses or access restricted archives will result in immediate suspension of account privileges and formal institutional review.
+            </p>
+</div>
+<div class="mt-4 flex justify-start">
+<button class="bg-[#053B50] text-white font-label font-medium px-6 py-3 rounded-md hover:bg-[#176B87] transition-colors shadow-sm">
+                Back to Dashboard
+            </button>
+</div>
+</div>
+</main>
+</body></html>

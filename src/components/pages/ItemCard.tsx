@@ -17,12 +17,17 @@ export default function ItemCard({ status, icon, title, location, reference, ima
   const placeholderText = isFound ? 'Media Redacted for Privacy' : 'Verification Required';
 
   return (
-    <div className="bg-surface-container-lowest p-6 rounded-xl group hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md">
+    <div className="bg-surface-container-lowest p-6 rounded-xl group hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer">
       <div className="flex justify-between items-start mb-6">
         <div className="w-12 h-12 bg-surface-container-low flex items-center justify-center rounded-lg">
           <span className="material-symbols-outlined text-primary-container">{icon}</span>
         </div>
-        <StatusBadge status={displayStatus} />
+        <div className="flex items-center gap-2">
+          <StatusBadge status={displayStatus} />
+          <span className="material-symbols-outlined text-on-surface-variant text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+            arrow_outward
+          </span>
+        </div>
       </div>
       
       <div className="space-y-4 mb-8">
@@ -52,9 +57,9 @@ export default function ItemCard({ status, icon, title, location, reference, ima
         <span className="text-[11px] font-bold text-outline uppercase tracking-wider">
           Ref: {reference}
         </span>
-        <button className="bg-secondary text-white px-5 py-2.5 rounded-md text-sm font-bold hover:brightness-110 transition-all">
+        <span className="bg-secondary text-white px-5 py-2.5 rounded-md text-sm font-bold group-hover:brightness-110 transition-all">
           Contact {displayStatus === 'Lost' ? 'Curator' : 'User'}
-        </button>
+        </span>
       </div>
     </div>
   );

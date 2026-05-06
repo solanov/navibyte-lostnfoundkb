@@ -248,6 +248,14 @@ export default function EntryForm() {
             <label className="block font-headline font-bold text-primary mb-2 text-sm uppercase tracking-tight">
               Visual Evidence
             </label>
+            <div className="flex items-start gap-2 mb-3 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-300">
+              <span className="material-symbols-outlined text-amber-500 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
+                warning
+              </span>
+              <p className="text-xs text-amber-700 font-medium leading-snug">
+                <span className="font-bold uppercase tracking-wide">Note:</span> Keep confidential/sensitive information hidden before uploading (e.g. names, IDs, personal details).
+              </p>
+            </div>
             <input 
               type="file" 
               ref={fileInputRef} 

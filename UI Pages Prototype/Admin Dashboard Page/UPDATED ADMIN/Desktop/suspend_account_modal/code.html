@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Suspend Institutional Access - User Management - The Academic Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;800;900&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed": "#8df4ec",
+                        "on-secondary-container": "#05637f",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-surface": "#1b1c1c",
+                        "surface-bright": "#fbf9f8",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#00201e",
+                        "on-primary-container": "#7aa5be",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "tertiary-container": "#003e3b",
+                        "tertiary": "#002624",
+                        "inverse-on-surface": "#f3f0f0",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#dcd9d9",
+                        "surface-container-high": "#eae8e7",
+                        "secondary-container": "#98defe",
+                        "on-surface-variant": "#41484c",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "background": "#fbf9f8",
+                        "primary-fixed": "#c2e8ff",
+                        "surface": "#fbf9f8",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "outline": "#71787d",
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "inverse-surface": "#303030",
+                        "secondary-fixed": "#bde9ff",
+                        "inverse-primary": "#a1cce6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e4e2e1",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "on-error": "#ffffff",
+                        "surface-container": "#f0eded",
+                        "outline-variant": "#c1c7cd",
+                        "on-primary-fixed": "#001e2c",
+                        "primary-container": "#053b50",
+                        "on-secondary-fixed": "#001f2a",
+                        "on-background": "#1b1c1c",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#38637a",
+                        "secondary": "#0d6682",
+                        "on-tertiary-container": "#44afa9",
+                        "primary": "#002433",
+                        "primary-fixed-dim": "#a1cce6",
+                        "surface-container-low": "#f5f3f3"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    fontFamily: {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-display, .font-headline { font-family: 'Public Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-surface h-screen w-full overflow-hidden flex font-body">
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-primary/40 backdrop-blur-sm p-4">
+<!-- Modal Container: Intake Form overlapping fields style -->
+<div class="w-full max-w-lg bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] overflow-hidden flex flex-col">
+<!-- Modal Header: primary_container for institutional intake feel -->
+<div class="bg-primary-container px-6 py-5 flex items-start gap-4">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-error-container/20 flex items-center justify-center mt-1">
+<span class="material-symbols-outlined text-error text-3xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div class="flex-1">
+<h2 class="text-on-primary font-headline font-bold text-xl tracking-tight leading-tight">Suspend Institutional Access</h2>
+<p class="text-on-primary-container text-sm mt-1 font-medium">This action revokes platform privileges.</p>
+</div>
+</div>
+<!-- Modal Body -->
+<div class="p-6 flex-1 flex flex-col gap-6">
+<!-- Target Context -->
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center gap-4">
+<img alt="John Doe Profile Avatar" class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="A professional headshot avatar of a university student or staff member. The individual has a neutral, approachable expression. The lighting is studio-quality with a soft, institutional background in muted blues and greys. The image is cropped in a tight circle to represent a typical user profile picture on a high-end academic platform." src="https://lh3.googleusercontent.com/aida/ADBb0uiUHVV5Xu_mLL1JhoYZjaV_xcOjYJ93sTVFEgjnMKj6iEERHihRVwyHndcDoW-NStxs6jxrwwIO8LuFSWu7m7P1leVa2Jo6khbsk4NC3QZQZot3e5RgZnmP2kYATeLp_PQHbAQMEEUA32Hjq_iXX1nkAy1Jw3cWsMc_S1RRpozbwymJXdnWGr0SzSoOldysJxAYZVuiMijNjjmM0bwD7bW6q4NMdw2ycg9Owyq_CFVxDqAsEfPzxSHlur37K6ZbMd8SL0h-iD0kIpw"/>
+<div>
+<p class="font-headline font-bold text-on-surface text-base">John Doe</p>
+<p class="text-on-surface-variant text-sm">j.doe@neu.edu.ph</p>
+</div>
+<div class="ml-auto">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-tertiary-fixed text-on-tertiary-fixed tracking-wider uppercase">Active</span>
+</div>
+</div>
+<!-- Form Fields -->
+<div class="space-y-5">
+<!-- Duration Toggle -->
+<div>
+<fieldset>
+<legend class="text-sm font-semibold text-on-surface mb-3 tracking-wide uppercase">Suspension Duration</legend>
+<div class="grid grid-cols-2 gap-3">
+<label class="relative flex cursor-pointer rounded-lg bg-surface-container-low p-4 shadow-sm border border-outline-variant/15 hover:bg-surface-container-high transition-colors">
+<input checked="" class="peer sr-only" name="duration" type="radio" value="temporary"/>
+<div class="flex w-full items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant peer-checked:text-primary" style="font-variation-settings: 'FILL' 0;">timer</span>
+<div>
+<p class="font-medium text-on-surface text-sm">Temporary</p>
+<p class="text-xs text-on-surface-variant">30 Days</p>
+</div>
+</div>
+</div>
+<div class="absolute inset-0 rounded-lg border-2 border-transparent peer-checked:border-primary pointer-events-none"></div>
+</label>
+<label class="relative flex cursor-pointer rounded-lg bg-surface-container-low p-4 shadow-sm border border-outline-variant/15 hover:bg-surface-container-high transition-colors">
+<input class="peer sr-only" name="duration" type="radio" value="permanent"/>
+<div class="flex w-full items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 0;">block</span>
+<div>
+<p class="font-medium text-error text-sm">Permanent</p>
+<p class="text-xs text-on-surface-variant">Indefinite</p>
+</div>
+</div>
+</div>
+<div class="absolute inset-0 rounded-lg border-2 border-transparent peer-checked:border-error pointer-events-none"></div>
+</label>
+</div>
+</fieldset>
+</div>
+<!-- Reason Textarea -->
+<div>
+<label class="block text-sm font-semibold text-on-surface mb-2 tracking-wide uppercase" for="reason">Suspension Reason &amp; Internal Notes <span class="text-error">*</span></label>
+<div class="relative">
+<textarea class="block w-full rounded-lg bg-surface-container-low border-0 py-3 px-4 text-on-surface shadow-sm ring-1 ring-inset ring-outline-variant/20 focus:ring-2 focus:ring-inset focus:ring-primary focus:bg-surface-container-lowest transition-all text-sm resize-none" id="reason" name="reason" placeholder="Provide detailed context for this moderation action..." rows="4"></textarea>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="bg-surface-container px-6 py-4 flex items-center justify-end gap-3 rounded-b-xl border-t border-outline-variant/15">
+<button class="px-5 py-2.5 rounded-md text-sm font-medium text-secondary bg-transparent border border-outline-variant/20 hover:bg-surface-container-low transition-colors" type="button">
+                    Cancel
+                </button>
+<button class="px-5 py-2.5 rounded-md text-sm font-medium text-on-error bg-error hover:bg-on-error-container transition-colors shadow-sm" type="button">
+                    Confirm Suspension
+                </button>
+</div>
+</div>
+</div>
+<!-- Background UI (Simulated behind modal) -->
+<div class="flex-1 flex flex-col relative blur-[2px] pointer-events-none select-none opacity-60">
+<!-- Top Nav (Simulated based on instructions) -->
+<header class="bg-[#053B50] text-white flex justify-between items-center px-8 h-16 w-full fixed top-0 z-40">
+<div class="text-xl font-black tracking-tighter">The Academic Curator</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined">notifications</span>
+<span class="material-symbols-outlined">settings</span>
+</div>
+</header>
+<div class="flex flex-1 pt-16">
+<!-- Side Nav (Simulated based on instructions) -->
+<aside class="bg-[#176B87] text-white h-screen w-64 fixed left-0 top-16 flex flex-col py-6 pl-4">
+<div class="mb-8">
+<h2 class="font-bold">Admin Portal</h2>
+<p class="text-sm opacity-80">University Oversight</p>
+</div>
+<nav class="flex flex-col gap-2">
+<div class="py-2 px-3 text-sm font-medium">Dashboard</div>
+<div class="py-2 px-3 text-sm font-medium bg-white text-[#176B87] rounded-l-lg">Moderation</div>
+<div class="py-2 px-3 text-sm font-medium">Directory</div>
+</nav>
+</aside>
+<!-- Main Content Area (Empty context) -->
+<main class="ml-64 flex-1 bg-background p-8">
+<!-- Content would go here -->
+</main>
+</div>
+</div>
+</body></html>

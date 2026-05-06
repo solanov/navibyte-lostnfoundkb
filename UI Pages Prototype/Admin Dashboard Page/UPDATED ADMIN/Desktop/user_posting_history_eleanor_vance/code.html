@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Posting History Modal - The Academic Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Public+Sans:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-container": "#05637f",
+                        "primary-fixed-dim": "#a1cce6",
+                        "on-tertiary-fixed": "#00201e",
+                        "on-secondary-fixed": "#001f2a",
+                        "surface-tint": "#38637a",
+                        "surface": "#fbf9f8",
+                        "on-background": "#1b1c1c",
+                        "primary": "#002433",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "secondary": "#0d6682",
+                        "primary-fixed": "#c2e8ff",
+                        "outline": "#71787d",
+                        "tertiary-container": "#003e3b",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "surface-container": "#f0eded",
+                        "surface-container-low": "#f5f3f3",
+                        "inverse-surface": "#303030",
+                        "surface-bright": "#fbf9f8",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e4e2e1",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#053b50",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "on-tertiary-container": "#44afa9",
+                        "on-surface": "#1b1c1c",
+                        "inverse-primary": "#a1cce6",
+                        "on-primary-fixed": "#001e2c",
+                        "surface-dim": "#dcd9d9",
+                        "tertiary": "#002624",
+                        "background": "#fbf9f8",
+                        "inverse-on-surface": "#f3f0f0",
+                        "secondary-fixed": "#bde9ff",
+                        "outline-variant": "#c1c7cd",
+                        "on-surface-variant": "#41484c",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "on-primary-container": "#7aa5be",
+                        "tertiary-fixed": "#8df4ec",
+                        "secondary-container": "#98defe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Public Sans"],
+                        "display": ["Public Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    "fontSize": {}
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased h-screen w-screen overflow-hidden relative flex">
+<!-- Faux Background Layer (Dimmed User Management View) -->
+<div aria-hidden="true" class="absolute inset-0 z-0 opacity-50 filter blur-[2px] bg-surface-container pointer-events-none flex">
+<!-- Mock SideNav Outline -->
+<div class="w-72 bg-surface-container-low h-full flex flex-col p-6 gap-y-2 opacity-60 border-r border-outline-variant/15">
+<div class="h-8 bg-surface-variant rounded mb-8 w-3/4"></div>
+<div class="h-10 bg-surface-variant rounded"></div>
+<div class="h-10 bg-surface-container-highest rounded"></div>
+<div class="h-10 bg-surface-variant rounded"></div>
+</div>
+<!-- Mock Main Content Outline -->
+<div class="flex-1 p-12 opacity-60">
+<div class="h-12 bg-surface-variant rounded w-1/3 mb-8"></div>
+<div class="bg-surface-container-lowest h-96 rounded shadow-sm border border-outline-variant/15 p-6">
+<div class="h-6 bg-surface-variant rounded w-full mb-4"></div>
+<div class="h-6 bg-surface-variant rounded w-full mb-4"></div>
+<div class="h-6 bg-surface-variant rounded w-full mb-4"></div>
+</div>
+</div>
+</div>
+<!-- Modal Overlay Backdrop -->
+<div class="absolute inset-0 z-40 bg-primary/20 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 lg:p-8">
+<!-- Modal Container -->
+<div aria-labelledby="modal-title" aria-modal="true" class="bg-surface-container-lowest w-full max-w-4xl rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] overflow-hidden flex flex-col max-h-[90vh]" role="dialog">
+<!-- Modal Header (Institutional Intake Style) -->
+<div class="bg-primary-container px-8 py-6 flex justify-between items-start">
+<div>
+<p class="font-label text-on-primary-container text-xs font-semibold uppercase tracking-widest mb-1">Audit Trail</p>
+<h2 class="font-headline text-on-primary text-2xl font-bold tracking-tight" id="modal-title">Posting History: Eleanor Vance</h2>
+<p class="font-body text-primary-fixed-dim text-sm mt-1 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+                        e.vance@neu.edu.ph
+                    </p>
+</div>
+<button aria-label="Close modal" class="text-on-primary-container hover:text-on-primary transition-colors p-2 rounded-lg hover:bg-white/10">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Content (Data Table) -->
+<div class="p-8 flex-1 overflow-y-auto bg-surface-container-lowest">
+<div class="w-full">
+<!-- Table Header -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr_120px] gap-4 pb-4 border-b-2 border-surface-container-highest font-label text-xs font-semibold text-on-surface-variant uppercase tracking-wider items-center">
+<div>Thumbnail</div>
+<div>Asset Ref ID</div>
+<div>Date Posted</div>
+<div>Status</div>
+<div class="text-right">Action</div>
+</div>
+<!-- Table Body -->
+<div class="flex flex-col">
+<!-- Row 1 -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr_120px] gap-4 py-4 border-b border-surface-container-high hover:bg-surface-bright transition-colors items-center group">
+<!-- Thumbnail -->
+<div class="w-16 h-16 rounded overflow-hidden bg-surface-container flex-shrink-0 border border-outline-variant/15">
+<img alt="Student ID thumbnail" class="w-full h-full object-cover" data-alt="A macro photograph of a misplaced university student ID card resting on a sleek, light-grey institutional desk. The lighting is crisp and cool, highlighting the glossy plastic surface of the card against the matte background. The aesthetic is clean, professional, and slightly clinical, evoking a sense of lost identity within a massive academic institution. The overall palette is dominated by cool whites and soft greys." src="https://lh3.googleusercontent.com/aida/ADBb0uiUHVV5Xu_mLL1JhoYZjaV_xcOjYJ93sTVFEgjnMKj6iEERHihRVwyHndcDoW-NStxs6jxrwwIO8LuFSWu7m7P1leVa2Jo6khbsk4NC3QZQZot3e5RgZnmP2kYATeLp_PQHbAQMEEUA32Hjq_iXX1nkAy1Jw3cWsMc_S1RRpozbwymJXdnWGr0SzSoOldysJxAYZVuiMijNjjmM0bwD7bW6q4NMdw2ycg9Owyq_CFVxDqAsEfPzxSHlur37K6ZbMd8SL0h-iD0kIpw"/>
+</div>
+<!-- Ref ID -->
+<div class="font-body text-sm font-medium text-primary">ID-2940</div>
+<!-- Date -->
+<div class="font-body text-sm text-on-surface-variant">2023-11-10</div>
+<!-- Status -->
+<div>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-tertiary-fixed text-on-tertiary-fixed font-label tracking-wide">
+                                    Active
+                                </span>
+</div>
+<!-- Action -->
+<div class="text-right">
+<button class="inline-flex items-center justify-center px-4 py-2 bg-transparent hover:bg-error-container text-error text-sm font-medium rounded-lg transition-colors border border-error/30 hover:border-error">
+                                    Force Delete
+                                </button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr_120px] gap-4 py-4 border-b border-surface-container-high hover:bg-surface-bright transition-colors items-center group">
+<!-- Thumbnail -->
+<div class="w-16 h-16 rounded overflow-hidden bg-surface-container flex-shrink-0 border border-outline-variant/15 flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-3xl">menu_book</span>
+</div>
+<!-- Ref ID -->
+<div class="font-body text-sm font-medium text-primary">BK-4412</div>
+<!-- Date -->
+<div class="font-body text-sm text-on-surface-variant">2023-10-25</div>
+<!-- Status -->
+<div>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-container text-on-secondary-container font-label tracking-wide">
+                                    Returned
+                                </span>
+</div>
+<!-- Action -->
+<div class="text-right">
+<span class="text-sm text-outline-variant font-medium italic">Resolved</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="bg-surface px-8 py-4 border-t border-surface-container-high flex justify-end">
+<button class="inline-flex items-center justify-center px-6 py-2.5 bg-primary-container hover:bg-primary text-on-primary text-sm font-semibold rounded-lg transition-all shadow-sm">
+                    Close Audit
+                </button>
+</div>
+</div>
+</div>
+</body></html>

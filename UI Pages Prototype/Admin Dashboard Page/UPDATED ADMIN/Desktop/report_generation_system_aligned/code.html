@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Generate Report - The Academic Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;900&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e4e2e1",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "on-error": "#ffffff",
+                        "primary": "#002433",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "on-background": "#1b1c1c",
+                        "secondary-container": "#98defe",
+                        "surface-tint": "#38637a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001e2c",
+                        "surface-bright": "#fbf9f8",
+                        "primary-container": "#053b50",
+                        "on-secondary-container": "#05637f",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "secondary-fixed": "#bde9ff",
+                        "tertiary": "#002624",
+                        "surface-container-high": "#eae8e7",
+                        "inverse-primary": "#a1cce6",
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "surface-variant": "#e4e2e1",
+                        "on-tertiary-container": "#44afa9",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#003e3b",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface": "#1b1c1c",
+                        "on-primary-container": "#7aa5be",
+                        "surface-container-low": "#f5f3f3",
+                        "surface": "#fbf9f8",
+                        "outline": "#71787d",
+                        "on-surface-variant": "#41484c",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "secondary": "#0d6682",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#a1cce6",
+                        "background": "#fbf9f8",
+                        "inverse-surface": "#303030",
+                        "outline-variant": "#c1c7cd",
+                        "on-secondary-fixed": "#001f2a",
+                        "tertiary-fixed": "#8df4ec",
+                        "inverse-on-surface": "#f3f0f0",
+                        "on-tertiary-fixed": "#00201e",
+                        "surface-dim": "#dcd9d9",
+                        "surface-container": "#f0eded",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#c2e8ff",
+                        "brand-nav": "#053B50",
+                        "brand-accent-dark": "#176B87",
+                        "brand-accent-light": "#64CCC5",
+                        "brand-bg": "#EEEEEE",
+                        "brand-white": "#FFFFFF"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-nav {
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-brand-bg text-on-surface font-body min-h-screen antialiased flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-brand-nav fixed top-0 w-full z-50 border-none shadow-xl flex justify-between items-center px-8 h-16">
+<div class="flex items-center gap-4">
+<span class="text-xl font-black text-white tracking-tighter font-headline">The Academic Curator</span>
+</div>
+<div class="flex-1 max-w-xl mx-8">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-brand-accent-dark" data-icon="search">search</span>
+<input class="w-full bg-white/10 border border-white/20 text-white placeholder-white/50 py-2 pl-10 pr-4 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-accent-dark focus:border-transparent transition-all" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-brand-accent-dark hover:text-white transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-brand-accent-dark hover:text-white transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<img alt="Administrator Profile" class="w-8 h-8 rounded-full border-2 border-brand-accent-dark" data-alt="A small, circular avatar portrait of a professional administrator in a brightly lit office setting, maintaining a clean, academic tone." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdOSA72nrEt_7eHTfxFNeX_sgOtcePInBFMofvnVlPVgdhPpGm6Q9f_wRPYn15xL-pTmtteTi6iDjxpc5Iz7cmwDIpiAcsxQcnNnnA6wwcI8QvrRizC081Jidbs27T1ESWSNbZSoqUVkVTuMUODWYPgw74BcqTxHKpzENlP3ej_B3McYZlMhHUcOYRaFArCD13bm10iFf7bAwdfLrBoHlYx7Tdfmnkb8u_uRcqMiKy1HSWgOFIphxw3wushy9kqd19jNLyBn1tryKM"/>
+</div>
+</header>
+<div class="flex flex-1 pt-16">
+<!-- SideNavBar -->
+<nav class="bg-brand-white h-screen w-64 fixed left-0 top-0 pt-20 flex flex-col gap-y-2 px-4 border-r border-slate-200/20 z-40">
+<div class="mb-8 px-2 flex items-center gap-3">
+<img alt="University Crest" class="w-10 h-10 rounded-DEFAULT" data-alt="A stylized, modern university crest icon, primarily in deep institutional blue, against a clean white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD30wECTGfj3DL2zAhgggx_Z0IeDQjOJEzr9aXbyE0oPEg4tbKmuU4xh2bHteTA_2iguiC36GS4aAFWeioE7lzsialtVcO2yuiaFADu6geS8_qCf3hMosBQsSxlcwUN9-Agvn3oudhVpXc5SAg6ZeiXX2OHKwbzJ8BznLrdX4rx6rmFxV2rP-8vEperaAxPm8gRxrbxwwW0h8avPh-EzDlck4ZtCnlo8bzgQ7PGVA_sg6dOcnbsnryUNcY-FeDv0mhWrsX1-Sk47de6"/>
+<div>
+<h2 class="text-lg font-bold text-brand-nav font-headline leading-tight">Admin Portal</h2>
+<p class="text-xs text-slate-500 font-label tracking-wide uppercase">Institutional Control</p>
+</div>
+</div>
+<a class="text-slate-600 hover:bg-slate-100 flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT font-['Inter'] text-sm tracking-wide uppercase font-semibold hover:translate-x-1 transition-transform duration-300 active:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="verified_user">verified_user</span>
+                Secure Vault
+            </a>
+<a class="text-slate-600 hover:bg-slate-100 flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT font-['Inter'] text-sm tracking-wide uppercase font-semibold hover:translate-x-1 transition-transform duration-300 active:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="group">group</span>
+                User Management
+            </a>
+<a class="text-slate-600 hover:bg-slate-100 flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT font-['Inter'] text-sm tracking-wide uppercase font-semibold hover:translate-x-1 transition-transform duration-300 active:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="delete_sweep">delete_sweep</span>
+                Disposal Queue
+            </a>
+<a class="bg-brand-accent-dark/10 text-brand-accent-dark font-bold shadow-sm flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT font-['Inter'] text-sm tracking-wide uppercase hover:translate-x-1 transition-transform duration-300 active:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="history_edu">history_edu</span>
+                Audit Trail
+            </a>
+<div class="mt-auto mb-6 px-2">
+<button class="w-full bg-brand-accent-light text-white py-2.5 px-4 rounded-md font-label uppercase tracking-widest text-xs font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-lg shadow-brand-accent-light/20">
+<span class="material-symbols-outlined text-sm" data-icon="description">description</span>
+                    Generate Report
+                </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 bg-brand-bg min-h-[calc(100vh-4rem)] p-8 md:p-12">
+<div class="max-w-4xl mx-auto space-y-8">
+<header class="space-y-2">
+<h1 class="font-headline text-4xl text-brand-nav font-bold tracking-tight">System Reports</h1>
+<p class="text-slate-600 font-body text-lg">Configure and export institutional data parameters.</p>
+</header>
+<div class="bg-brand-white rounded-xl p-8 relative overflow-hidden flex flex-col group transition-colors duration-300" style="box-shadow: 0 20px 40px rgba(0, 36, 51, 0.06);">
+<div class="flex-1 space-y-8 relative z-10">
+<!-- Report Type -->
+<div class="space-y-3">
+<label class="block text-brand-nav font-headline text-lg font-bold tracking-tight">Report Parameter</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface border-0 outline outline-1 outline-outline-variant/30 text-on-surface py-3.5 pl-4 pr-10 rounded-md focus:ring-2 focus:ring-brand-accent-dark focus:outline-none transition-shadow font-body">
+<option>Inventory Summary</option>
+<option>User Activity</option>
+<option>Audit Logs</option>
+<option>Disposal Manifest</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-brand-accent-dark">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Date Range -->
+<div class="space-y-3">
+<label class="block text-brand-nav font-headline text-lg font-bold tracking-tight">Temporal Range</label>
+<div class="grid grid-cols-2 gap-4">
+<div class="relative">
+<input class="w-full bg-surface border-0 outline outline-1 outline-outline-variant/30 text-on-surface py-3.5 pl-4 pr-4 rounded-md focus:ring-2 focus:ring-brand-accent-dark focus:outline-none transition-shadow font-body" type="date" value="2023-09-01"/>
+</div>
+<div class="relative">
+<input class="w-full bg-surface border-0 outline outline-1 outline-outline-variant/30 text-on-surface py-3.5 pl-4 pr-4 rounded-md focus:ring-2 focus:ring-brand-accent-dark focus:outline-none transition-shadow font-body" type="date" value="2023-11-15"/>
+</div>
+</div>
+</div>
+<!-- File Format -->
+<div class="space-y-3">
+<label class="block text-brand-nav font-headline text-lg font-bold tracking-tight">Output Format</label>
+<div class="flex gap-4">
+<button class="flex-1 bg-surface-container-high py-4 rounded-md border border-transparent hover:border-outline-variant/30 transition-all flex flex-col items-center gap-2 focus:bg-brand-accent-dark/10 focus:border-brand-accent-dark text-on-surface">
+<span class="material-symbols-outlined text-3xl text-brand-accent-light" data-icon="csv">csv</span>
+<span class="font-label text-xs tracking-wider uppercase font-semibold">CSV</span>
+</button>
+<button class="flex-1 bg-surface-container py-4 rounded-md border border-transparent hover:border-outline-variant/30 transition-all flex flex-col items-center gap-2 focus:bg-brand-accent-dark/10 focus:border-brand-accent-dark text-on-surface">
+<span class="material-symbols-outlined text-3xl text-brand-accent-light" data-icon="picture_as_pdf">picture_as_pdf</span>
+<span class="font-label text-xs tracking-wider uppercase font-semibold">PDF</span>
+</button>
+<button class="flex-1 bg-surface-container py-4 rounded-md border border-transparent hover:border-outline-variant/30 transition-all flex flex-col items-center gap-2 focus:bg-brand-accent-dark/10 focus:border-brand-accent-dark text-on-surface">
+<span class="material-symbols-outlined text-3xl text-brand-accent-light" data-icon="table">table</span>
+<span class="font-label text-xs tracking-wider uppercase font-semibold">Excel</span>
+</button>
+</div>
+</div>
+<div class="pt-6 flex flex-col sm:flex-row gap-4 items-center">
+<button class="w-full sm:w-auto px-8 py-4 bg-brand-accent-light text-white rounded-md font-body font-semibold hover:opacity-90 transition-colors flex items-center justify-center gap-2 shadow-sm">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+                                Generate &amp; Download Report
+                            </button>
+<button class="w-full sm:w-auto px-8 py-4 bg-transparent text-brand-accent-dark border-2 border-brand-accent-dark rounded-md font-body font-semibold hover:bg-brand-accent-dark/5 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="event_repeat">event_repeat</span>
+                                Schedule Recurring Report
+                            </button>
+</div>
+</div>
+<!-- Side Status/Image Area -->
+</div>
+</div>
+</main>
+</div>
+</body></html>

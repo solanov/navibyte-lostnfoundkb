@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Disposal Queue - The Academic Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#00201e",
+                        "inverse-on-surface": "#f3f0f0",
+                        "tertiary-container": "#003e3b",
+                        "secondary-fixed": "#bde9ff",
+                        "outline-variant": "#c1c7cd",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#a1cce6",
+                        "on-secondary-fixed": "#001f2a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001e2c",
+                        "tertiary": "#002624",
+                        "surface-tint": "#38637a",
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "secondary": "#0d6682",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "primary": "#002433",
+                        "outline": "#71787d",
+                        "on-background": "#1b1c1c",
+                        "surface-container": "#f0eded",
+                        "tertiary-fixed": "#8df4ec",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#1b1c1c",
+                        "inverse-primary": "#a1cce6",
+                        "surface-dim": "#dcd9d9",
+                        "surface-bright": "#fbf9f8",
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "background": "#fbf9f8",
+                        "inverse-surface": "#303030",
+                        "on-primary-container": "#7aa5be",
+                        "surface": "#fbf9f8",
+                        "surface-container-low": "#f5f3f3",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#c2e8ff",
+                        "on-tertiary-container": "#44afa9",
+                        "secondary-container": "#98defe",
+                        "primary-container": "#053b50",
+                        "on-surface-variant": "#41484c",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e4e2e1",
+                        "on-secondary-container": "#05637f",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Public Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased pb-24 pt-16 selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="bg-primary-container fixed top-0 w-full z-50 flex items-center justify-between px-4 h-16 text-on-primary font-headline tracking-tight font-bold shadow-md">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined hover:bg-white/10 transition-colors rounded-full p-2 cursor-pointer" data-icon="account_balance">account_balance</span>
+<span class="text-xl font-bold tracking-tighter text-on-primary">The Academic Curator</span>
+</div>
+<div>
+<div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium overflow-hidden border border-white/20 hover:bg-white/20 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-on-primary text-[20px]" data-icon="person">person</span>
+</div>
+</div>
+</header>
+<main class="max-w-md mx-auto px-4 md:hidden mt-6 flex flex-col gap-6">
+<!-- Header & Batch Actions -->
+<div class="flex flex-col gap-4 sticky top-16 z-40 bg-surface/95 backdrop-blur-md pt-2 pb-4 shadow-[0_4px_12px_rgba(0,36,51,0.02)]">
+<h1 class="text-2xl font-headline font-bold text-primary tracking-tight">Disposal Queue</h1>
+<p class="text-sm text-on-surface-variant font-body">Items flagged for permanent archival or disposal.</p>
+<div class="flex items-center justify-between bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/20 shadow-sm">
+<label class="flex items-center gap-3 cursor-pointer text-sm font-medium text-primary font-body">
+<input class="form-checkbox h-5 w-5 text-secondary rounded border-outline-variant/50 focus:ring-secondary bg-surface-container-lowest" type="checkbox"/>
+<span>Select All</span>
+</label>
+<button class="bg-secondary-container text-on-secondary-container px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-secondary-fixed transition-colors flex items-center gap-2 border border-secondary-container/20 font-label">
+<span class="material-symbols-outlined text-[18px]" data-icon="print">print</span>
+                    Batch Print
+                </button>
+</div>
+</div>
+<!-- Queue Cards List -->
+<div class="flex flex-col gap-4">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_2px_8px_rgba(0,36,51,0.04)] border border-outline-variant/20 relative group transition-all duration-300">
+<div class="absolute top-4 left-4 z-10">
+<input class="form-checkbox h-5 w-5 text-secondary rounded border-outline-variant/50 focus:ring-secondary bg-surface-container-lowest" type="checkbox"/>
+</div>
+<div class="ml-10">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-error-container text-on-error-container px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 font-label">
+<span class="material-symbols-outlined text-[12px]" data-icon="warning">warning</span>
+                            45 Days Overdue
+                        </span>
+<span class="text-xs text-on-surface-variant font-medium flex items-center gap-1 font-body">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+                            Bin B-12
+                        </span>
+</div>
+<h3 class="font-headline font-bold text-[17px] text-primary leading-tight mb-1">Antique Brass Microscope</h3>
+<p class="text-[13px] text-on-surface-variant mb-4 line-clamp-2 leading-snug font-body">Leitz Wetzlar model, circa 1920. Optics severely damaged. Requested for parts salvage by Bio Dept.</p>
+<div class="flex items-center gap-3">
+<img alt="" class="w-[60px] h-[60px] object-cover rounded-lg border border-outline-variant/20" data-alt="A vintage brass microscope resting on a sterile white institutional table, soft high-key lighting, modern editorial photography style, muted tones with deep blue shadows, conveying a sense of academic history and clinical analysis." src="https://lh3.googleusercontent.com/aida/ADBb0ugVvquat9Y2CyVdVqVi11CpaehdQBHpax2o7iqafzh6XbmaVEd8ClA6A7Y7GzB4ONUmVqJwrwOsdUKgt_9JVvwbe42i2ABlpZLDJOg8V9V6d3OJeTkjRoFhVGeWwzFvq5TDZmi4GWq8EUtK4ErEIQ9Y_At7Z-qnB_1S8aYHxQG6Kf6d2Jr2ce7fXi0hS7M1T4hvJ3aEl0OYuViACdKDwktLFVnB-kxs09FIlGiq9BuC6NSVPlnaiScNwOdpfMggTa5hGaVec8H2Wws"/>
+<div class="flex-1 flex justify-end">
+<button class="bg-error/5 text-error border border-error/20 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-error hover:text-white transition-colors flex items-center gap-2 font-label">
+<span class="material-symbols-outlined text-[16px]" data-icon="gavel">gavel</span>
+                                Initiate Audit
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_2px_8px_rgba(0,36,51,0.04)] border border-outline-variant/20 relative group transition-all duration-300">
+<div class="absolute top-4 left-4 z-10">
+<input class="form-checkbox h-5 w-5 text-secondary rounded border-outline-variant/50 focus:ring-secondary bg-surface-container-lowest" type="checkbox"/>
+</div>
+<div class="ml-10">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-error-container text-on-error-container px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 font-label">
+<span class="material-symbols-outlined text-[12px]" data-icon="warning">warning</span>
+                            30 Days Overdue
+                        </span>
+<span class="text-xs text-on-surface-variant font-medium flex items-center gap-1 font-body">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+                            Vault C
+                        </span>
+</div>
+<h3 class="font-headline font-bold text-[17px] text-primary leading-tight mb-1">Geological Core Samples</h3>
+<p class="text-[13px] text-on-surface-variant mb-4 line-clamp-2 leading-snug font-body">Box of 12 granite cores from 2018 expedition. Labels degraded. Unclaimed by Earth Sciences.</p>
+<div class="flex justify-end mt-2">
+<button class="bg-error/5 text-error border border-error/20 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-error hover:text-white transition-colors flex items-center gap-2 font-label">
+<span class="material-symbols-outlined text-[16px]" data-icon="gavel">gavel</span>
+                            Initiate Audit
+                        </button>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_2px_8px_rgba(0,36,51,0.04)] border border-outline-variant/20 relative group transition-all duration-300">
+<div class="absolute top-4 left-4 z-10">
+<input class="form-checkbox h-5 w-5 text-secondary rounded border-outline-variant/50 focus:ring-secondary bg-surface-container-lowest" type="checkbox"/>
+</div>
+<div class="ml-10">
+<div class="flex justify-between items-start mb-3">
+<span class="bg-error-container text-on-error-container px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 font-label">
+<span class="material-symbols-outlined text-[12px]" data-icon="warning">warning</span>
+                            14 Days Overdue
+                        </span>
+<span class="text-xs text-on-surface-variant font-medium flex items-center gap-1 font-body">
+<span class="material-symbols-outlined text-[14px]" data-icon="location_on">location_on</span>
+                            Zone A-4
+                        </span>
+</div>
+<h3 class="font-headline font-bold text-[17px] text-primary leading-tight mb-1">Unclaimed Lecture Podium</h3>
+<p class="text-[13px] text-on-surface-variant mb-4 line-clamp-2 leading-snug font-body">Oak veneer, damaged wiring harness. Abandoned in Main Hall after renovations.</p>
+<div class="flex justify-end mt-2">
+<button class="bg-error/5 text-error border border-error/20 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-error hover:text-white transition-colors flex items-center gap-2 font-label">
+<span class="material-symbols-outlined text-[16px]" data-icon="gavel">gavel</span>
+                            Initiate Audit
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface shadow-[0_-4px_16px_rgba(0,36,51,0.05)] fixed bottom-0 left-0 w-full h-[72px] z-50 flex justify-around items-center px-2 pb-safe border-t border-outline-variant/20 text-on-surface-variant font-label text-[11px] font-semibold tracking-wide uppercase md:hidden">
+<a class="flex flex-col items-center justify-center hover:text-primary transition-colors w-16 h-full gap-1" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="inventory_2">inventory_2</span>
+<span>Vault</span>
+</a>
+<a class="flex flex-col items-center justify-center hover:text-primary transition-colors w-16 h-full gap-1" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="group">group</span>
+<span>Users</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-container bg-secondary-container rounded-xl px-4 py-1.5 min-w-[64px] shadow-sm gap-1" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="delete_sweep" style="font-variation-settings: 'FILL' 1;">delete_sweep</span>
+<span>Queue</span>
+</a>
+<a class="flex flex-col items-center justify-center hover:text-primary transition-colors w-16 h-full gap-1" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="history_edu">history_edu</span>
+<span>Logs</span>
+</a>
+</nav>
+</body></html>
