@@ -35,4 +35,4 @@ To solve these challenges, two Knowledge Management (KM) frameworks were evaluat
 
 ### Stage 4: Internalization (Explicit-to-Tacit)
 * **Feature:** Verification Module & Secure Vault
-* **Action:** Staff members access the private "Hidden Note" within the Secure Vault, internalize that restricted information, and use it to execute a **Challenge Question** to verify an owner's identity. This completes the loop, turning digital data back into a successful, secure physical return.
+* **Action:** Staff members access the private "Hidden Note" within the Secure Vault, internalize that restricted information, and use it to execute a **Challenge Question** to verify an owner's identity. This completes the loop, turning digital data back into a successful, secure physical return of the items.
