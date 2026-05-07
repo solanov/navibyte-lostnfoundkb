@@ -9,3 +9,4 @@
 | 5  | 4/29 | Implement Data Sensitivity for Users with Censorship | Add Data Sensitivity through censorship or admin approval  | All Members + Professor | We consulted our Professor for feedback regarding data sensitivity                                               |
 | 6   | 5/04 | Make changes to UI Design | Keep or Change UI Fixes | All Members | Decided to change the UI Design as it feels lacking and we've decided we need to change it to keep it user friendly                   
 | 7   | 5/06 | Automation of Data Censorship  | Automated or Manual Censorship of data | All Members + Professor | The outcome was that the implementation of automated censorship was to be the go to. The reason for this decision was the fullstack's concern for scalability |
+| 7   | 5/07 | Change the publicity of users | Keep Anonymosity or Change Publicity | All Members | We decided for publicity change as the default option of anonymosity should be optional |
