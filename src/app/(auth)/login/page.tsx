@@ -119,9 +119,9 @@ export default function Login() {
           </div>
 
           <footer className="mt-10 flex justify-center items-center gap-4 text-[11px] font-label font-medium text-gray-400 uppercase tracking-widest">
-            <Link href="#" className="hover:text-[#053B50] transition-colors">Privacy</Link>
+            <Link href="/privacy" className="hover:text-[#053B50] transition-colors">Privacy</Link>
             <span>·</span>
-            <Link href="#" className="hover:text-[#053B50] transition-colors">Terms</Link>
+            <Link href="/terms" className="hover:text-[#053B50] transition-colors">Terms</Link>
           </footer>
         </div>
       </div>
