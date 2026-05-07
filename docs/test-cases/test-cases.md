@@ -16,10 +16,10 @@ Valid registration using institutional email
 The account is successfully created, a confirmation message is displayed, and the user is redirected to the login or home page.
 
 ## Actual Result
-
+The account is successfully created and redirected as expected.
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -32,23 +32,24 @@ The account is successfully created, a confirmation message is displayed, and th
 Authentication / Registration
 
 ## Scenario
-Invalid registration using non-institutional email
+Invalid registration using non-institutional Google account
 
 ## Steps
-1. Navigate to the registration page.
-2. Enter an email address with a non-institutional domain (e.g., @gmail.com).
-3. Show the error button to not have access since not using institutional email.
+1. Navigate to the registration/login page.
+2. Click the "Sign in with Google" button.
+3. Attempt to select or enter a Google account that does not use the institutional domain (e.g., a standard @gmail.com account).
 
 ## Expected Result
-Registration fails. The system displays an inline validation error stating "Only @neu.edu.ph email addresses are allowed."
+Registration fails. The Google Authentication prompt automatically restricts the allowed accounts to the `@neu.edu.ph` domain, preventing the user from successfully authenticating with an outside email.
 
 ## Actual Result
-
+The system automatically enforces the `@neu.edu.ph` domain during the Google Sign-in flow, successfully preventing the input or selection of other email formats.
 
 ## Status:
-
+Successful
 
 ## Notes
+Security is handled correctly via Google OAuth domain restriction rather than manual form validation.
 
 
 ---
@@ -100,10 +101,10 @@ Successful posting of a "Lost" item with an image
 The post is successfully created and appears at the top of the "Lost" listings on the Home/Search pages.
 
 ## Actual Result
-
+The post is successfully created and appears in the listings as expected.
 
 ## Status:
-
+Successful
 
 ## Notes
 
