@@ -189,10 +189,10 @@ Uploading an unsupported file format for an item image
 The system rejects the file upload, displaying an error stating "Unsupported file format. Please upload JPG or PNG files only."
 
 ## Actual Result
-
+The system successfully rejects the file upload. It does not accept any file extensions besides valid image extensions.
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -217,12 +217,13 @@ System rejects image uploads that exceed the maximum file size
 The post is not submitted. The system displays an error stating "File size too large. Maximum allowed size is [e.g., 5MB]."
 
 ## Actual Result
-
+The system successfully rejects the large file. The platform correctly limits uploads up to 10MB only.
 
 ## Status:
-
+Successful
 
 ## Notes
+Expected Result documentation should be updated to reflect the actual 10MB limit.
 
 
 ---
