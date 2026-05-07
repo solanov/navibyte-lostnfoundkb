@@ -15,6 +15,7 @@ interface LostItem {
   status: string;
   image_url?: string | null;
   reported_by: string;
+  created_timestamp?: string;
   categories?: {
     name: string;
     icon_identifier: string;
@@ -148,8 +149,8 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
       alert("Post deleted successfully.");
       handleCloseModal();
       window.location.reload();
-    } catch (err: any) {
-      alert(`Error deleting post: ${err.message}`);
+    } catch (err) {
+      alert(`Error deleting post: ${err instanceof Error ? err.message : String(err)}`);
     }
   };
 
@@ -169,17 +170,17 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
       alert("Item marked as returned.");
       handleCloseModal();
       window.location.reload();
-    } catch (err: any) {
-      alert(`Error updating item: ${err.message}`);
+    } catch (err) {
+      alert(`Error updating item: ${err instanceof Error ? err.message : String(err)}`);
     }
   };
 
   return (
     <>
       {/* Items Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
         {items.length === 0 ? (
-          <div className="col-span-1 md:col-span-2 py-12 text-center text-outline-variant">
+          <div className="col-span-full py-12 text-center text-slate-400">
             <span className="material-symbols-outlined text-5xl mb-4 opacity-50">inbox</span>
             <p className="font-medium">No items found.</p>
           </div>
@@ -187,14 +188,20 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
           items.map((item) => {
             const [title] = (item.general_description || '').split('\n\n');
             const icon = item.categories?.icon_identifier || 'help_outline';
-            const reference = `AC-${item.post_id.substring(0, 4).toUpperCase()}`;
+            const reference = `LF-${item.post_id.substring(0, 4).toUpperCase()}`;
             const displayStatus = item.status === 'Reported' ? 'Lost' : item.status;
+
+            // Format date
+            const rawDate = item.date_lost || item.created_timestamp;
+            const dateLost = rawDate
+              ? new Date(rawDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              : undefined;
 
             return (
               <button
                 key={item.post_id}
                 onClick={() => handleItemClick(item)}
-                className="text-left bg-transparent border-none p-0 cursor-pointer hover:opacity-80 transition-opacity"
+                className="text-left bg-transparent border-none p-0 cursor-pointer w-full"
                 aria-label={`View details for ${title || 'item'}`}
               >
                 <ItemCard
@@ -204,6 +211,7 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
                   location={item.zone || 'Unknown Location'}
                   reference={reference}
                   imageUrl={item.image_url}
+                  dateLost={dateLost}
                 />
               </button>
             );
