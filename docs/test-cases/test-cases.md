@@ -130,12 +130,13 @@ Attempt to post a "Found" item missing required fields
 The system prevents form submission and displays red validation text indicating that "Title" and "Description" are required.
 
 ## Actual Result
-
+The system prevents submission, but it does not display a red validation text on the fields. It relies on a system-level notification for the error instead.
 
 ## Status:
-
+Failed
 
 ## Notes
+UI needs to be updated to show inline red validation text for better user experience.
 
 
 ---
