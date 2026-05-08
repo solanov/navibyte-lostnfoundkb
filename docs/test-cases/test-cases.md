@@ -16,10 +16,10 @@ Valid registration using institutional email
 The account is successfully created, a confirmation message is displayed, and the user is redirected to the login or home page.
 
 ## Actual Result
-
+The account is successfully created and redirected as expected.
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -32,23 +32,24 @@ The account is successfully created, a confirmation message is displayed, and th
 Authentication / Registration
 
 ## Scenario
-Invalid registration using non-institutional email
+Invalid registration using non-institutional Google account
 
 ## Steps
-1. Navigate to the registration page.
-2. Enter an email address with a non-institutional domain (e.g., @gmail.com).
-3. Show the error button to not have access since not using institutional email.
+1. Navigate to the registration/login page.
+2. Click the "Sign in with Google" button.
+3. Attempt to select or enter a Google account that does not use the institutional domain (e.g., a standard @gmail.com account).
 
 ## Expected Result
-Registration fails. The system displays an inline validation error stating "Only @neu.edu.ph email addresses are allowed."
+Registration fails. The Google Authentication prompt automatically restricts the allowed accounts to the `@neu.edu.ph` domain, preventing the user from successfully authenticating with an outside email.
 
 ## Actual Result
-
+The system automatically enforces the `@neu.edu.ph` domain during the Google Sign-in flow, successfully preventing the input or selection of other email formats.
 
 ## Status:
-
+Successful
 
 ## Notes
+Security is handled correctly via Google OAuth domain restriction rather than manual form validation.
 
 
 ---
@@ -100,10 +101,10 @@ Successful posting of a "Lost" item with an image
 The post is successfully created and appears at the top of the "Lost" listings on the Home/Search pages.
 
 ## Actual Result
-
+The post is successfully created and appears in the listings as expected.
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -129,12 +130,13 @@ Attempt to post a "Found" item missing required fields
 The system prevents form submission and displays red validation text indicating that "Title" and "Description" are required.
 
 ## Actual Result
-
+The system prevents submission, but it does not display a red validation text on the fields. It relies on a system-level notification for the error instead.
 
 ## Status:
-
+Failed
 
 ## Notes
+UI needs to be updated to show inline red validation text for better user experience.
 
 
 ---
@@ -158,12 +160,13 @@ Attempt to post an item using only whitespace and special characters
 The system sanitizes the inputs, prevents XSS execution, and rejects the post due to the title resolving to empty/invalid characters.
 
 ## Actual Result
-
+The system accepted the title with only whitespace and failed to sanitize the description, allowing the XSS script to execute.
 
 ## Status:
-
+Failed
 
 ## Notes
+CRITICAL FIX REQUIRED: Input sanitization and validation must be implemented immediately to prevent XSS vulnerabilities.
 
 
 ---
@@ -186,10 +189,10 @@ Uploading an unsupported file format for an item image
 The system rejects the file upload, displaying an error stating "Unsupported file format. Please upload JPG or PNG files only."
 
 ## Actual Result
-
+The system successfully rejects the file upload. It does not accept any file extensions besides valid image extensions.
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -214,12 +217,13 @@ System rejects image uploads that exceed the maximum file size
 The post is not submitted. The system displays an error stating "File size too large. Maximum allowed size is [e.g., 5MB]."
 
 ## Actual Result
-
+The system successfully rejects the large file. The platform correctly limits uploads up to 10MB only.
 
 ## Status:
-
+Successful
 
 ## Notes
+Expected Result documentation should be updated to reflect the actual 10MB limit.
 
 
 ---
