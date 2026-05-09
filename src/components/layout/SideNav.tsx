@@ -13,7 +13,7 @@ export default function SideNav() {
   
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<string>("Curator");
+  const [userRole, setUserRole] = useState<string>("");
   
   // The Toggle State
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -70,7 +70,7 @@ export default function SideNav() {
         {!isCollapsed && (
           <div className="whitespace-nowrap overflow-hidden transition-all duration-300">
             <h1 className="text-[#002433] font-black text-xl leading-tight font-headline tracking-tight">Navibyte KB</h1>
-            <p className="text-[#41484c] text-xs font-medium uppercase tracking-widest mt-0.5">The Archive</p>
+            <p className="text-[#41484c] text-xs font-medium uppercase tracking-widest mt-0.5">Lost & Found</p>
           </div>
         )}
       </div>
@@ -87,7 +87,7 @@ export default function SideNav() {
           }`}
         >
           <span className={`material-symbols-outlined ${isCollapsed ? 'mr-0' : 'mr-4'}`} style={{ fontVariationSettings: isBoardActive ? "'FILL' 1" : "'FILL' 0" }}>grid_view</span>
-          {!isCollapsed && <span className="text-sm tracking-wide whitespace-nowrap">Central Feed</span>}
+          {!isCollapsed && <span className="text-sm tracking-wide whitespace-nowrap">Home</span>}
         </Link>
 
         <Link 
@@ -139,7 +139,7 @@ export default function SideNav() {
             </div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0 transition-opacity duration-300">
-                <p className="text-sm font-bold text-[#002433] truncate">{userName || 'Loading...'}</p>
+                <p className="text-sm font-bold text-[#002433] truncate">{userName || '...'}</p>
                 <p className="text-[10px] font-black text-[#44afa9] uppercase tracking-widest mt-0.5">{userRole}</p>
               </div>
             )}

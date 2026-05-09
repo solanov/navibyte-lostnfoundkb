@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 // Mock data structure - replace with your Supabase fetch logic later
 interface AppNotification {
@@ -35,7 +37,7 @@ const mockNotifications: AppNotification[] = [
   {
     id: "3",
     title: "New Message",
-    message: "Julius Ortiz has replied to your inquiry regarding ID #LF-C434.",
+    message: "Vinz Solano has replied to your inquiry regarding ID #LF-C434.",
     type: "message",
     isRead: true,
     timestamp: "Yesterday",
@@ -45,8 +47,31 @@ const mockNotifications: AppNotification[] = [
 
 export default function NotificationCenter({ isCollapsed = false }: { isCollapsed?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>(mockNotifications);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Listen for the URL parameter from the mobile bottom nav
+  useEffect(() => {
+    if (searchParams.get("action") === "notifs") {
+      setIsOpen(true);
+      
+      // Clean up the URL silently so if they close the modal, 
+      // clicking the button again will still trigger a change.
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("action");
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }
+  }, [searchParams, pathname, router]);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -102,28 +127,35 @@ export default function NotificationCenter({ isCollapsed = false }: { isCollapse
             </span>
           )}
         </div>
-        <span className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${isCollapsed ? 'hidden' : 'hidden md:block'} whitespace-nowrap`}>Alerts</span>
+        <span className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${isCollapsed ? 'hidden' : 'hidden md:block'} whitespace-nowrap`}>Notifications</span>
       </button>
 
-      {/* The Modal */}
-      {isOpen && (
-        <div
-          ref={modalRef}
-          onClick={handleBackdropClick}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#002433]/40 backdrop-blur-md transition-opacity duration-300"
-        >
-          <div className="bg-[#ffffff] rounded-2xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] max-h-[85vh] w-full max-w-lg flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      {/* The Modal - Teleported to document.body */}
+      {mounted && isOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
+          
+          {/* Dark Blurred Backdrop */}
+          <div 
+            className="absolute inset-0 bg-[#002433]/50 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setIsOpen(false)}
+          ></div>
+
+          {/* Modal Content Box */}
+          <div 
+            ref={modalRef}
+            className="relative z-10 bg-[#ffffff] rounded-2xl shadow-[0_20px_40px_rgba(0,36,51,0.2)] max-h-[85vh] w-full max-w-lg flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+          >
             
             {/* Header - Institutional Intake Style (#053b50) */}
-            <div className="bg-[#053b50] px-6 py-5 flex items-center justify-between border-b border-[#002433]/10 shrink-0">
+            <div className="bg-[#053b50] px-4 md:px-6 py-4 md:py-5 flex items-center justify-between border-b border-[#002433]/10 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-[#ffffff]/10 flex items-center justify-center rounded-xl backdrop-blur-sm border border-[#ffffff]/10">
                   <span className="material-symbols-outlined text-[#8df4ec] text-xl">notifications_active</span>
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-white font-headline tracking-tight">System Alerts</h2>
+                  <h2 className="text-base md:text-lg font-black text-white font-headline tracking-tight">Notifications</h2>
                   <p className="text-[10px] font-bold text-[#8df4ec] uppercase tracking-widest mt-0.5">
-                    {unreadCount} Unread Dossiers
+                    {unreadCount} Unread Notification
                   </p>
                 </div>
               </div>
@@ -137,7 +169,7 @@ export default function NotificationCenter({ isCollapsed = false }: { isCollapse
 
             {/* Quick Actions */}
             {unreadCount > 0 && (
-              <div className="bg-[#f5f3f3] px-6 py-2 border-b border-[#002433]/5 flex justify-end shrink-0">
+              <div className="bg-[#f5f3f3] px-4 md:px-6 py-2 border-b border-[#002433]/5 flex justify-end shrink-0">
                 <button 
                   onClick={markAllAsRead}
                   className="text-[10px] font-bold uppercase tracking-widest text-[#44afa9] hover:text-[#002433] transition-colors"
@@ -149,6 +181,7 @@ export default function NotificationCenter({ isCollapsed = false }: { isCollapse
 
             {/* Notifications List */}
             <div className="flex-1 overflow-y-auto">
+              {/* NOTE: Paste your existing 'notifications.length === 0 ? (...) : (...)' list mapping logic here! Keep it exactly as it was. */}
               {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-48 text-[#41484c]/50">
                   <span className="material-symbols-outlined text-4xl mb-2">notifications_paused</span>
@@ -161,13 +194,13 @@ export default function NotificationCenter({ isCollapsed = false }: { isCollapse
                     return (
                       <div 
                         key={notif.id} 
-                        className={`p-5 transition-colors flex gap-4 ${
+                        className={`p-4 md:p-5 transition-colors flex gap-3 md:gap-4 ${
                           notif.isRead ? 'bg-[#ffffff] hover:bg-[#f5f3f3]/50' : 'bg-[#f5f3f3]'
                         }`}
                       >
                         {/* Icon */}
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${style.bg}`}>
-                          <span className={`material-symbols-outlined text-[20px] ${style.color}`}>
+                        <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shrink-0 ${style.bg}`}>
+                          <span className={`material-symbols-outlined text-[18px] md:text-[20px] ${style.color}`}>
                             {style.icon}
                           </span>
                         </div>
@@ -175,10 +208,10 @@ export default function NotificationCenter({ isCollapsed = false }: { isCollapse
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-1">
-                            <h3 className={`text-sm font-bold truncate ${notif.isRead ? 'text-[#41484c]' : 'text-[#002433]'}`}>
+                            <h3 className={`text-sm font-bold ${notif.isRead ? 'text-[#41484c]' : 'text-[#002433]'}`}>
                               {notif.title}
                             </h3>
-                            <span className="text-[10px] font-bold text-[#41484c]/60 whitespace-nowrap pt-0.5">
+                            <span className="text-[9px] md:text-[10px] font-bold text-[#41484c]/60 whitespace-nowrap pt-0.5">
                               {notif.timestamp}
                             </span>
                           </div>
@@ -193,7 +226,7 @@ export default function NotificationCenter({ isCollapsed = false }: { isCollapse
                               onClick={() => setIsOpen(false)}
                               className="inline-flex items-center text-[10px] font-black uppercase tracking-widest text-[#44afa9] hover:text-[#002433] transition-colors"
                             >
-                              View Dossier <span className="material-symbols-outlined text-[14px] ml-1">arrow_forward</span>
+                              View Notification <span className="material-symbols-outlined text-[14px] ml-1">arrow_forward</span>
                             </Link>
                           )}
                         </div>
@@ -210,8 +243,10 @@ export default function NotificationCenter({ isCollapsed = false }: { isCollapse
             </div>
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
+
     </>
   );
 }

@@ -9,12 +9,22 @@ export default function SearchBar() {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  // Initialize with the current URL parameter if it exists
-  const [query, setQuery] = useState(searchParams.get('q') || '');
+  const currentUrlQuery = searchParams.get('q') || '';
+  const [query, setQuery] = useState(currentUrlQuery);
+
+  // FIX 1: Sync local state if the URL is cleared externally (e.g., clicking "Clear All")
+  useEffect(() => {
+    setQuery(currentUrlQuery);
+  }, [currentUrlQuery]);
 
   useEffect(() => {
-    // Debounce: Wait 300ms after the user stops typing to update the URL
     const timer = setTimeout(() => {
+      const urlQuery = searchParams.get('q') || '';
+      
+      if (query === urlQuery) {
+        return; 
+      }
+
       const params = new URLSearchParams(searchParams.toString());
       
       if (query) {
@@ -23,9 +33,8 @@ export default function SearchBar() {
         params.delete('q');
       }
 
-      // startTransition prevents the page from freezing while fetching new data
       startTransition(() => {
-        router.replace(`${pathname}?${params.toString()}`);
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
       });
     }, 300);
 
@@ -37,17 +46,29 @@ export default function SearchBar() {
       <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#41484c]/60">
         search
       </span>
+      
+      {/* Notice we increased pr-12 so text doesn't type under the new 'x' button */}
       <input 
         type="text" 
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search for items, locations, or IDs..." 
-        className="w-full pl-12 pr-4 py-3 bg-[#f5f3f3] rounded-xl text-sm text-[#002433] placeholder:text-[#41484c]/60 focus:bg-[#ffffff] focus:ring-2 focus:ring-[#44afa9]/30 outline-none transition-all" 
+        className="w-full pl-12 pr-12 py-3 bg-[#f5f3f3] rounded-xl text-sm text-[#002433] placeholder:text-[#41484c]/60 focus:bg-[#ffffff] focus:ring-2 focus:ring-[#44afa9]/30 outline-none transition-all" 
       />
-      {/* Optional loading spinner while server fetches */}
-      {isPending && (
-        <span className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#44afa9]/30 border-t-[#44afa9] rounded-full animate-spin"></span>
-      )}
+      
+      <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8">
+        {isPending ? (
+          <span className="w-4 h-4 border-2 border-[#44afa9]/30 border-t-[#44afa9] rounded-full animate-spin"></span>
+        ) : query ? (
+          <button
+            onClick={() => setQuery('')}
+            className="flex items-center justify-center text-[#41484c]/60 hover:text-[#ba1a1a] hover:bg-[#ba1a1a]/10 transition-colors rounded-full p-1"
+            aria-label="Clear search"
+          >
+            <span className="material-symbols-outlined text-[18px]">close</span>
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }
