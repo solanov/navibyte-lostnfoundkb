@@ -90,7 +90,6 @@ function getDisplayName(profile: UserProfile | null, fallback: string) {
 
 export default function MessagesView() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [currentUserAvatarUrl, setCurrentUserAvatarUrl] = useState<string | null>(null);
   const [bundles, setBundles] = useState<ConversationBundle[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [messageText, setMessageText] = useState("");
@@ -127,11 +126,6 @@ export default function MessagesView() {
       }
 
       setCurrentUserId(user.id);
-      setCurrentUserAvatarUrl(
-        user.user_metadata?.avatar_url ||
-          user.user_metadata?.picture ||
-          null
-      );
 
       const { data: conversations, error: conversationError } = await supabase
         .from("conversations")
@@ -342,18 +336,33 @@ export default function MessagesView() {
         >
           <div className="border-b border-outline-variant/30 px-4 py-5 md:px-6">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="font-headline text-3xl font-black tracking-tight text-primary">
-                  Messages
-                </h1>
-                <p className="text-sm font-medium text-on-surface-variant">
-                  Conversations about reported items
-                </p>
+              
+              <div className="flex items-center gap-2">
+                {/* SLEEK INLINE BACK BUTTON */}
+                <Link
+                  href="/board"
+                  className="-ml-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#41484c] transition-all hover:bg-[#002433]/5 hover:text-[#002433] active:scale-95"
+                  aria-label="Back to Board"
+                  title="Back to Board"
+                >
+                  <span className="material-symbols-outlined text-[24px]">arrow_back</span>
+                </Link>
+
+                <div>
+                  <h1 className="font-headline text-3xl font-black tracking-tight text-primary">
+                    Messages
+                  </h1>
+                  <p className="text-sm font-medium text-on-surface-variant">
+                    Conversations about reported items
+                  </p>
+                </div>
               </div>
+
               <span className="material-symbols-outlined rounded-full bg-[#8df4ec]/25 p-2 text-[#0d6682]">
                 forum
               </span>
             </div>
+            
             <div className="relative mt-4">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
                 search
@@ -471,6 +480,7 @@ export default function MessagesView() {
                     >
                       <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-outline-variant/20 bg-surface-container-low md:h-16 md:w-16">
                         {selectedBundle.item.image_url ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
                           <img
                             src={selectedBundle.item.image_url}
                             alt={getItemTitle(selectedBundle.item)}

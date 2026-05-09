@@ -1,23 +1,26 @@
-# Week 4 Standup - `April 22, 2026`
+# Week 6 Standup - `May 7, 2026`
 
-> **Minutes of the Meeting**: `29 minutes`
+> **Minutes of the Meeting**: `22 minutes`
 
 ## Agenda
 
-- Presentation of UI Design Changes
-- Discuss Sprint Planning for Sprint 2
+- Concerns with Documentation and Project Structure
+- Tests
+- Further UI Changes
+- Polishing and Bugfixes
 - Weekly Standup
 
 ### **Scrum**: Vinz Solano
 
 - **What I completed since last week**:
-  - Task delagation
-  - Reminders of Tasks
-  - Adjusted Project Board
+  - Task Delagations
+  - Approve PRs
+  - Made changes to Project Board according to what the progress is
 
 - **What I am working on this week**:
-  - More adjustments with the Project Board
-  - Helped with development. Converted UI to usable components.
+  - More PR Approvals
+  - Task Delagation
+  - Answering Concerns
 
 - **Any blockers or help needed**:
   - None
@@ -25,11 +28,11 @@
 ### **Fullstack Developer**: Peja Escares
 
 - **What I completed since last week**:
-  - Polished User Authentication
-  - Changes to database
+  - Continuation of Admin Dashboards (CRUD Operations)
 
 - **What I am working on this week**:
-  - Backend Tasks
+  - Routing of pages
+  - Data Censorship Automation 
 
 - **Any blockers or help needed**:
   - None
@@ -37,11 +40,10 @@
 ### **UI/UX Designer**: Albert Ortiz
 
 - **What I completed since last week**:
-  - Designed more wireframes for Admin
-  - Made KM-Rationale
+  - Admin Dashboard Polishing + Mobile Polishing
 
 - **What I am working on this week**:
-  - Admin Wireframes
+  - More changes to the Public Board
 
 - **Any blockers or help needed**:
   - None
@@ -49,21 +51,27 @@
 ### **Knowledge Management Analyst**: Saira DeMesa
 
 - **What I completed since last week**:
-  - Working on KM Report (Not pushed yet)
+  - Polishing on KM Report
 
 - **What I am working on this week**:
-  - Continue working on KM Report
+  - Report
+  - Framework to App Mapping
+  - Changelogs.md
 
 - **Any blockers or help needed**:
-  - Concerns with the KM Report
+  - None
 
 ### **QA & Documentation Lead**: Carl Ola
 
 - **What I completed since last week**:
-  - Creating more Test Cases
+  - More test cases and documentation
+  - Testing (Bug Finding)
 
 - **What I am working on this week**:
-  - None, as there are no current tasks
+  - README
+  - Testing (Bug finding)
+  - Final Testing
+  - Figure Analysis Report
 
 - **Any blockers or help needed**:
-  - No current tasks, as Sprint 1 is completed yet.
+  - None

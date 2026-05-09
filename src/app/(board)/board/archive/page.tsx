@@ -1,5 +1,4 @@
 import Sidebar from '@/src/components/layout/SideNav';
-import BottomNavBar from '@/src/components/layout/BottomNavBar';
 import Link from 'next/link';
 import ArchiveClient from './ArchiveClient';
 
@@ -7,43 +6,41 @@ export const dynamic = 'force-dynamic';
 
 export default async function ArchivePage() {
   return (
-    <div className="bg-background text-foreground min-h-screen font-body selection:bg-primary-fixed selection:text-primary pb-24 md:pb-0">
+    <div className="flex min-h-screen w-full">
+      {/* Sidebar Navigation */}
+      <Sidebar />
       
-      {/* Sticky Mobile Header */}
-      <div className="md:hidden sticky top-[72px] z-40 px-4 py-3 bg-surface-container-low/90 backdrop-blur-md border-b border-outline-variant/20">
-        <h1 className="text-xl font-bold text-primary font-headline">My Archive</h1>
-      </div>
-
-      <div className="flex min-h-screen">
-        <Sidebar />
+      <main className="flex-1 bg-[#fbf9f8] p-4 md:pt-16 md:pl-16 md:pr-12 pt-20 min-w-0 transition-all duration-300">
         
-        <main className="flex-1 md:ml-72 bg-surface-container-low p-4 md:p-8 pt-6 md:pt-24">
-          <div className="max-w-4xl mx-auto">
-            
-            {/* Feed Header */}
-            <div className="mb-8 flex justify-between items-end">
-              <div>
-                <h1 className="hidden md:block text-4xl font-extrabold tracking-tighter text-primary font-headline">
-                  My Archive
-                </h1>
-                <p className="text-on-surface-variant font-medium mt-1">
-                  History of your deleted and returned posts.
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Link href="/board" className="bg-surface-container-lowest text-primary border border-outline-variant/30 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-surface-container-high transition-all">
-                  Back to Board
-                </Link>
-              </div>
+        {/* FIX: Removed 'mx-auto' so it aligns flush left with our custom padding! */}
+        <div className="w-full max-w-7xl">
+          
+          {/* Feed Header - No bottom line! */}
+          <div className="mb-8 flex justify-between items-end">
+            <div>
+              <h1 className="text-3xl font-black tracking-tight text-[#002433] font-headline">
+                My Archive
+              </h1>
+              <p className="text-[#41484c] text-sm font-medium mt-1">
+                History of your deleted and returned posts.
+              </p>
             </div>
-
-            <ArchiveClient />
-
+            <div className="flex gap-2">
+              {/* Original Back to Board Button */}
+              <Link 
+                href="/board" 
+                className="bg-surface-container-lowest text-primary border border-outline-variant/30 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-surface-container-high transition-all"
+              >
+                Back to Board
+              </Link>
+            </div>
           </div>
-        </main>
-      </div>
-      
-      <BottomNavBar />
+
+          {/* The Client Component that renders the actual items */}
+          <ArchiveClient />
+
+        </div>
+      </main>
     </div>
   );
 }
