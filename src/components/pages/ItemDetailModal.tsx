@@ -80,7 +80,7 @@ export default function ItemDetailModal({
     <div
       ref={modalRef}
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-opacity duration-200"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-opacity duration-200"
     >
       {/* Modal Content */}
       <div className="bg-surface-container-lowest rounded-2xl shadow-2xl max-h-[90vh] w-full max-w-2xl flex flex-col overflow-hidden">
