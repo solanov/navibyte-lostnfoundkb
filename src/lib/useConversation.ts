@@ -132,6 +132,24 @@ export function useConversation(conversationId: string | null) {
   return { messages, loading, error, sendMessage, markAsRead };
 }
 
+/**
+ * Normalize participant pair by sorting UUIDs lexicographically.
+ *
+ * This guarantees that two users A and B always produce the same
+ * (initiator_id, receiver_id) order, regardless of who initiates first.
+ * Combined with the DB UNIQUE (post_id, initiator_id, receiver_id)
+ * constraint, this prevents duplicate conversation threads between the
+ * same pair of users for the same post.
+ */
+function normalizeParticipants(
+  userA: string,
+  userB: string
+): { initiatorId: string; receiverId: string } {
+  return userA < userB
+    ? { initiatorId: userA, receiverId: userB }
+    : { initiatorId: userB, receiverId: userA };
+}
+
 export async function getOrCreateConversation(
   postId: string,
   currentUserId: string,
@@ -141,12 +159,18 @@ export async function getOrCreateConversation(
     throw new Error('You cannot start a conversation with yourself.');
   }
 
+  // Normalize so (A,B) and (B,A) always map to the same canonical row.
+  const { initiatorId, receiverId } = normalizeParticipants(currentUserId, otherUserId);
+
   try {
+    // Look for an existing one-on-one conversation between these two users
+    // for this specific post using the canonical participant order.
     const { data: existingConversations, error: queryError } = await supabase
       .from('conversations')
       .select('*')
       .eq('post_id', postId)
-      .or(`and(initiator_id.eq.${currentUserId},receiver_id.eq.${otherUserId}),and(initiator_id.eq.${otherUserId},receiver_id.eq.${currentUserId})`)
+      .eq('initiator_id', initiatorId)
+      .eq('receiver_id', receiverId)
       .limit(1);
 
     if (queryError) throw queryError;
@@ -155,25 +179,28 @@ export async function getOrCreateConversation(
       return existingConversations[0];
     }
 
+    // No existing conversation — create one using the normalized pair.
     const { data: newConversation, error: insertError } = await supabase
       .from('conversations')
       .insert([
         {
           post_id: postId,
-          initiator_id: currentUserId,
-          receiver_id: otherUserId,
+          initiator_id: initiatorId,
+          receiver_id: receiverId,
         },
       ])
       .select()
       .single();
 
     if (insertError) {
+      // Race condition: another insert won — re-fetch the canonical row.
       if (insertError.code === '23505') {
         const { data: retryConversation, error: retryError } = await supabase
           .from('conversations')
           .select('*')
           .eq('post_id', postId)
-          .or(`and(initiator_id.eq.${currentUserId},receiver_id.eq.${otherUserId}),and(initiator_id.eq.${otherUserId},receiver_id.eq.${currentUserId})`)
+          .eq('initiator_id', initiatorId)
+          .eq('receiver_id', receiverId)
           .limit(1)
           .single();
 

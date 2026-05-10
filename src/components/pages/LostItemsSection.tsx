@@ -6,6 +6,7 @@ import ItemCard from './ItemCard';
 import ConversationModal from './ConversationModal';
 import ItemDetailModal from './ItemDetailModal';
 import { userDeletePostAction, markAsReturnedAction } from '@/src/app/admin/actions/posts';
+import { useNotification } from '@/src/hooks/useNotification';
 
 interface LostItem {
   post_id: string;
@@ -27,6 +28,7 @@ interface LostItemsSectionProps {
 }
 
 export default function LostItemsSection({ items }: LostItemsSectionProps) {
+  const { notify } = useNotification();
   const [selectedItem, setSelectedItem] = useState<LostItem | null>(null);
   const [conversationItem, setConversationItem] = useState<LostItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -101,7 +103,7 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
     console.log('Claim item:', selectedItem.post_id);
     // TODO: Implement claim logic - redirect to claim form or open claim modal
     // For now, just close the modal
-    alert(`Claim initiated for item: ${selectedItem.post_id}`);
+    notify(`Claim initiated for item: ${selectedItem.post_id}`, "info");
     handleCloseModal();
   };
 
@@ -109,17 +111,17 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
     if (!selectedItem) return;
 
     if (!currentUserId) {
-      alert('Please sign in to contact the poster.');
+      notify('Please sign in to contact the poster.', 'warning');
       return;
     }
 
     if (!selectedItem.reported_by) {
-      alert('This item does not have a poster account attached.');
+      notify('This item does not have a poster account attached.', 'error');
       return;
     }
 
     if (selectedItem.reported_by === currentUserId) {
-      alert('This item is linked to your account.');
+      notify('This item is linked to your account.', 'warning');
       return;
     }
 
@@ -146,11 +148,11 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
       if (!accessToken) throw new Error("Authentication token missing.");
 
       await userDeletePostAction(accessToken, selectedItem.post_id);
-      alert("Post deleted successfully.");
+      notify("Post deleted successfully.", "success");
       handleCloseModal();
       window.location.reload();
     } catch (err) {
-      alert(`Error deleting post: ${err instanceof Error ? err.message : String(err)}`);
+      notify(`Error deleting post: ${err instanceof Error ? err.message : String(err)}`, "error");
     }
   };
 
@@ -167,11 +169,11 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
       if (!accessToken) throw new Error("Authentication token missing.");
 
       await markAsReturnedAction(accessToken, selectedItem.post_id);
-      alert("Item marked as returned.");
+      notify("Item marked as returned.", "success");
       handleCloseModal();
       window.location.reload();
     } catch (err) {
-      alert(`Error updating item: ${err instanceof Error ? err.message : String(err)}`);
+      notify(`Error updating item: ${err instanceof Error ? err.message : String(err)}`, "error");
     }
   };
 

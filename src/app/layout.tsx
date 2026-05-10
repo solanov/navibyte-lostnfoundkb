@@ -12,6 +12,9 @@ const publicSans = Public_Sans({
   subsets: ["latin"],
 });
 
+import { NotificationProvider } from "@/src/context/NotificationContext";
+import ToastContainer from "@/src/components/ui/ToastContainer";
+
 export const metadata: Metadata = {
   title: "New Era University Knowledge Board",
   description: "Navibyte Lost & Found Knowledge Board",
@@ -34,7 +37,10 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#EEEEEE] font-body">
-        {children}
+        <NotificationProvider>
+          {children}
+          <ToastContainer />
+        </NotificationProvider>
       </body>
     </html>
   );

@@ -112,10 +112,7 @@ export default function Login() {
               )}
             </button>
 
-            <p className="mt-1 text-center text-gray-400 text-[11px] font-label uppercase tracking-widest">
-              Don&apos;t have an account?{" "}
-              <Link href="/register" className="text-[#053B50] font-bold hover:text-[#64CCC5] transition-colors">Register</Link>
-            </p>
+            
           </div>
 
           <footer className="mt-10 flex justify-center items-center gap-4 text-[11px] font-label font-medium text-gray-400 uppercase tracking-widest">

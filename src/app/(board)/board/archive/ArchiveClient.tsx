@@ -5,6 +5,7 @@ import { supabase } from "@/src/lib/supabase";
 import { fetchUserArchiveAction } from "@/src/app/admin/actions/posts";
 import ItemCard from "@/src/components/pages/ItemCard";
 import ItemDetailModal from "@/src/components/pages/ItemDetailModal";
+import { useNotification } from "@/src/hooks/useNotification";
 
 interface ArchiveItem {
   post_id: string;
@@ -25,6 +26,7 @@ interface ArchiveItem {
 }
 
 export default function ArchiveClient() {
+  const { notify } = useNotification();
   const [items, setItems] = useState<ArchiveItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -132,8 +134,8 @@ export default function ArchiveClient() {
         isOpen={!!selectedItem}
         item={selectedItem as any}
         isOwner={true}
-        onClaimClick={() => alert("Action disabled for archived items.")}
-        onContactClick={() => alert("Action disabled for archived items.")}
+        onClaimClick={() => notify("Action disabled for archived items.", "warning")}
+        onContactClick={() => notify("Action disabled for archived items.", "warning")}
         onClose={() => setSelectedItem(null)}
       />
     </>
