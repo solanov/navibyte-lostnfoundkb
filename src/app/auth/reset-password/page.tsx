@@ -167,16 +167,10 @@ export default function ResetPassword() {
                 </p>
               </div>
 
-              <Link
-                id="reset-request-new-btn"
-                href="/forgot-password"
-                className="w-full py-4 bg-[#64CCC5] hover:bg-[#4fb8b1] active:scale-[0.98] text-white font-headline font-bold rounded-xl shadow-[0_4px_20px_rgba(100,204,197,0.35)] transition-all flex items-center justify-center gap-2 mb-3"
-              >
-                <span className="material-symbols-outlined text-sm">
-                  refresh
-                </span>
-                Request New Link
-              </Link>
+              <p className="text-gray-500 font-body text-sm leading-relaxed mb-8">
+                If you need to reset your password, please contact your
+                administrator or sign in with your institutional Google account.
+              </p>
 
               <Link
                 id="reset-back-to-login-btn"
