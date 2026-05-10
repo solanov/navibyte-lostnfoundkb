@@ -263,7 +263,7 @@ export default function ConversationModal({
           <button
             type="submit"
             disabled={!messageText.trim() || isBusy || !conversationId}
-            className="bg-secondary text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+            className="btn-claim px-6 py-2.5 rounded-lg font-bold text-sm hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
             aria-label="Send message"
           >
             <span className="material-symbols-outlined">send</span>
