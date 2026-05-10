@@ -169,7 +169,21 @@ The method of return is dictated by the chosen privacy states:
 | **Privacy Advocacy** | The user interface includes mandatory disclaimers and reminders advising users to  avoid capturing Personally Identifiable Information (PII) during the image upload process. |
 
 ## Limitations and Future Work
+### Limitations
+- **Taxonomic Constraints:** The Fixed Choice Model eliminates human noise but may lead to a *Misclassification Gap* for unique items that do not fit predefined icons, categories or colors.
 
+- **Verification Subjectivity:** The Blind Verification Protocol still relies on the Poster’s judgment. Malicious or negligent approval can compromise the *Chain of Custody*.
+
+- **Physical-Digital Latency:** The system remains susceptible to Inventory Drift if users or staff fail to update the *Handover Complete* or *Bin Mapping* status in real-time.
+
+- **Manual Disposal:** While Lifecycle Management flags old items, the physical purging process remains a labor-intensive manual task for staff.
+
+### Future Work
+- **Computer Vision (AI) Integration:** Implement image recognition to automate the Externalization Stage, suggesting icons/colors and auto-blurring PII (faces/IDs) to enhance privacy.
+
+- **Proactive Geofencing:** Extend the Spatial Logic (Zones) by sending push notifications to users who were in a specific zone at the time an item was logged as found.
+
+- **Verification Assistance:** Use Natural Language Processing in the Masked Chat to provide staff with a *Confidence Score* by matching claimant descriptions against the *Hidden Note*.
 
 ## References
 
