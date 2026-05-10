@@ -37,6 +37,7 @@ interface ItemSummary {
 
 interface ConversationBundle {
   conversation: ConversationRow;
+  myProfile: UserProfile | null;
   otherProfile: UserProfile | null;
   item: ItemSummary | null;
   messages: Message[];
@@ -149,7 +150,7 @@ export default function MessagesView() {
 
       const [profilesResult, itemsResult, messagesResult] = await Promise.all([
         participantIds.length > 0
-          ? supabase.from("users").select("user_id,full_name,email").in("user_id", participantIds)
+          ? supabase.from("users").select("user_id,full_name,email,avatar_url").in("user_id", participantIds)
           : Promise.resolve({ data: [], error: null }),
         postIds.length > 0
           ? supabase
@@ -193,6 +194,7 @@ export default function MessagesView() {
 
           return {
             conversation,
+            myProfile: profilesById.get(user.id) || null,
             otherProfile: profilesById.get(otherUserId) || null,
             item: itemsById.get(conversation.post_id) || null,
             messages: conversationMessages,
@@ -415,8 +417,13 @@ export default function MessagesView() {
                     {isActive && (
                       <span className="absolute left-0 top-1/2 h-10 w-1 -translate-y-1/2 rounded-r-full bg-[#44afa9]" />
                     )}
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-container text-sm font-black uppercase text-white">
-                      {getInitials(otherName)}
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full overflow-hidden bg-primary-container text-sm font-black uppercase text-white border border-outline-variant/10">
+                      {bundle.otherProfile?.avatar_url ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={bundle.otherProfile.avatar_url} alt={otherName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                      ) : (
+                        getInitials(otherName)
+                      )}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="mb-1 flex items-baseline justify-between gap-3">
@@ -457,8 +464,13 @@ export default function MessagesView() {
                 >
                   <span className="material-symbols-outlined">arrow_back</span>
                 </button>
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-container text-sm font-black uppercase text-white">
-                  {getInitials(getDisplayName(selectedBundle.otherProfile, "Item contact"))}
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full overflow-hidden bg-primary-container text-sm font-black uppercase text-white border border-outline-variant/10">
+                  {selectedBundle.otherProfile?.avatar_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={selectedBundle.otherProfile.avatar_url} alt={getDisplayName(selectedBundle.otherProfile, "Item contact")} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                  ) : (
+                    getInitials(getDisplayName(selectedBundle.otherProfile, "Item contact"))
+                  )}
                 </div>
                 <div className="min-w-0">
                   <h2 className="truncate font-headline text-lg font-black text-primary md:text-2xl">
@@ -543,28 +555,40 @@ export default function MessagesView() {
                   ) : (
                     messages.map((message) => {
                       const isMine = message.sender_id === currentUserId;
+                      const profile = isMine ? selectedBundle.myProfile : selectedBundle.otherProfile;
+                      const displayName = getDisplayName(profile, isMine ? "You" : "Item contact");
 
                       return (
                         <div
                           key={message.message_id}
-                          className={`flex flex-col gap-1 ${isMine ? "items-end" : "items-start"}`}
+                          className={`flex gap-2.5 ${isMine ? "flex-row-reverse" : "flex-row"}`}
                         >
-                          <div
-                            className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-sm md:max-w-[70%] ${
-                              isMine
-                                ? "rounded-br-sm bg-[#0d6682] text-white"
-                                : "rounded-bl-sm border border-outline-variant/30 bg-surface-container-low text-on-surface"
-                            }`}
-                          >
-                            <p className="break-words text-sm leading-6">{message.content}</p>
-                          </div>
-                          <div className="flex items-center gap-1 px-1 text-[11px] font-semibold text-on-surface-variant">
-                            <span>{formatConversationTime(message.created_at)}</span>
-                            {isMine && (
-                              <span className="material-symbols-outlined text-[15px] text-[#44afa9]">
-                                {message.is_read ? "done_all" : "check"}
-                              </span>
+                          <div className="flex h-8 w-8 shrink-0 mt-auto mb-[22px] items-center justify-center rounded-full overflow-hidden bg-primary-container text-xs font-black uppercase text-white border border-outline-variant/10 hidden md:flex">
+                            {profile?.avatar_url ? (
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              <img src={profile.avatar_url} alt={displayName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                            ) : (
+                              getInitials(displayName)
                             )}
+                          </div>
+                          <div className={`flex flex-col gap-1 max-w-[85%] md:max-w-[70%] ${isMine ? "items-end" : "items-start"}`}>
+                            <div
+                              className={`w-full rounded-2xl px-4 py-3 shadow-sm ${
+                                isMine
+                                  ? "rounded-br-sm bg-[#0d6682] text-white"
+                                  : "rounded-bl-sm border border-outline-variant/30 bg-surface-container-low text-on-surface"
+                              }`}
+                            >
+                              <p className="break-words text-sm leading-6">{message.content}</p>
+                            </div>
+                            <div className="flex items-center gap-1 px-1 text-[11px] font-semibold text-on-surface-variant">
+                              <span>{formatConversationTime(message.created_at)}</span>
+                              {isMine && (
+                                <span className="material-symbols-outlined text-[15px] text-[#44afa9]">
+                                  {message.is_read ? "done_all" : "check"}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );

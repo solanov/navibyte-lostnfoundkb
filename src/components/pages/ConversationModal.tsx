@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useConversation, getOrCreateConversation } from '@/src/lib/useConversation';
+import { supabase } from '@/src/lib/supabase';
 
 interface ConversationModalProps {
   isOpen: boolean;
@@ -25,6 +26,8 @@ export default function ConversationModal({
   onClose,
 }: ConversationModalProps) {
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [currentAvatar, setCurrentAvatar] = useState<string | null>(null);
+  const [otherAvatar, setOtherAvatar] = useState<string | null>(null);
   const [messageText, setMessageText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +60,19 @@ export default function ConversationModal({
         setIsLoading(true);
         const conversation = await getOrCreateConversation(itemPostId, currentUserId, otherUserId);
         setConversationId(conversation.conversation_id);
+
+        const { data } = await supabase
+          .from('users')
+          .select('user_id, avatar_url')
+          .in('user_id', [currentUserId, otherUserId]);
+          
+        if (data) {
+          const current = data.find((u) => u.user_id === currentUserId);
+          const other = data.find((u) => u.user_id === otherUserId);
+          if (current?.avatar_url) setCurrentAvatar(current.avatar_url);
+          if (other?.avatar_url) setOtherAvatar(other.avatar_url);
+        }
+
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to initialize conversation');
@@ -136,11 +152,23 @@ export default function ConversationModal({
       <div className="bg-surface-container-lowest rounded-2xl shadow-2xl max-h-[90vh] w-full max-w-2xl flex flex-col overflow-hidden">
         {/* Header - Fixed */}
         <div className="sticky top-0 z-10 bg-surface-container-lowest border-b border-outline-variant/20 px-6 py-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-on-surface">Message</h2>
-            <p className="text-xs text-on-surface-variant">
-              {otherUserName ? `${otherUserName} - ` : ''}Re: {itemTitle}
-            </p>
+          <div className="flex items-center gap-3">
+            {otherUserName && (
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full overflow-hidden bg-primary-container text-sm font-black uppercase text-white border border-outline-variant/10">
+                {otherAvatar ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={otherAvatar} alt={otherUserName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  otherUserName.charAt(0).toUpperCase()
+                )}
+              </div>
+            )}
+            <div>
+              <h2 className="text-xl font-bold text-on-surface">Message</h2>
+              <p className="text-xs text-on-surface-variant">
+                {otherUserName ? `${otherUserName} - ` : ''}Re: {itemTitle}
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -170,32 +198,46 @@ export default function ConversationModal({
               </div>
             </div>
           ) : (
-            messages.map((msg) => (
-              <div
-                key={msg.message_id}
-                className={`flex ${msg.sender_id === currentUserId ? 'justify-end' : 'justify-start'}`}
-              >
+            messages.map((msg) => {
+              const isMine = msg.sender_id === currentUserId;
+              const displayName = isMine ? currentUserName : otherUserName;
+              const avatarUrl = isMine ? currentAvatar : otherAvatar;
+
+              return (
                 <div
-                  className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
-                    msg.sender_id === currentUserId
-                      ? 'bg-secondary text-white'
-                      : 'bg-surface-container-low text-on-surface'
-                  }`}
+                  key={msg.message_id}
+                  className={`flex gap-2.5 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}
                 >
-                  <p className="text-sm font-medium mb-1">
-                    {msg.sender_id === currentUserId ? currentUserName : otherUserName}
-                  </p>
-                  <p className="text-sm break-words">{msg.content}</p>
-                  <p className={`text-xs mt-1 ${msg.sender_id === currentUserId ? 'text-white/70' : 'text-on-surface-variant'}`}>
-                    {new Date(msg.created_at).toLocaleTimeString('en-US', {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true,
-                    })}
-                  </p>
+                  <div className="flex h-8 w-8 shrink-0 mt-auto items-center justify-center rounded-full overflow-hidden bg-primary-container text-xs font-black uppercase text-white border border-outline-variant/10 hidden sm:flex">
+                    {avatarUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={avatarUrl} alt={displayName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      displayName.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <div
+                    className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
+                      isMine
+                        ? 'bg-secondary text-white'
+                        : 'bg-surface-container-low text-on-surface'
+                    }`}
+                  >
+                    <p className="text-sm font-medium mb-1">
+                      {displayName}
+                    </p>
+                    <p className="text-sm break-words">{msg.content}</p>
+                    <p className={`text-xs mt-1 ${isMine ? 'text-white/70' : 'text-on-surface-variant'}`}>
+                      {new Date(msg.created_at).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
+                      })}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
           <div ref={messagesEndRef} />
         </div>
