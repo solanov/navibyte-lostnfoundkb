@@ -4,6 +4,16 @@ import ColorSwatch from './ColorSwatch';
 import { useState, useRef, useEffect } from "react";
 import { supabase } from '@/src/lib/supabase';
 import { useNotification } from '@/src/hooks/useNotification';
+import { createEntryAction } from '@/app/(board)/create/actions';
+import {
+  CREATE_ENTRY_ALLOWED_COLORS,
+  CREATE_ENTRY_ALLOWED_IMAGE_TYPES,
+  CREATE_ENTRY_MAX_IMAGE_BYTES,
+  getCreateEntryErrorMessage,
+  normalizeCreateEntryText,
+  type CreateEntryErrors,
+  validateCreateEntryInput,
+} from '@/lib/createEntrySecurity';
 
 interface EntryFormProps {
   onSuccess?: () => void;
@@ -28,6 +38,7 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
   const [description, setDescription] = useState('');
   const [zone, setZone] = useState('');
   const [hiddenNote, setHiddenNote] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<CreateEntryErrors>({});
   
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -71,7 +82,7 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
     fetchOrSeedCategories();
   }, []);
 
-  const colorOptions = [
+  const colorOptions: Array<{ class: string; value: (typeof CREATE_ENTRY_ALLOWED_COLORS)[number] }> = [
     { class: 'bg-[#303030]', value: 'Black' },
     { class: 'bg-white', value: 'White' },
     { class: 'bg-[#e0e0e0]', value: 'Silver' },
@@ -82,6 +93,73 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
     { class: 'bg-gradient-to-br from-purple-500 to-orange-500', value: 'Other' }
   ];
 
+  const clearFieldError = (field: keyof CreateEntryErrors) => {
+    setFieldErrors((current) => {
+      if (!current[field]) {
+        return current;
+      }
+
+      const nextErrors = { ...current };
+      delete nextErrors[field];
+      return nextErrors;
+    });
+  };
+
+  const buildDraftInput = (overrides?: Partial<{
+    title: string;
+    description: string;
+    zone: string;
+    hiddenNote: string;
+    selectedCategory: number | null;
+    selectedColor: string | null;
+  }>) => ({
+    entryType,
+    selectedCategory: overrides?.selectedCategory ?? selectedCategory,
+    selectedColor: overrides?.selectedColor ?? selectedColor,
+    title: overrides?.title ?? title,
+    description: overrides?.description ?? description,
+    zone: overrides?.zone ?? zone,
+    hiddenNote: overrides?.hiddenNote ?? hiddenNote,
+    imageUrl: null,
+  });
+
+  const validateDraft = (overrides?: Parameters<typeof buildDraftInput>[0]) =>
+    validateCreateEntryInput(buildDraftInput(overrides));
+
+  const applyFieldValidation = (
+    field: keyof CreateEntryErrors,
+    override: Parameters<typeof buildDraftInput>[0]
+  ) => {
+    const validation = validateDraft(override);
+    setFieldErrors((current) => {
+      const nextErrors = { ...current };
+      if (validation.ok || !validation.errors[field]) {
+        delete nextErrors[field];
+      } else {
+        nextErrors[field] = validation.errors[field];
+      }
+      return nextErrors;
+    });
+  };
+
+  const commitFieldValidation = () => {
+    const sanitizedValues = {
+      title: normalizeCreateEntryText(title),
+      zone: normalizeCreateEntryText(zone),
+      description: normalizeCreateEntryText(description, { multiline: true }),
+      hiddenNote: normalizeCreateEntryText(hiddenNote, { multiline: true }),
+    };
+
+    setTitle(sanitizedValues.title);
+    setZone(sanitizedValues.zone);
+    setDescription(sanitizedValues.description);
+    setHiddenNote(sanitizedValues.hiddenNote);
+
+    const validation = validateDraft(sanitizedValues);
+    setFieldErrors(validation.ok ? {} : validation.errors);
+    return validation;
+  };
+  
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -101,24 +179,42 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
   };
   
   const handleFile = (selectedFile: File) => {
-    if (selectedFile.size > 10 * 1024 * 1024) {
-      notify("File is too large. Max 10MB", "error");
+    if (!CREATE_ENTRY_ALLOWED_IMAGE_TYPES.includes(selectedFile.type as (typeof CREATE_ENTRY_ALLOWED_IMAGE_TYPES)[number])) {
+      setFieldErrors((current) => ({ ...current, image: "Only PNG and JPEG files are allowed." }));
+      notify("Only PNG and JPEG files are allowed.", "error");
       return;
     }
+
+    if (selectedFile.size > CREATE_ENTRY_MAX_IMAGE_BYTES) {
+      setFieldErrors((current) => ({ ...current, image: "File is too large. Maximum size is 10MB." }));
+      notify("File is too large. Maximum size is 10MB.", "error");
+      return;
+    }
+
+    clearFieldError("image");
     setFile(selectedFile);
     setPreview(URL.createObjectURL(selectedFile));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedCategory || !selectedColor || !title || !description || !zone) {
-      notify("Please fill in all required fields (including Category, Zone, and Color).", "warning");
+
+    const validation = commitFieldValidation();
+    if (!validation.ok) {
+      notify(getCreateEntryErrorMessage(validation.errors), "warning");
       return;
     }
+
     setIsSubmitting(true);
     
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+
+      if (!user || !accessToken) {
+        throw new Error("Please sign in before posting a new entry.");
+      }
       
       let imageUrl = null;
       if (file) {
@@ -138,22 +234,16 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
           
         imageUrl = publicUrlData.publicUrl;
       }
-      
-      const status = entryType === 'lost' ? 'Reported' : 'Found';
-      const general_description = `${title}\n\n${description}`;
-      
-      const { error: insertError } = await supabase.from('lost_items').insert({
-        category_id: selectedCategory,
-        color: selectedColor,
-        zone,
-        general_description,
-        hidden_note: hiddenNote,
-        status,
-        image_url: imageUrl,
-        reported_by: user?.id,
+
+      const result = await createEntryAction(accessToken, {
+        ...validation.data,
+        imageUrl,
       });
-      
-      if (insertError) throw insertError;
+
+      if (!result.success) {
+        setFieldErrors(result.fieldErrors ?? {});
+        throw new Error(result.message);
+      }
       
       notify("Entry successfully added!", "success");
       // Reset form
@@ -161,6 +251,7 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
       setDescription('');
       setZone('');
       setHiddenNote('');
+      setFieldErrors({});
       setFile(null);
       setPreview(null);
       setSelectedCategory(null);
@@ -221,10 +312,24 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
                 type="text" 
                 required 
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  clearFieldError("title");
+                }}
+                onBlur={() => {
+                  const normalizedValue = normalizeCreateEntryText(title);
+                  setTitle(normalizedValue);
+                  applyFieldValidation("title", { title: normalizedValue });
+                }}
                 placeholder="e.g. Leather Wallet, Silver Keyring" 
-                className="w-full bg-surface-container-low border-none rounded-lg p-4 focus:ring-2 focus:ring-tertiary text-on-surface transition-all placeholder:text-outline-variant" 
+                aria-invalid={Boolean(fieldErrors.title)}
+                className={`w-full border rounded-lg p-4 focus:ring-2 focus:ring-tertiary text-on-surface transition-all placeholder:text-outline-variant ${
+                  fieldErrors.title
+                    ? 'bg-red-50 border-red-300 focus:ring-red-200'
+                    : 'bg-surface-container-low border-transparent'
+                }`} 
               />
+              {fieldErrors.title && <p className="mt-2 text-xs font-medium text-red-700">{fieldErrors.title}</p>}
             </div>
             <div>
               <label className="block font-headline font-bold text-primary mb-2 text-sm uppercase tracking-tight">
@@ -234,10 +339,24 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
                 type="text" 
                 required 
                 value={zone}
-                onChange={(e) => setZone(e.target.value)}
+                onChange={(e) => {
+                  setZone(e.target.value);
+                  clearFieldError("zone");
+                }}
+                onBlur={() => {
+                  const normalizedValue = normalizeCreateEntryText(zone);
+                  setZone(normalizedValue);
+                  applyFieldValidation("zone", { zone: normalizedValue });
+                }}
                 placeholder="e.g. Library 3rd Floor, Cafeteria" 
-                className="w-full bg-surface-container-low border-none rounded-lg p-4 focus:ring-2 focus:ring-tertiary text-on-surface transition-all placeholder:text-outline-variant" 
+                aria-invalid={Boolean(fieldErrors.zone)}
+                className={`w-full border rounded-lg p-4 focus:ring-2 focus:ring-tertiary text-on-surface transition-all placeholder:text-outline-variant ${
+                  fieldErrors.zone
+                    ? 'bg-red-50 border-red-300 focus:ring-red-200'
+                    : 'bg-surface-container-low border-transparent'
+                }`} 
               />
+              {fieldErrors.zone && <p className="mt-2 text-xs font-medium text-red-700">{fieldErrors.zone}</p>}
             </div>
             <div>
               <label className="block font-headline font-bold text-primary mb-2 text-sm uppercase tracking-tight">
@@ -247,10 +366,24 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
                 required 
                 rows={3}
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  clearFieldError("description");
+                }}
+                onBlur={() => {
+                  const normalizedValue = normalizeCreateEntryText(description, { multiline: true });
+                  setDescription(normalizedValue);
+                  applyFieldValidation("description", { description: normalizedValue });
+                }}
                 placeholder="Detail any distinguishing marks, stickers, or brand names..." 
-                className="w-full bg-surface-container-low border-none rounded-lg p-4 focus:ring-2 focus:ring-tertiary text-on-surface transition-all placeholder:text-outline-variant" 
+                aria-invalid={Boolean(fieldErrors.description)}
+                className={`w-full border rounded-lg p-4 focus:ring-2 focus:ring-tertiary text-on-surface transition-all placeholder:text-outline-variant ${
+                  fieldErrors.description
+                    ? 'bg-red-50 border-red-300 focus:ring-red-200'
+                    : 'bg-surface-container-low border-transparent'
+                }`} 
               />
+              {fieldErrors.description && <p className="mt-2 text-xs font-medium text-red-700">{fieldErrors.description}</p>}
             </div>
           </div>
 
@@ -267,11 +400,15 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
                   label={cat.label}
                   icon={cat.icon}
                   isSelected={selectedCategory === cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
+                  onClick={() => {
+                    setSelectedCategory(cat.id);
+                    clearFieldError("category");
+                  }}
                   />
               ))}
               {categories.length === 0 && <p className="col-span-4 text-xs text-outline-variant italic">Loading categories...</p>}
             </div>
+            {fieldErrors.category && <p className="mt-3 text-xs font-medium text-red-700">{fieldErrors.category}</p>}
           </div>
 
           {/* Image Upload */}
@@ -327,6 +464,7 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
                 </>
               )}
             </div>
+            {fieldErrors.image && <p className="mt-3 text-xs font-medium text-red-700">{fieldErrors.image}</p>}
           </div>
 
           {/* Color Palette Selector */}
@@ -340,10 +478,14 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
                 key={idx}
                 colorClass={opt.class}
                 isSelected={selectedColor === opt.value}
-                onClick={() => setSelectedColor(opt.value)}
+                onClick={() => {
+                  setSelectedColor(opt.value);
+                  clearFieldError("color");
+                }}
               />
               ))}
             </div>
+            {fieldErrors.color && <p className="mt-3 text-xs font-medium text-red-700">{fieldErrors.color}</p>}
           </div>
 
           {/* Hidden Note */}
@@ -357,10 +499,24 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
             <textarea 
               rows={2}
               value={hiddenNote}
-              onChange={(e) => setHiddenNote(e.target.value)}
+              onChange={(e) => {
+                setHiddenNote(e.target.value);
+                clearFieldError("hiddenNote");
+              }}
+              onBlur={() => {
+                const normalizedValue = normalizeCreateEntryText(hiddenNote, { multiline: true });
+                setHiddenNote(normalizedValue);
+                applyFieldValidation("hiddenNote", { hiddenNote: normalizedValue });
+              }}
               placeholder="Private details for admin verification only (e.g. serial number, specific internal markings)..." 
-              className="w-full bg-surface-container-low border border-primary/20 rounded-lg p-4 focus:ring-1 focus:ring-primary text-on-surface transition-all text-sm italic placeholder:text-outline/60" 
+              aria-invalid={Boolean(fieldErrors.hiddenNote)}
+              className={`w-full border rounded-lg p-4 focus:ring-1 focus:ring-primary text-on-surface transition-all text-sm italic placeholder:text-outline/60 ${
+                fieldErrors.hiddenNote
+                  ? 'bg-red-50 border-red-300 focus:ring-red-200'
+                  : 'bg-surface-container-low border-primary/20'
+              }`} 
             />
+            {fieldErrors.hiddenNote && <p className="mt-2 text-xs font-medium text-red-700">{fieldErrors.hiddenNote}</p>}
           </div>
 
           {/* Footer Action */}
