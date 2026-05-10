@@ -7,7 +7,6 @@ import { supabase } from '@/src/lib/supabase';
 interface ConversationModalProps {
   isOpen: boolean;
   itemPostId: string;
-  itemTitle: string;
   currentUserId: string | null;
   currentUserName: string;
   otherUserId: string;
@@ -18,7 +17,6 @@ interface ConversationModalProps {
 export default function ConversationModal({
   isOpen,
   itemPostId,
-  itemTitle,
   currentUserId,
   currentUserName,
   otherUserId,
@@ -40,7 +38,7 @@ export default function ConversationModal({
     error: messagesError,
     sendMessage,
     markAsRead,
-  } = useConversation(conversationId);
+  } = useConversation(conversationId ? [conversationId] : [], conversationId);
 
   useEffect(() => {
     if (!isOpen) {
@@ -165,9 +163,7 @@ export default function ConversationModal({
             )}
             <div>
               <h2 className="text-xl font-bold text-on-surface">Message</h2>
-              <p className="text-xs text-on-surface-variant">
-                {otherUserName ? `${otherUserName} - ` : ''}Re: {itemTitle}
-              </p>
+              <p className="text-xs text-on-surface-variant">Direct conversation</p>
             </div>
           </div>
           <button

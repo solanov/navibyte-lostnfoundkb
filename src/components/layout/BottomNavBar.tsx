@@ -1,12 +1,12 @@
 "use client";
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import NotificationCenter from './NotificationCenter';
 
 
 export default function BottomNavBar() {
   const pathname = usePathname();
-  const router = useRouter();
   const isBoardActive = pathname === '/board' || pathname === '/';
   const isMessagesActive = pathname?.startsWith('/messages');
   
@@ -32,19 +32,7 @@ export default function BottomNavBar() {
         <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: pathname === '/board/archive' ? "'FILL' 1" : "'FILL' 0" }}>inventory_2</span>
         <span className="font-label text-[11px] font-semibold uppercase tracking-widest">Archive</span>
       </Link>
-
-      <button 
-        onClick={() => {
-          router.push(`${pathname}?action=notifs`, { scroll: false });
-        }}
-        className="flex flex-col items-center justify-center px-5 py-1.5 text-slate-400 dark:text-slate-500 hover:text-[#44afa9] transition-all active:scale-90 duration-150"
-      >
-        <div className="relative mb-1 flex items-center justify-center">
-          <span className="material-symbols-outlined">Notifications</span>
-          <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#ba1a1a] rounded-full border border-white dark:border-slate-950"></span>
-        </div>
-        <span className="font-label text-[11px] font-semibold uppercase tracking-widest">Notifs</span>
-      </button>
+      <NotificationCenter variant="mobile" />
     </nav>
   );
 }

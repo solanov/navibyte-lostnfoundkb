@@ -116,14 +116,11 @@ export default function SideNav() {
               isMessagesActive ? 'bg-[#ffffff] text-[#44afa9] shadow-sm' : 'text-[#41484c] hover:bg-[#ffffff]/60 hover:bg-[#002433]/5'
             }`}
           >
-            <div className="relative">
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: isMessagesActive ? "'FILL' 1" : "'FILL' 0" }}>forum</span>
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#44afa9] rounded-full"></span>
-            </div>
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: isMessagesActive ? "'FILL' 1" : "'FILL' 0" }}>forum</span>
             {!isCollapsed && <span className="text-[10px] font-bold uppercase tracking-widest mt-1 whitespace-nowrap">Inbox</span>}
           </Link>
 
-          <NotificationCenter isCollapsed={isCollapsed} />
+          <NotificationCenter isCollapsed={isCollapsed} variant="sidebar" />
         </div>
 
         {/* Profile & Logout */}

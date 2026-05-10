@@ -236,7 +236,6 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
         <ConversationModal
           isOpen={isConversationOpen}
           itemPostId={conversationItem.post_id}
-          itemTitle={(conversationItem.general_description || '').split('\n\n')[0] || 'Item'}
           currentUserId={currentUserId}
           currentUserName={currentUserName}
           otherUserId={conversationItem.reported_by}

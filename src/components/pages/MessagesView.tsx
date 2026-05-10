@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import BottomNavBar from "@/src/components/layout/BottomNavBar";
-import ItemDetailModal from "@/src/components/pages/ItemDetailModal";
 import { supabase } from "@/src/lib/supabase";
-import { Message, useConversation } from "@/src/lib/useConversation";
+import {
+  Message,
+  getConversationPairKey,
+  useConversation,
+} from "@/src/lib/useConversation";
 
 interface UserProfile {
   user_id: string;
@@ -22,24 +26,13 @@ interface ConversationRow {
   created_at: string;
 }
 
-interface ItemSummary {
-  post_id: string;
-  general_description: string | null;
-  zone: string | null;
-  status: string | null;
-  image_url: string | null;
-  reported_by: string | null;
-  categories?: {
-    name: string | null;
-    icon_identifier: string | null;
-  } | null;
-}
-
 interface ConversationBundle {
-  conversation: ConversationRow;
+  activeConversationId: string;
+  conversationIds: string[];
+  createdAt: string;
+  otherUserId: string;
   myProfile: UserProfile | null;
   otherProfile: UserProfile | null;
-  item: ItemSummary | null;
   messages: Message[];
   lastMessage: Message | null;
   unreadCount: number;
@@ -73,11 +66,6 @@ function formatConversationTime(value?: string) {
   });
 }
 
-function getItemTitle(item: ItemSummary | null) {
-  const [title] = (item?.general_description || "").split("\n\n");
-  return title || item?.categories?.name || "Lost item conversation";
-}
-
 function getInitials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "U";
@@ -90,6 +78,9 @@ function getDisplayName(profile: UserProfile | null, fallback: string) {
 }
 
 export default function MessagesView() {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [bundles, setBundles] = useState<ConversationBundle[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
@@ -97,15 +88,7 @@ export default function MessagesView() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
-
-  const {
-    messages,
-    loading: messagesLoading,
-    error: messagesError,
-    sendMessage,
-    markAsRead,
-  } = useConversation(selectedConversationId);
+  const requestedConversationId = searchParams.get("conversation");
 
   const loadInbox = useCallback(async (nextSelectedId?: string | null) => {
     setLoading(true);
@@ -138,7 +121,6 @@ export default function MessagesView() {
 
       const conversationRows = (conversations || []) as ConversationRow[];
       const conversationIds = conversationRows.map((conversation) => conversation.conversation_id);
-      const postIds = Array.from(new Set(conversationRows.map((conversation) => conversation.post_id).filter(Boolean)));
       const participantIds = Array.from(
         new Set(
           conversationRows.flatMap((conversation) => [
@@ -148,15 +130,9 @@ export default function MessagesView() {
         )
       );
 
-      const [profilesResult, itemsResult, messagesResult] = await Promise.all([
+      const [profilesResult, messagesResult] = await Promise.all([
         participantIds.length > 0
           ? supabase.from("users").select("user_id,full_name,email,avatar_url").in("user_id", participantIds)
-          : Promise.resolve({ data: [], error: null }),
-        postIds.length > 0
-          ? supabase
-              .from("public_lost_items")
-              .select("post_id,general_description,zone,status,image_url,reported_by,categories(name,icon_identifier)")
-              .in("post_id", postIds)
           : Promise.resolve({ data: [], error: null }),
         conversationIds.length > 0
           ? supabase
@@ -168,14 +144,10 @@ export default function MessagesView() {
       ]);
 
       if (profilesResult.error) throw profilesResult.error;
-      if (itemsResult.error) throw itemsResult.error;
       if (messagesResult.error) throw messagesResult.error;
 
       const profilesById = new Map(
         ((profilesResult.data || []) as UserProfile[]).map((profile) => [profile.user_id, profile])
-      );
-      const itemsById = new Map(
-        ((itemsResult.data || []) as ItemSummary[]).map((item) => [item.post_id, item])
       );
       const messagesByConversation = new Map<string, Message[]>();
 
@@ -185,21 +157,42 @@ export default function MessagesView() {
         messagesByConversation.set(message.conversation_id, grouped);
       });
 
-      const nextBundles = conversationRows
-        .map((conversation) => {
-          const conversationMessages = messagesByConversation.get(conversation.conversation_id) || [];
+      const groupedConversations = new Map<string, ConversationRow[]>();
+
+      conversationRows.forEach((conversation) => {
+        const otherUserId =
+          conversation.initiator_id === user.id ? conversation.receiver_id : conversation.initiator_id;
+        const pairKey = getConversationPairKey(user.id, otherUserId);
+        const existing = groupedConversations.get(pairKey) || [];
+        existing.push(conversation);
+        groupedConversations.set(pairKey, existing);
+      });
+
+      const nextBundles = Array.from(groupedConversations.values())
+        .map((group) => {
+          const sortedGroup = [...group].sort(
+            (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          );
+          const canonicalConversation = sortedGroup[0];
           const otherUserId =
-            conversation.initiator_id === user.id ? conversation.receiver_id : conversation.initiator_id;
-          const lastMessage = conversationMessages[conversationMessages.length - 1] || null;
+            canonicalConversation.initiator_id === user.id
+              ? canonicalConversation.receiver_id
+              : canonicalConversation.initiator_id;
+          const mergedMessages = sortedGroup
+            .flatMap((conversation) => messagesByConversation.get(conversation.conversation_id) || [])
+            .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+          const lastMessage = mergedMessages[mergedMessages.length - 1] || null;
 
           return {
-            conversation,
+            activeConversationId: canonicalConversation.conversation_id,
+            conversationIds: sortedGroup.map((conversation) => conversation.conversation_id),
+            createdAt: canonicalConversation.created_at,
+            otherUserId,
             myProfile: profilesById.get(user.id) || null,
             otherProfile: profilesById.get(otherUserId) || null,
-            item: itemsById.get(conversation.post_id) || null,
-            messages: conversationMessages,
+            messages: mergedMessages,
             lastMessage,
-            unreadCount: conversationMessages.filter(
+            unreadCount: mergedMessages.filter(
               (message) => !message.is_read && message.sender_id !== user.id
             ).length,
           };
@@ -207,18 +200,18 @@ export default function MessagesView() {
         // Only show conversations that have at least one message sent
         .filter((bundle) => bundle.messages.length > 0)
         .sort((a, b) => {
-          const aTime = new Date(a.lastMessage?.created_at || a.conversation.created_at).getTime();
-          const bTime = new Date(b.lastMessage?.created_at || b.conversation.created_at).getTime();
+          const aTime = new Date(a.lastMessage?.created_at || a.createdAt).getTime();
+          const bTime = new Date(b.lastMessage?.created_at || b.createdAt).getTime();
           return bTime - aTime;
         });
 
       setBundles(nextBundles);
 
       const selectedStillExists = nextBundles.some(
-        (bundle) => bundle.conversation.conversation_id === nextSelectedId
+        (bundle) => bundle.activeConversationId === nextSelectedId
       );
       const currentStillExists = nextBundles.some(
-        (bundle) => bundle.conversation.conversation_id === selectedConversationId
+        (bundle) => bundle.activeConversationId === selectedConversationId
       );
 
       if (nextSelectedId && selectedStillExists) {
@@ -267,6 +260,53 @@ export default function MessagesView() {
   }, [currentUserId, loadInbox, selectedConversationId]);
 
   useEffect(() => {
+    if (!requestedConversationId) {
+      return;
+    }
+
+    const matchingBundle = bundles.find(
+      (bundle) =>
+        bundle.activeConversationId === requestedConversationId ||
+        bundle.conversationIds.includes(requestedConversationId)
+    );
+
+    if (!matchingBundle) {
+      if (loading) {
+        return;
+      }
+    } else if (selectedConversationId !== matchingBundle.activeConversationId) {
+      setSelectedConversationId(matchingBundle.activeConversationId);
+    }
+
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.delete("conversation");
+    const nextQuery = nextParams.toString();
+    router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
+  }, [
+    bundles,
+    loading,
+    pathname,
+    requestedConversationId,
+    router,
+    searchParams,
+    selectedConversationId,
+  ]);
+
+  const selectedBundle = useMemo(
+    () => bundles.find((bundle) => bundle.activeConversationId === selectedConversationId) || null,
+    [bundles, selectedConversationId]
+  );
+
+  const activeConversationIds = selectedBundle?.conversationIds || [];
+  const {
+    messages,
+    loading: messagesLoading,
+    error: messagesError,
+    sendMessage,
+    markAsRead,
+  } = useConversation(activeConversationIds, selectedBundle?.activeConversationId || null);
+
+  useEffect(() => {
     if (!currentUserId) return;
 
     messages.forEach((message) => {
@@ -276,23 +316,15 @@ export default function MessagesView() {
     });
   }, [currentUserId, markAsRead, messages]);
 
-  const selectedBundle = useMemo(
-    () =>
-      bundles.find((bundle) => bundle.conversation.conversation_id === selectedConversationId) ||
-      null,
-    [bundles, selectedConversationId]
-  );
-
   const filteredBundles = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return bundles;
 
     return bundles.filter((bundle) => {
       const otherName = getDisplayName(bundle.otherProfile, "User").toLowerCase();
-      const itemTitle = getItemTitle(bundle.item).toLowerCase();
       const snippet = (bundle.lastMessage?.content || "").toLowerCase();
 
-      return otherName.includes(query) || itemTitle.includes(query) || snippet.includes(query);
+      return otherName.includes(query) || snippet.includes(query);
     });
   }, [bundles, searchQuery]);
 
@@ -300,11 +332,11 @@ export default function MessagesView() {
     event.preventDefault();
 
     const trimmed = messageText.trim();
-    if (!trimmed || !selectedConversationId || !currentUserId) return;
+    if (!trimmed || !selectedBundle || !currentUserId) return;
 
     await sendMessage(trimmed, currentUserId);
     setMessageText("");
-    loadInbox(selectedConversationId);
+    loadInbox(selectedBundle.activeConversationId);
   };
 
   if (!loading && !currentUserId) {
@@ -400,11 +432,10 @@ export default function MessagesView() {
               </div>
             ) : (
               filteredBundles.map((bundle) => {
-                const conversationId = bundle.conversation.conversation_id;
+                const conversationId = bundle.activeConversationId;
                 const isActive = conversationId === selectedConversationId;
                 const otherName = getDisplayName(bundle.otherProfile, "Item contact");
-                const itemTitle = getItemTitle(bundle.item);
-                const snippet = bundle.lastMessage?.content || `Re: ${itemTitle}`;
+                const snippet = bundle.lastMessage?.content || `Direct Message`;
 
                 return (
                   <button
@@ -429,10 +460,9 @@ export default function MessagesView() {
                       <div className="mb-1 flex items-baseline justify-between gap-3">
                         <p className="truncate text-sm font-bold text-on-surface">{otherName}</p>
                         <span className={`shrink-0 text-[11px] font-bold ${bundle.unreadCount ? "text-[#0d6682]" : "text-on-surface-variant"}`}>
-                          {formatConversationTime(bundle.lastMessage?.created_at || bundle.conversation.created_at)}
+                          {formatConversationTime(bundle.lastMessage?.created_at || bundle.createdAt)}
                         </span>
                       </div>
-                      <p className="truncate text-xs font-semibold text-primary">Re: {itemTitle}</p>
                       <p className={`truncate text-sm ${bundle.unreadCount ? "font-bold text-on-surface" : "text-on-surface-variant"}`}>
                         {snippet}
                       </p>
@@ -476,68 +506,11 @@ export default function MessagesView() {
                   <h2 className="truncate font-headline text-lg font-black text-primary md:text-2xl">
                     {getDisplayName(selectedBundle.otherProfile, "Item contact")}
                   </h2>
-                  <p className="truncate text-xs font-semibold text-on-surface-variant md:text-sm">
-                    Re: {getItemTitle(selectedBundle.item)}
-                  </p>
                 </div>
               </header>
 
               <div className="flex-1 overflow-y-auto bg-background px-4 py-5 md:px-6">
                 <div className="mx-auto flex max-w-3xl flex-col gap-4">
-                  {/* Product Reference Card */}
-                  {selectedBundle.item && (
-                    <button
-                      onClick={() => setIsItemModalOpen(true)}
-                      className="group flex w-full items-center gap-3 rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-3 text-left shadow-sm transition-all hover:border-[#44afa9]/40 hover:shadow-md active:scale-[0.99] md:p-4"
-                    >
-                      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-outline-variant/20 bg-surface-container-low md:h-16 md:w-16">
-                        {selectedBundle.item.image_url ? (
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img
-                            src={selectedBundle.item.image_url}
-                            alt={getItemTitle(selectedBundle.item)}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center text-outline-variant">
-                            <span className="material-symbols-outlined text-2xl">
-                              {selectedBundle.item.categories?.icon_identifier || "help_outline"}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-bold text-on-surface group-hover:text-primary">
-                          {getItemTitle(selectedBundle.item)}
-                        </p>
-                        <div className="mt-1 flex flex-wrap items-center gap-2">
-                          <span
-                            className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-widest ${
-                              (selectedBundle.item.status === "Found")
-                                ? "bg-tertiary-fixed text-on-tertiary-container"
-                                : "bg-[#ba1a1a] text-white"
-                            }`}
-                          >
-                            {selectedBundle.item.status === "Reported" ? "Lost" : selectedBundle.item.status}
-                          </span>
-                          {selectedBundle.item.zone && (
-                            <span className="flex items-center gap-0.5 text-[11px] font-semibold text-on-surface-variant">
-                              <span className="material-symbols-outlined text-[13px]">location_on</span>
-                              {selectedBundle.item.zone}
-                            </span>
-                          )}
-                          {selectedBundle.item.categories?.name && (
-                            <span className="text-[11px] font-semibold text-on-surface-variant">
-                              · {selectedBundle.item.categories.name}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <span className="material-symbols-outlined shrink-0 text-lg text-outline-variant transition-colors group-hover:text-[#44afa9]">
-                        chevron_right
-                      </span>
-                    </button>
-                  )}
                   {messagesLoading && messages.length === 0 ? (
                     <div className="py-16 text-center text-sm font-medium text-on-surface-variant">
                       Loading messages...
@@ -644,36 +617,6 @@ export default function MessagesView() {
       </div>
 
       {!selectedConversationId && <BottomNavBar />}
-
-      {/* Item Detail Modal */}
-      <ItemDetailModal
-        isOpen={isItemModalOpen}
-        item={
-          selectedBundle?.item
-            ? {
-                post_id: selectedBundle.item.post_id,
-                general_description: selectedBundle.item.general_description || "",
-                zone: selectedBundle.item.zone || "Unknown",
-                status: selectedBundle.item.status || "Reported",
-                image_url: selectedBundle.item.image_url,
-                reported_by: selectedBundle.item.reported_by || undefined,
-                categories: selectedBundle.item.categories
-                  ? {
-                      name: selectedBundle.item.categories.name || "Uncategorized",
-                      icon_identifier: selectedBundle.item.categories.icon_identifier || "help_outline",
-                    }
-                  : undefined,
-              }
-            : null
-        }
-        onClose={() => setIsItemModalOpen(false)}
-        onClaimClick={() => {
-          setIsItemModalOpen(false);
-        }}
-        onContactClick={() => {
-          setIsItemModalOpen(false);
-        }}
-      />
     </div>
   );
 }

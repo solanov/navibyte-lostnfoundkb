@@ -13,6 +13,7 @@ const publicSans = Public_Sans({
 });
 
 import { NotificationProvider } from "@/src/context/NotificationContext";
+import { NotificationInboxProvider } from "@/src/context/NotificationInboxContext";
 import ToastContainer from "@/src/components/ui/ToastContainer";
 
 export const metadata: Metadata = {
@@ -38,8 +39,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[#EEEEEE] font-body">
         <NotificationProvider>
-          {children}
-          <ToastContainer />
+          <NotificationInboxProvider>
+            {children}
+            <ToastContainer />
+          </NotificationInboxProvider>
         </NotificationProvider>
       </body>
     </html>
