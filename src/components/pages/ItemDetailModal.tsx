@@ -274,7 +274,7 @@ export default function ItemDetailModal({
               </button>
               <button
                 onClick={onClaimClick}
-                className="flex-1 bg-secondary text-white px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:brightness-110 transition-all active:scale-95"
+                className="btn-claim flex-1 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:brightness-110 transition-all active:scale-95"
               >
                 <span className="flex items-center justify-center gap-2">
                   <span className="material-symbols-outlined text-lg">check_circle</span>

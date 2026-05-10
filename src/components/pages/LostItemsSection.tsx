@@ -224,7 +224,7 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
       <ItemDetailModal
         isOpen={isModalOpen}
         item={selectedItem}
-        isOwner={currentUserId === selectedItem?.reported_by}
+        isOwner={!!currentUserId && currentUserId === selectedItem?.reported_by}
         onClaimClick={handleClaimItem}
         onContactClick={handleContactPoster}
         onDeletePost={handleDeletePost}

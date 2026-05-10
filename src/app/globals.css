@@ -37,6 +37,9 @@
   --color-primary-fixed: var(--primary-fixed);
   --color-primary-fixed-dim: var(--primary-fixed-dim);
   
+  --color-secondary: #0d6682;
+  --color-secondary-container: #98defe;
+  
   --color-tertiary: var(--tertiary);
   --color-on-tertiary: var(--on-tertiary);
   --color-tertiary-fixed: var(--tertiary-fixed);
@@ -60,4 +63,9 @@
 
 .btn-tertiary {
   background-color: var(--tertiary);
+}
+
+.btn-claim {
+  background-color: #0d6682;
+  color: #ffffff;
 }
