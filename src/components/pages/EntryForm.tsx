@@ -3,6 +3,7 @@ import CategoryButton from './CategoryButton';
 import ColorSwatch from './ColorSwatch';
 import { useState, useRef, useEffect } from "react";
 import { supabase } from '@/src/lib/supabase';
+import { useNotification } from '@/src/hooks/useNotification';
 
 interface EntryFormProps {
   onSuccess?: () => void;
@@ -17,6 +18,7 @@ const fallbackCategories = [
 ];
 
 export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProps) {
+  const { notify } = useNotification();
   const [entryType, setEntryType] = useState<'lost' | 'found'>('lost');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -100,7 +102,7 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
   
   const handleFile = (selectedFile: File) => {
     if (selectedFile.size > 10 * 1024 * 1024) {
-      alert("File is too large. Max 10MB");
+      notify("File is too large. Max 10MB", "error");
       return;
     }
     setFile(selectedFile);
@@ -110,7 +112,7 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCategory || !selectedColor || !title || !description || !zone) {
-      alert("Please fill in all required fields (including Category, Zone, and Color).");
+      notify("Please fill in all required fields (including Category, Zone, and Color).", "warning");
       return;
     }
     setIsSubmitting(true);
@@ -153,7 +155,7 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
       
       if (insertError) throw insertError;
       
-      alert("Entry successfully added!");
+      notify("Entry successfully added!", "success");
       // Reset form
       setTitle('');
       setDescription('');
@@ -166,7 +168,7 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
       onSuccess?.();
     } catch (err) {
       console.error(err);
-      alert(err instanceof Error ? err.message : "An error occurred during submission.");
+      notify(err instanceof Error ? err.message : "An error occurred during submission.", "error");
     } finally {
       setIsSubmitting(false);
     }
