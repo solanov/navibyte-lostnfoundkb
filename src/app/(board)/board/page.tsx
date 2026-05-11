@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/src/lib/supabase';
 import SearchBar from '@/src/components/pages/SearchBar';
 import FilterDetails from '@/src/components/pages/FilterDetails';
+import { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
 
@@ -214,7 +215,9 @@ const categoryOptionsFromTable = (categoriesResult.data || []).map((category) =>
               
               {/* Search Bar */}
               {/* Search Bar Component */}
-              <SearchBar />
+              <Suspense fallback={<div className="h-[48px] w-full rounded-xl bg-[#f5f3f3]" />}>
+                <SearchBar />
+              </Suspense>
 
               {/* Compact Filters Row */}
               <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 pt-1">
@@ -387,7 +390,9 @@ const categoryOptionsFromTable = (categoriesResult.data || []).map((category) =>
         </main>
       </div>
 
-      <CreateEntryOverlay />
+      <Suspense fallback={null}>
+        <CreateEntryOverlay />
+      </Suspense>
       <BottomNavBar />
     </div>
   );
