@@ -220,8 +220,18 @@ export default function AdminDashboard() {
     try {
       await verifyClaimAction(accessToken, item.post_id, claimantName, studentId, previous);
       setNotice("Claim verified and item marked as Returned.");
+      setItems((currentItems) =>
+        currentItems.map((currentItem) =>
+          currentItem.post_id === item.post_id
+            ? {
+                ...currentItem,
+                status: "Returned",
+                last_handled_by: profile.user_id,
+              }
+            : currentItem
+        )
+      );
       setModal(null);
-      await loadAdminData();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     }
@@ -246,8 +256,14 @@ export default function AdminDashboard() {
     try {
       await updateUserBlockAction(accessToken, user.user_id, user.is_blocked, blocked, reason);
       setNotice(blocked ? "Account suspended." : "Account restored.");
+      setUsers((currentUsers) =>
+        currentUsers.map((currentUser) =>
+          currentUser.user_id === user.user_id
+            ? { ...currentUser, is_blocked: blocked }
+            : currentUser
+        )
+      );
       setModal(null);
-      await loadAdminData();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     }
@@ -274,8 +290,18 @@ export default function AdminDashboard() {
     try {
       await disposeItemAction(accessToken, item.post_id, method, reason, previous);
       setNotice("Disposal audit approved and item moved to Purged.");
+      setItems((currentItems) =>
+        currentItems.map((currentItem) =>
+          currentItem.post_id === item.post_id
+            ? {
+                ...currentItem,
+                status: "Purged",
+                last_handled_by: profile.user_id,
+              }
+            : currentItem
+        )
+      );
       setModal(null);
-      await loadAdminData();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     }
@@ -300,8 +326,21 @@ export default function AdminDashboard() {
     try {
       await adminDeletePostAction(accessToken, item.post_id, reason);
       setNotice("Post deleted and moved to Purged.");
+      setItems((currentItems) =>
+        currentItems.map((currentItem) =>
+          currentItem.post_id === item.post_id
+            ? {
+                ...currentItem,
+                status: "Purged",
+                deleted_by: profile.user_id,
+                deletion_reason: reason,
+                deleted_at: new Date().toISOString(),
+                last_handled_by: profile.user_id,
+              }
+            : currentItem
+        )
+      );
       setModal(null);
-      await loadAdminData();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     }

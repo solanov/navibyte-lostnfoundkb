@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import useSWR from "swr";
 import { supabase } from "@/src/lib/supabase";
 import {
   approveOfficeClaimAction,
@@ -66,57 +67,102 @@ export default function AdminClaimsPage({ params }: { params: Promise<{ postId: 
   const { notify } = useNotification();
   const postId = resolvedParams.postId;
 
-  const [post, setPost] = useState<PostSummary | null>(null);
-  const [claims, setClaims] = useState<ClaimRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   // Rejection modal state
   const [rejectingClaimId, setRejectingClaimId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
 
-  const getAccessToken = useCallback(async () => {
-    const { data: sessionData } = await supabase.auth.getSession();
-    const token = sessionData.session?.access_token;
-    if (!token) throw new Error("Authentication token missing.");
-    return token;
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncSession = async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+
+      if (!isMounted) {
+        return;
+      }
+
+      setAccessToken(sessionData.session?.access_token ?? null);
+      setAuthLoading(false);
+    };
+
+    void syncSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAccessToken(session?.access_token ?? null);
+      setAuthLoading(false);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
-    const token = await getAccessToken();
-
-    try {
-      const result = await fetchAdminPostClaimsAction(token, postId);
-      setPost(result.post as unknown as PostSummary);
-      setClaims(result.claims as ClaimRequest[]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load claims.");
-    }
-
-    setLoading(false);
-  }, [postId, router]);
-
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (!authLoading && !accessToken) {
+      router.push("/login");
+    }
+  }, [accessToken, authLoading, router]);
+
+  const {
+    data,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR(
+    accessToken ? ["admin-post-claims", accessToken, postId] : null,
+    () => fetchAdminPostClaimsAction(accessToken as string, postId),
+    {
+      keepPreviousData: true,
+    }
+  );
+
+  const post = (data?.post as PostSummary | undefined) ?? null;
+  const claims = (data?.claims as ClaimRequest[] | undefined) ?? [];
+  const loading = authLoading || (Boolean(accessToken) && isLoading);
+  const errorMessage =
+    error instanceof Error ? error.message : error ? String(error) : null;
 
   const handleApprove = async (claimId: string) => {
     setActionLoading(claimId + "-approve");
     try {
-      const token = await getAccessToken();
-      await approveOfficeClaimAction(token, claimId);
+      if (!accessToken) throw new Error("Authentication token missing.");
+
+      const nextTimestamp = new Date().toISOString();
+      const optimisticData = data
+        ? {
+            ...data,
+            claims: data.claims.map((claim) =>
+              claim.claim_id === claimId
+                ? {
+                    ...claim,
+                    status: "Approved" as ClaimRequest["status"],
+                    updated_at: nextTimestamp,
+                  }
+                : claim
+            ),
+          }
+        : data;
+
+      await mutate(
+        async () => {
+          await approveOfficeClaimAction(accessToken, claimId);
+          return optimisticData;
+        },
+        {
+          optimisticData,
+          rollbackOnError: true,
+          revalidate: false,
+        }
+      );
+
       notify("Claim approved. Student can now collect the item.", "success");
-      await loadData();
     } catch (err) {
       notify(`Error: ${err instanceof Error ? err.message : String(err)}`, "error");
     } finally {
@@ -132,10 +178,40 @@ export default function AdminClaimsPage({ params }: { params: Promise<{ postId: 
 
     setActionLoading(claimId + "-release");
     try {
-      const token = await getAccessToken();
-      await finalizeOfficeReleaseAction(token, claimId);
+      if (!accessToken) throw new Error("Authentication token missing.");
+
+      const nextTimestamp = new Date().toISOString();
+      const optimisticData = data
+        ? {
+            ...data,
+            post: data.post
+              ? { ...data.post, status: "Released" }
+              : data.post,
+            claims: data.claims.map((claim) =>
+              claim.claim_id === claimId
+                ? {
+                    ...claim,
+                    status: "Released" as ClaimRequest["status"],
+                    updated_at: nextTimestamp,
+                  }
+                : claim
+            ),
+          }
+        : data;
+
+      await mutate(
+        async () => {
+          await finalizeOfficeReleaseAction(accessToken, claimId);
+          return optimisticData;
+        },
+        {
+          optimisticData,
+          rollbackOnError: true,
+          revalidate: false,
+        }
+      );
+
       notify("Item released. Record updated to Released.", "success");
-      await loadData();
     } catch (err) {
       notify(`Error: ${err instanceof Error ? err.message : String(err)}`, "error");
     } finally {
@@ -148,12 +224,40 @@ export default function AdminClaimsPage({ params }: { params: Promise<{ postId: 
 
     setActionLoading(rejectingClaimId + "-reject");
     try {
-      const token = await getAccessToken();
-      await rejectClaimAction(token, rejectingClaimId, rejectionReason);
+      if (!accessToken) throw new Error("Authentication token missing.");
+
+      const nextTimestamp = new Date().toISOString();
+      const optimisticData = data
+        ? {
+            ...data,
+            claims: data.claims.map((claim) =>
+              claim.claim_id === rejectingClaimId
+                ? {
+                    ...claim,
+                    status: "Rejected" as ClaimRequest["status"],
+                    admin_notes: rejectionReason,
+                    updated_at: nextTimestamp,
+                  }
+                : claim
+            ),
+          }
+        : data;
+
+      await mutate(
+        async () => {
+          await rejectClaimAction(accessToken, rejectingClaimId, rejectionReason);
+          return optimisticData;
+        },
+        {
+          optimisticData,
+          rollbackOnError: true,
+          revalidate: false,
+        }
+      );
+
       notify("Claim rejected.", "success");
       setRejectingClaimId(null);
       setRejectionReason("");
-      await loadData();
     } catch (err) {
       notify(`Error: ${err instanceof Error ? err.message : String(err)}`, "error");
     } finally {
@@ -174,13 +278,13 @@ export default function AdminClaimsPage({ params }: { params: Promise<{ postId: 
     );
   }
 
-  if (error) {
+  if (errorMessage) {
     return (
       <div className="flex items-center justify-center min-h-screen p-6">
         <div className="bg-white rounded-2xl shadow-md p-8 max-w-md w-full text-center">
           <span className="material-symbols-outlined text-5xl text-[#ba1a1a] mb-4 block">error</span>
           <h2 className="text-xl font-black text-[#002433] mb-2">Error</h2>
-          <p className="text-[#41484c] mb-6">{error}</p>
+          <p className="text-[#41484c] mb-6">{errorMessage}</p>
           <Link href="/admin" className="inline-flex items-center gap-2 px-6 py-3 bg-[#44afa9] text-white font-bold rounded-xl hover:bg-[#3b9691] transition-colors">
             <span className="material-symbols-outlined text-[18px]">arrow_back</span>
             Back to Admin
@@ -268,7 +372,7 @@ export default function AdminClaimsPage({ params }: { params: Promise<{ postId: 
                 {claim.item_description_verification && (
                   <div className="bg-[#f5f3f3] rounded-xl p-4 mb-4">
                     <p className="text-[10px] font-black uppercase tracking-widest text-[#41484c] mb-1">
-                      Claimant's Item Description
+                      Claimant&apos;s Item Description
                     </p>
                     <p className="text-sm text-[#002433] leading-relaxed">
                       {claim.item_description_verification}

@@ -6,9 +6,9 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
+import useSWR from "swr";
 import { supabase } from "@/src/lib/supabase";
 
 export type NotificationFeedType = "message" | "status" | "system";
@@ -49,11 +49,9 @@ interface NotificationRow {
   created_at: string;
 }
 
-const NotificationInboxContext = createContext<NotificationInboxContextValue | undefined>(
-  undefined
-);
-
-const POLL_INTERVAL_MS = 45_000;
+const NotificationInboxContext = createContext<
+  NotificationInboxContextValue | undefined
+>(undefined);
 
 function normalizeNotificationType(type: NotificationRow["type"]): NotificationFeedType {
   switch (type) {
@@ -102,94 +100,94 @@ function mapNotification(row: NotificationRow): NotificationFeedItem {
   };
 }
 
+function sortNotifications(notifications: NotificationFeedItem[]) {
+  return [...notifications].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+}
+
+async function fetchNotifications(userId: string) {
+  const { data, error } = await supabase
+    .from("notifications")
+    .select("notification_id,type,title,content,link_to,is_read,created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  if (error) {
+    throw error;
+  }
+
+  return ((data || []) as NotificationRow[]).map(mapNotification);
+}
+
+function upsertNotification(
+  notifications: NotificationFeedItem[],
+  row: NotificationRow
+) {
+  const nextNotification = mapNotification(row);
+  const existingIndex = notifications.findIndex(
+    (notification) => notification.id === nextNotification.id
+  );
+
+  if (existingIndex === -1) {
+    return sortNotifications([nextNotification, ...notifications]);
+  }
+
+  const nextNotifications = [...notifications];
+  nextNotifications[existingIndex] = nextNotification;
+  return sortNotifications(nextNotifications);
+}
+
 export function NotificationInboxProvider({ children }: { children: ReactNode }) {
-  const [notifications, setNotifications] = useState<NotificationFeedItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const currentUserIdRef = useRef<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
-    setError(null);
+  const {
+    data: notifications = [],
+    error,
+    isLoading,
+    mutate,
+  } = useSWR(
+    currentUserId ? ["notification-feed", currentUserId] : null,
+    () => fetchNotifications(currentUserId as string),
+    {
+      fallbackData: [],
+      keepPreviousData: true,
+    }
+  );
 
-    try {
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncCurrentUser = async () => {
       const {
         data: { user },
-        error: authError,
       } = await supabase.auth.getUser();
 
-      if (authError) {
-        throw authError;
-      }
-
-      if (!user) {
-        currentUserIdRef.current = null;
-        setCurrentUserId(null);
-        setNotifications([]);
-        setLoading(false);
+      if (!isMounted) {
         return;
       }
 
-      currentUserIdRef.current = user.id;
-      setCurrentUserId(user.id);
+      setCurrentUserId(user?.id ?? null);
+      setAuthLoading(false);
+    };
 
-      const { data, error: notificationError } = await supabase
-        .from("notifications")
-        .select("notification_id,type,title,content,link_to,is_read,created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(100);
-
-      if (notificationError) {
-        throw notificationError;
-      }
-
-      setNotifications(((data || []) as NotificationRow[]).map(mapNotification));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load notifications.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void refresh();
+    void syncCurrentUser();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      void refresh();
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUserId(session?.user?.id ?? null);
+      setAuthLoading(false);
     });
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
     };
-  }, [refresh]);
-
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      void refresh();
-    }, POLL_INTERVAL_MS);
-
-    const handleFocus = () => {
-      void refresh();
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        void refresh();
-      }
-    };
-
-    window.addEventListener("focus", handleFocus);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      window.clearInterval(intervalId);
-      window.removeEventListener("focus", handleFocus);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [refresh]);
+  }, []);
 
   useEffect(() => {
     if (!currentUserId) {
@@ -206,8 +204,21 @@ export function NotificationInboxProvider({ children }: { children: ReactNode })
           table: "notifications",
           filter: `user_id=eq.${currentUserId}`,
         },
-        () => {
-          void refresh();
+        (payload) => {
+          if (payload.eventType === "DELETE") {
+            const deletedNotificationId = (payload.old as NotificationRow).notification_id;
+            void mutate(
+              (current = []) =>
+                current.filter(
+                  (notification) => notification.id !== deletedNotificationId
+                ),
+              false
+            );
+            return;
+          }
+
+          const row = payload.new as NotificationRow;
+          void mutate((current = []) => upsertNotification(current, row), false);
         }
       )
       .subscribe();
@@ -215,89 +226,134 @@ export function NotificationInboxProvider({ children }: { children: ReactNode })
     return () => {
       channel.unsubscribe();
     };
-  }, [currentUserId, refresh]);
+  }, [currentUserId, mutate]);
+
+  const refresh = useCallback(async () => {
+    setActionError(null);
+    if (!currentUserId) {
+      return;
+    }
+    await mutate();
+  }, [currentUserId, mutate]);
 
   const markAsRead = useCallback(
     async (id: string) => {
-      const userId = currentUserIdRef.current;
       const target = notifications.find((notification) => notification.id === id);
 
-      if (!userId || !target || target.isRead) {
+      if (!currentUserId || !target || target.isRead) {
         return;
       }
 
-      setNotifications((prev) =>
-        prev.map((notification) =>
-          notification.id === id ? { ...notification, isRead: true } : notification
-        )
-      );
+      setActionError(null);
 
       try {
-        const { error: updateError } = await supabase
-          .from("notifications")
-          .update({ is_read: true })
-          .eq("notification_id", target.source.notificationId)
-          .eq("user_id", userId);
+        await mutate(
+          async (current = []) => {
+            const { error: updateError } = await supabase
+              .from("notifications")
+              .update({ is_read: true })
+              .eq("notification_id", target.source.notificationId)
+              .eq("user_id", currentUserId);
 
-        if (updateError) {
-          throw updateError;
-        }
-      } catch (err) {
-        setNotifications((prev) =>
-          prev.map((notification) =>
-            notification.id === id ? { ...notification, isRead: false } : notification
-          )
+            if (updateError) {
+              throw updateError;
+            }
+
+            return current.map((notification) =>
+              notification.id === id
+                ? { ...notification, isRead: true }
+                : notification
+            );
+          },
+          {
+            optimisticData: (current: NotificationFeedItem[] = []) =>
+              current.map((notification) =>
+                notification.id === id
+                  ? { ...notification, isRead: true }
+                  : notification
+              ),
+            rollbackOnError: true,
+            revalidate: false,
+          }
         );
-
-        setError(err instanceof Error ? err.message : "Failed to update notification state.");
+      } catch (err) {
+        setActionError(
+          err instanceof Error
+            ? err.message
+            : "Failed to update notification state."
+        );
       }
     },
-    [notifications]
+    [currentUserId, mutate, notifications]
   );
 
   const markAllAsRead = useCallback(async () => {
-    const userId = currentUserIdRef.current;
     const unreadNotifications = notifications.filter((notification) => !notification.isRead);
 
-    if (!userId || unreadNotifications.length === 0) {
+    if (!currentUserId || unreadNotifications.length === 0) {
       return;
     }
 
-    setNotifications((prev) => prev.map((notification) => ({ ...notification, isRead: true })));
+    setActionError(null);
 
     try {
-      const { error: updateError } = await supabase
-        .from("notifications")
-        .update({ is_read: true })
-        .eq("user_id", userId)
-        .eq("is_read", false);
+      await mutate(
+        async (current = []) => {
+          const { error: updateError } = await supabase
+            .from("notifications")
+            .update({ is_read: true })
+            .eq("user_id", currentUserId)
+            .eq("is_read", false);
 
-      if (updateError) {
-        throw updateError;
-      }
-    } catch (err) {
-      setNotifications((prev) =>
-        prev.map((notification) => {
-          const wasUnread = unreadNotifications.some((candidate) => candidate.id === notification.id);
-          return wasUnread ? { ...notification, isRead: false } : notification;
-        })
+          if (updateError) {
+            throw updateError;
+          }
+
+          return current.map((notification) => ({
+            ...notification,
+            isRead: true,
+          }));
+        },
+        {
+          optimisticData: (current: NotificationFeedItem[] = []) =>
+            current.map((notification) => ({
+              ...notification,
+              isRead: true,
+            })),
+          rollbackOnError: true,
+          revalidate: false,
+        }
       );
-
-      setError(err instanceof Error ? err.message : "Failed to update notifications.");
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : "Failed to update notifications."
+      );
     }
-  }, [notifications]);
+  }, [currentUserId, mutate, notifications]);
 
   const value = useMemo<NotificationInboxContextValue>(
     () => ({
       notifications,
       unreadCount: notifications.filter((notification) => !notification.isRead).length,
-      loading,
-      error,
+      loading: authLoading || (Boolean(currentUserId) && isLoading),
+      error:
+        actionError ||
+        (error instanceof Error ? error.message : error ? String(error) : null),
       markAsRead,
       markAllAsRead,
       refresh,
     }),
-    [error, loading, markAllAsRead, markAsRead, notifications, refresh]
+    [
+      actionError,
+      authLoading,
+      currentUserId,
+      error,
+      isLoading,
+      markAllAsRead,
+      markAsRead,
+      notifications,
+      refresh,
+    ]
   );
 
   return (

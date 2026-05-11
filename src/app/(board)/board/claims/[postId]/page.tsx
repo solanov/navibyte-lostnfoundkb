@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import useSWR from "swr";
 import { supabase } from "@/src/lib/supabase";
 import { finalizeP2PReturnAction } from "@/src/app/admin/actions/posts";
 import { fetchOwnedPostClaimsAction } from "@/src/app/admin/actions/claims";
@@ -60,43 +61,68 @@ export default function UserClaimsPage() {
   const { notify } = useNotification();
   const postId = params.postId as string;
 
-  const [post, setPost] = useState<PostSummary | null>(null);
-  const [claims, setClaims] = useState<ClaimRequest[]>([]);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!isMounted) {
+        return;
+      }
+
+      setAccessToken(session?.access_token ?? null);
+      setCurrentUserId(session?.user?.id ?? null);
+      setAuthLoading(false);
+    };
+
+    void syncSession();
 
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    const user = session?.user;
-    const accessToken = session?.access_token;
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAccessToken(session?.access_token ?? null);
+      setCurrentUserId(session?.user?.id ?? null);
+      setAuthLoading(false);
+    });
 
-    if (!user || !accessToken) {
-      router.push("/login");
-      return;
-    }
-    setCurrentUserId(user.id);
-
-    try {
-      const result = await fetchOwnedPostClaimsAction(accessToken, postId);
-      setPost(result.post as PostSummary);
-      setClaims(result.claims as ClaimRequest[]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load claims.");
-    }
-
-    setLoading(false);
-  }, [postId, router]);
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (!authLoading && !accessToken) {
+      router.push("/login");
+    }
+  }, [accessToken, authLoading, router]);
+
+  const {
+    data,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR(
+    accessToken ? ["owned-post-claims", accessToken, postId] : null,
+    () => fetchOwnedPostClaimsAction(accessToken as string, postId),
+    {
+      keepPreviousData: true,
+    }
+  );
+
+  const post = (data?.post as PostSummary | undefined) ?? null;
+  const claims = (data?.claims as ClaimRequest[] | undefined) ?? [];
+  const loading = authLoading || (Boolean(accessToken) && isLoading);
+  const errorMessage =
+    error instanceof Error ? error.message : error ? String(error) : null;
 
   const handleConfirmP2PHandoff = async (claimId: string) => {
     const confirmed = window.confirm(
@@ -106,13 +132,40 @@ export default function UserClaimsPage() {
 
     setActionLoading(claimId);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
       if (!accessToken) throw new Error("Authentication token missing.");
 
-      await finalizeP2PReturnAction(accessToken, postId, claimId);
+      const nextTimestamp = new Date().toISOString();
+      const optimisticData = data
+        ? {
+            ...data,
+            post: data.post
+              ? { ...data.post, status: "Released" }
+              : data.post,
+            claims: data.claims.map((claim) =>
+              claim.claim_id === claimId
+                ? {
+                    ...claim,
+                    status: "Released" as ClaimRequest["status"],
+                    updated_at: nextTimestamp,
+                  }
+                : claim
+            ),
+          }
+        : data;
+
+      await mutate(
+        async () => {
+          await finalizeP2PReturnAction(accessToken, postId, claimId);
+          return optimisticData;
+        },
+        {
+          optimisticData,
+          rollbackOnError: true,
+          revalidate: false,
+        }
+      );
+
       notify("Item successfully marked as handed off.", "success");
-      await loadData();
     } catch (err) {
       notify(
         `Error: ${err instanceof Error ? err.message : String(err)}`,
@@ -140,7 +193,7 @@ export default function UserClaimsPage() {
     );
   }
 
-  if (error) {
+  if (errorMessage) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#f5f3f3] p-6">
         <div className="bg-white rounded-2xl shadow-md p-8 max-w-md w-full text-center">
@@ -150,7 +203,7 @@ export default function UserClaimsPage() {
           <h2 className="text-xl font-black text-[#002433] mb-2">
             Access Denied
           </h2>
-          <p className="text-[#41484c] mb-6">{error}</p>
+          <p className="text-[#41484c] mb-6">{errorMessage}</p>
           <Link
             href="/board/claims"
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#44afa9] text-white font-bold rounded-xl hover:bg-[#3b9691] transition-colors"

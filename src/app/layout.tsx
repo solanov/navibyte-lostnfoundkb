@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SWRConfig } from "swr";
 
 import { NotificationProvider } from "@/src/context/NotificationContext";
 import { NotificationInboxProvider } from "@/src/context/NotificationInboxContext";
@@ -24,12 +25,21 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#EEEEEE] font-body">
-        <NotificationProvider>
-          <NotificationInboxProvider>
-            {children}
-            <ToastContainer />
-          </NotificationInboxProvider>
-        </NotificationProvider>
+        <SWRConfig
+          value={{
+            dedupingInterval: 5_000,
+            focusThrottleInterval: 30_000,
+            keepPreviousData: true,
+            revalidateOnFocus: false,
+          }}
+        >
+          <NotificationProvider>
+            <NotificationInboxProvider>
+              {children}
+              <ToastContainer />
+            </NotificationInboxProvider>
+          </NotificationProvider>
+        </SWRConfig>
       </body>
     </html>
   );
