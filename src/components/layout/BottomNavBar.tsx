@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Suspense } from 'react';
 import NotificationCenter from './NotificationCenter';
 
 
@@ -32,7 +33,18 @@ export default function BottomNavBar() {
         <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: pathname === '/board/archive' ? "'FILL' 1" : "'FILL' 0" }}>inventory_2</span>
         <span className="font-label text-[11px] font-semibold uppercase tracking-widest">Archive</span>
       </Link>
-      <NotificationCenter variant="mobile" />
+      <Suspense fallback={<NotificationCenterMobileFallback />}>
+        <NotificationCenter variant="mobile" />
+      </Suspense>
     </nav>
+  );
+}
+
+function NotificationCenterMobileFallback() {
+  return (
+    <div className="flex flex-col items-center justify-center px-5 py-1.5 text-slate-400" aria-hidden="true">
+      <span className="material-symbols-outlined mb-1">notifications</span>
+      <span className="font-label text-[11px] font-semibold uppercase tracking-widest">Notifs</span>
+    </div>
   );
 }

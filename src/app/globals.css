@@ -52,9 +52,9 @@
   --color-outline: var(--outline);
   --color-outline-variant: var(--outline-variant);
 
-  --font-body: var(--font-inter);
-  --font-headline: var(--font-public-sans);
-  --font-label: var(--font-inter);
+  --font-body: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-headline: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-label: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 
 .material-symbols-outlined {

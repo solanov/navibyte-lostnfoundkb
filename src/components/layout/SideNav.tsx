@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState, useRef } from 'react';
+import { Suspense, useEffect, useState, useRef } from 'react';
 import { supabase } from '@/src/lib/supabase';
 import NotificationCenter from './NotificationCenter';
 
@@ -152,7 +152,9 @@ export default function SideNav() {
             {!isCollapsed && <span className="text-[10px] font-bold uppercase tracking-widest mt-1 whitespace-nowrap">Inbox</span>}
           </Link>
 
-          <NotificationCenter isCollapsed={isCollapsed} variant="sidebar" />
+          <Suspense fallback={<NotificationCenterFallback isCollapsed={isCollapsed} />}>
+            <NotificationCenter isCollapsed={isCollapsed} variant="sidebar" />
+          </Suspense>
         </div>
 
         {/* Profile Popover Toggle */}
@@ -231,5 +233,19 @@ export default function SideNav() {
         </div>
       </div>
     </aside>
+  );
+}
+
+function NotificationCenterFallback({ isCollapsed }: { isCollapsed: boolean }) {
+  return (
+    <div
+      className="relative flex-1 flex flex-col items-center justify-center rounded-xl py-3 text-[#41484c]"
+      aria-hidden="true"
+    >
+      <div className="relative mb-1 flex items-center justify-center">
+        <span className="material-symbols-outlined">notifications</span>
+      </div>
+      {!isCollapsed && <span className="text-[10px] font-bold uppercase tracking-widest">Notifications</span>}
+    </div>
   );
 }
