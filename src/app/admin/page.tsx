@@ -102,6 +102,10 @@ function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Something went wrong.";
 }
 
+function isProtectedAdminAccount(user: Pick<AdminProfile, "role">) {
+  return user.role === "Admin";
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<AdminTab>("vault");
@@ -573,6 +577,10 @@ function UsersView({ users, items, onSuspend, onRestore, onHistory }: { users: A
                         <button onClick={() => onHistory(user)} className="rounded-md border border-outline-variant/30 px-3 py-2 text-xs font-bold text-secondary transition hover:bg-surface-container-low">History</button>
                         {user.is_blocked ? (
                           <button onClick={() => onRestore(user)} className="rounded-md bg-primary px-3 py-2 text-xs font-bold text-white transition hover:bg-primary-container">Restore</button>
+                        ) : isProtectedAdminAccount(user) ? (
+                          <span className="inline-flex items-center rounded-md border border-[#44afa9]/25 bg-[#8df4ec]/15 px-3 py-2 text-xs font-bold text-primary">
+                            Protected Admin
+                          </span>
                         ) : (
                           <button onClick={() => onSuspend(user)} className="rounded-md bg-red-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-red-700">Suspend</button>
                         )}

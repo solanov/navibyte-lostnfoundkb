@@ -18,6 +18,10 @@ export function isAdminOrStaffRole(role: string | null | undefined) {
   return ["admin", "staff"].includes(String(role ?? "").toLowerCase());
 }
 
+export function isAdminRole(role: string | null | undefined) {
+  return String(role ?? "").toLowerCase() === "admin";
+}
+
 export function resolveClaimFlowType({
   posterRole,
   currentPossession,
