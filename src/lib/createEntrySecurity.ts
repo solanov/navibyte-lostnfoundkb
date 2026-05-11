@@ -43,6 +43,10 @@ export type SanitizedCreateEntryInput = {
   imageUrl: string | null;
 };
 
+type CreateEntryValidationOptions = {
+  requireImage?: boolean;
+};
+
 type NormalizeOptions = {
   multiline?: boolean;
 };
@@ -78,8 +82,12 @@ export function normalizeCreateEntryText(value: string, options: NormalizeOption
   return withoutUnsafeCharacters.replace(/\s+/gu, " ").trim();
 }
 
-export function validateCreateEntryInput(input: CreateEntryInput): ValidationResult {
+export function validateCreateEntryInput(
+  input: CreateEntryInput,
+  options: CreateEntryValidationOptions = {}
+): ValidationResult {
   const errors: CreateEntryErrors = {};
+  const requireImage = options.requireImage ?? true;
 
   if (!Number.isInteger(input.selectedCategory) || (input.selectedCategory ?? 0) <= 0) {
     errors.category = "Choose a category before posting your entry.";
@@ -124,7 +132,7 @@ export function validateCreateEntryInput(input: CreateEntryInput): ValidationRes
     errors.hiddenNote = hiddenNote.error;
   }
 
-  const imageUrl = validateImageUrl(input.imageUrl);
+  const imageUrl = validateImageUrl(input.imageUrl, requireImage);
   if (!imageUrl.ok) {
     errors.image = imageUrl.error;
   }
@@ -194,8 +202,15 @@ function validateTextField(field: CreateEntryField, rawValue: string, options: T
   return { ok: true as const, value: normalizedValue };
 }
 
-function validateImageUrl(imageUrl?: string | null) {
+function validateImageUrl(imageUrl?: string | null, required = true) {
   if (!imageUrl) {
+    if (required) {
+      return {
+        ok: false as const,
+        error: "Upload at least one image before posting your entry.",
+      };
+    }
+
     return { ok: true as const, value: null };
   }
 

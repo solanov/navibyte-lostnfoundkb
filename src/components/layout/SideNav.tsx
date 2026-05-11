@@ -37,6 +37,7 @@ export default function SideNav() {
   const isBoardActive = pathname === '/board' || pathname === '/';
   const isMessagesActive = pathname?.startsWith('/messages');
   const isArchiveActive = pathname === '/board/archive';
+  const isClaimsActive = pathname?.startsWith('/board/claims');
 
   useEffect(() => {
     let isMounted = true;
@@ -118,6 +119,21 @@ export default function SideNav() {
           <span className={`material-symbols-outlined ${isCollapsed ? 'mr-0' : 'mr-4'}`} style={{ fontVariationSettings: isArchiveActive ? "'FILL' 1" : "'FILL' 0" }}>inventory_2</span>
           {!isCollapsed && <span className="text-sm tracking-wide whitespace-nowrap">My Archive</span>}
         </Link>
+
+        {userRole === 'Public' && (
+          <Link
+            href="/board/claims"
+            title="Claims On My Posts"
+            className={`flex items-center py-3 rounded-xl transition-all duration-300 ${isCollapsed ? 'justify-center px-0' : 'px-4'} ${
+              isClaimsActive
+                ? 'bg-[#ffffff] text-[#002433] font-bold shadow-[0_8px_16px_rgba(0,36,51,0.04)]'
+                : 'text-[#41484c] hover:bg-[#ffffff]/60 hover:text-[#002433]'
+            }`}
+          >
+            <span className={`material-symbols-outlined ${isCollapsed ? 'mr-0' : 'mr-4'}`} style={{ fontVariationSettings: isClaimsActive ? "'FILL' 1" : "'FILL' 0" }}>assignment</span>
+            {!isCollapsed && <span className="text-sm tracking-wide whitespace-nowrap">My Claims</span>}
+          </Link>
+        )}
       </nav>
 
       {/* Bottom Pinned User Dock */}
