@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@supabase/supabase-js";
-import { getAdminClient } from "./core";
+import { getAdminClient, resolvePostClaimFlowType } from "./core";
 
 /**
  * Verify a user's session and return their user ID.
@@ -238,9 +238,7 @@ export async function submitClaimAction(
     throw new Error("You already have an active claim request for this item.");
   }
 
-  // Determine the claim flow from the item's possession state
-  const flowType: "P2P" | "Office" =
-    item.current_possession === "With_Finder" ? "P2P" : "Office";
+  const flowType = await resolvePostClaimFlowType(adminClient, item);
 
   const { data: claim, error: claimError } = await adminClient
     .from("claim_requests")
@@ -304,7 +302,7 @@ export async function finalizeP2PReturnAction(
   // Verify the caller is the original finder
   const { data: item } = await adminClient
     .from("lost_items")
-    .select("post_id, reported_by, status")
+    .select("post_id, reported_by, status, current_possession")
     .eq("post_id", postId)
     .single();
 
@@ -325,7 +323,8 @@ export async function finalizeP2PReturnAction(
     .single();
 
   if (!claim) throw new Error("Claim request not found.");
-  if (claim.flow_type !== "P2P") throw new Error("This action is only valid for P2P claims.");
+  const effectiveFlowType = await resolvePostClaimFlowType(adminClient, item, claim.flow_type);
+  if (effectiveFlowType !== "P2P") throw new Error("This action is only valid for direct handoff claims.");
   if (claim.status !== "Approved") {
     throw new Error("The claim must be approved before the handoff can be confirmed.");
   }
@@ -343,11 +342,11 @@ export async function finalizeP2PReturnAction(
     post_id: postId,
     actor_id: user.id,
     action: "P2P_HANDOFF_CONFIRMED",
-    previous_state: { status: item.status, claim_status: claim.status, flow_type: "P2P" },
+    previous_state: { status: item.status, claim_status: claim.status, flow_type: effectiveFlowType },
     new_state: {
       status: "Released",
       claim_id: claimId,
-      flow_type: "P2P",
+      flow_type: effectiveFlowType,
       claimant_name: claim.claimant_name,
       claimant_school_id: claim.claimant_school_id,
       confirmed_by: user.id,

@@ -218,11 +218,6 @@ export default function PublicClaimsOverviewPage() {
                           >
                             {entry.totalClaims === 0 ? "No Claims" : `Latest: ${entry.latestClaimStatus}`}
                           </span>
-                          {entry.totalClaims > 0 && (
-                            <span className="mt-2 text-[10px] font-black uppercase tracking-widest text-[#41484c]/60">
-                              {entry.latestFlowType === "P2P" ? "Student-to-student" : "Office pickup"}
-                            </span>
-                          )}
                         </div>
                         <Link
                           href={`/board/claims/${entry.postId}`}

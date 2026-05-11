@@ -663,7 +663,7 @@ function AuditView({ logs }: { logs: AuditLog[] }) {
 
   return (
     <>
-      <PageHeader eyebrow="System Logs" title="Audit Trail" description="Student-to-student claim logs appear only after the handoff is completed, while student-to-admin claims remain visible throughout the office flow." />
+      <PageHeader eyebrow="System Logs" title="Audit Trail" description="Review claim activity, account events, returns, deletions, and disposal history from one consolidated audit stream." />
       <div className="mb-6 flex flex-wrap gap-2">
         {groupedLogs.map((group) => (
           <span key={group.category} className="rounded-full bg-surface-container px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">

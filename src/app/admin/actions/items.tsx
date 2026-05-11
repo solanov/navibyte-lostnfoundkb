@@ -1,6 +1,6 @@
 "use server";
 
-import { verifyAdminAccess } from "./core";
+import { resolvePostClaimFlowType, verifyAdminAccess } from "./core";
 
 type AuditState = Record<string, unknown>;
 
@@ -128,19 +128,22 @@ export async function approveOfficeClaimAction(
     .single();
 
   if (claimError || !claim) throw new Error("Claim request not found.");
-  if (claim.flow_type !== "Office") {
+
+  // Fetch the linked item's current status for the audit trail
+  const { data: item } = await adminClient
+    .from("lost_items")
+    .select("status, reported_by, current_possession")
+    .eq("post_id", claim.post_id)
+    .single();
+
+  const effectiveFlowType = await resolvePostClaimFlowType(adminClient, item ?? {}, claim.flow_type);
+
+  if (effectiveFlowType !== "Office") {
     throw new Error("This action is only valid for Office (In_Office) claims.");
   }
   if (claim.status !== "Pending") {
     throw new Error(`Cannot approve a claim that is currently '${claim.status}'.`);
   }
-
-  // Fetch the linked item's current status for the audit trail
-  const { data: item } = await adminClient
-    .from("lost_items")
-    .select("status")
-    .eq("post_id", claim.post_id)
-    .single();
 
   const { error: updateError } = await adminClient
     .from("claim_requests")
@@ -162,7 +165,7 @@ export async function approveOfficeClaimAction(
     },
     new_state: {
       claim_id: claimId,
-      flow_type: "Office",
+      flow_type: effectiveFlowType,
       claim_status: "Approved",
       approved_by: profile.user_id,
       claimant_name: claim.claimant_name,
@@ -191,19 +194,22 @@ export async function finalizeOfficeReleaseAction(
     .single();
 
   if (claimError || !claim) throw new Error("Claim request not found.");
-  if (claim.flow_type !== "Office") {
+
+  // Fetch current item state for audit trail
+  const { data: item } = await adminClient
+    .from("lost_items")
+    .select("status, reported_by, current_possession")
+    .eq("post_id", claim.post_id)
+    .single();
+
+  const effectiveFlowType = await resolvePostClaimFlowType(adminClient, item ?? {}, claim.flow_type);
+
+  if (effectiveFlowType !== "Office") {
     throw new Error("This action is only valid for Office (In_Office) claims.");
   }
   if (claim.status !== "Approved") {
     throw new Error("The claim must be approved before the office release can be confirmed.");
   }
-
-  // Fetch current item state for audit trail
-  const { data: item } = await adminClient
-    .from("lost_items")
-    .select("status")
-    .eq("post_id", claim.post_id)
-    .single();
 
   // Call the atomic database function to finalize the handoff
   const { error: rpcError } = await adminClient.rpc("finalize_item_handoff", {
@@ -225,7 +231,7 @@ export async function finalizeOfficeReleaseAction(
     new_state: {
       status: "Released",
       claim_id: claimId,
-      flow_type: "Office",
+      flow_type: effectiveFlowType,
       claimant_name: claim.claimant_name,
       claimant_school_id: claim.claimant_school_id,
       released_by: profile.user_id,

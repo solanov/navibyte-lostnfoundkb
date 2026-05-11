@@ -43,11 +43,6 @@ const STATUS_STYLES: Record<string, string> = {
   Released: "bg-emerald-50 text-emerald-700 border-emerald-200",
 };
 
-const FLOW_LABELS: Record<string, string> = {
-  P2P: "Student-to-Student",
-  Office: "Office Pickup",
-};
-
 const RETURN_REJECTION_NOTE = "Item marked as returned to another claimant.";
 
 function formatDate(value: string) {
@@ -372,9 +367,6 @@ export default function UserClaimsPage() {
                       }`}
                     >
                       {claim.status}
-                    </span>
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-[#002433]/5 text-[#002433] border border-[#002433]/10">
-                      {FLOW_LABELS[claim.flow_type] ?? claim.flow_type}
                     </span>
                   </div>
                 </div>
