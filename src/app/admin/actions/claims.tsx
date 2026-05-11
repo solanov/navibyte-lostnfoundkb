@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@supabase/supabase-js";
-import { getAdminClient, verifyAdminAccess } from "./core";
+import { getAdminClient, resolvePostClaimFlowType, verifyAdminAccess } from "./core";
 import {
   buildOwnedClaimOverview,
   ClaimOverviewEntry,
@@ -15,6 +15,7 @@ interface OwnedPostClaimsResult {
     general_description: string;
     status: string;
     zone: string;
+    current_possession: string | null;
     reported_by: string;
     categories?: { name: string; icon_identifier: string } | null;
   };
@@ -109,7 +110,7 @@ export async function fetchOwnedPostClaimsAction(
   const { data: post, error: postError } = await adminClient
     .from("lost_items")
     .select(
-      "post_id,general_description,status,zone,reported_by,categories(name,icon_identifier)"
+      "post_id,general_description,status,zone,current_possession,reported_by,categories(name,icon_identifier)"
     )
     .eq("post_id", postId)
     .single();
@@ -134,9 +135,14 @@ export async function fetchOwnedPostClaimsAction(
     throw new Error("Failed to load claims.");
   }
 
+  const effectiveFlowType = await resolvePostClaimFlowType(adminClient, post);
+
   return {
     post: post as unknown as OwnedPostClaimsResult["post"],
-    claims: (claims || []) as OwnedPostClaimsResult["claims"],
+    claims: ((claims || []) as OwnedPostClaimsResult["claims"]).map((claim) => ({
+      ...claim,
+      flow_type: effectiveFlowType,
+    })),
   };
 }
 
@@ -149,7 +155,7 @@ export async function fetchAdminPostClaimsAction(
   const { data: post, error: postError } = await adminClient
     .from("lost_items")
     .select(
-      "post_id,general_description,status,zone,reported_by,categories(name,icon_identifier)"
+      "post_id,general_description,status,zone,current_possession,reported_by,categories(name,icon_identifier)"
     )
     .eq("post_id", postId)
     .single();
@@ -171,8 +177,13 @@ export async function fetchAdminPostClaimsAction(
     throw new Error("Failed to load claims.");
   }
 
+  const effectiveFlowType = await resolvePostClaimFlowType(adminClient, post);
+
   return {
     post,
-    claims: claims || [],
+    claims: (claims || []).map((claim) => ({
+      ...claim,
+      flow_type: effectiveFlowType,
+    })),
   };
 }

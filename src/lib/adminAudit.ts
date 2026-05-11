@@ -11,8 +11,7 @@ export type AuditLogRecord = {
 };
 
 export type AuditCategoryKey =
-  | "student_to_student_claims"
-  | "student_to_admin_claims"
+  | "claims"
   | "deleted_items"
   | "returns"
   | "disposal"
@@ -20,8 +19,7 @@ export type AuditCategoryKey =
   | "other";
 
 export const AUDIT_CATEGORY_LABELS: Record<AuditCategoryKey, string> = {
-  student_to_student_claims: "Student to Student Claims",
-  student_to_admin_claims: "Student to Admin Claims",
+  claims: "Claims",
   deleted_items: "Deleted Items",
   returns: "Returns",
   disposal: "Disposal",
@@ -60,6 +58,30 @@ function getClaimOutcome(state: AuditState) {
   return typeof status === "string" ? status : null;
 }
 
+function isClaimAuditLog(log: Pick<AuditLogRecord, "action" | "previous_state" | "new_state">) {
+  if (getAuditLogFlowType(log)) {
+    return true;
+  }
+
+  if (
+    typeof readStateValue(log.new_state, "claim_id") === "string" ||
+    typeof readStateValue(log.previous_state, "claim_id") === "string"
+  ) {
+    return true;
+  }
+
+  if (
+    typeof readStateValue(log.new_state, "claim_status") === "string" ||
+    typeof readStateValue(log.previous_state, "claim_status") === "string"
+  ) {
+    return true;
+  }
+
+  return log.action.startsWith("CLAIM_") ||
+    log.action.startsWith("P2P_") ||
+    log.action.startsWith("OFFICE_");
+}
+
 export function isAuditLogVisibleToAdmin(log: Pick<AuditLogRecord, "action" | "previous_state" | "new_state">) {
   const flowType = getAuditLogFlowType(log);
   if (flowType !== "P2P") {
@@ -90,13 +112,8 @@ export function getAuditCategory(log: Pick<AuditLogRecord, "action" | "previous_
     return "returns";
   }
 
-  const flowType = getAuditLogFlowType(log);
-  if (flowType === "P2P") {
-    return "student_to_student_claims";
-  }
-
-  if (flowType === "Office" || ["CLAIM_VERIFIED", "CLAIM_REJECTED"].includes(log.action)) {
-    return "student_to_admin_claims";
+  if (isClaimAuditLog(log)) {
+    return "claims";
   }
 
   return "other";

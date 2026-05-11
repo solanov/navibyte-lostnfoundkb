@@ -102,6 +102,10 @@ function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : "Something went wrong.";
 }
 
+function isProtectedAdminAccount(user: Pick<AdminProfile, "role">) {
+  return user.role === "Admin";
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<AdminTab>("vault");
@@ -220,8 +224,18 @@ export default function AdminDashboard() {
     try {
       await verifyClaimAction(accessToken, item.post_id, claimantName, studentId, previous);
       setNotice("Claim verified and item marked as Returned.");
+      setItems((currentItems) =>
+        currentItems.map((currentItem) =>
+          currentItem.post_id === item.post_id
+            ? {
+                ...currentItem,
+                status: "Returned",
+                last_handled_by: profile.user_id,
+              }
+            : currentItem
+        )
+      );
       setModal(null);
-      await loadAdminData();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     }
@@ -246,8 +260,14 @@ export default function AdminDashboard() {
     try {
       await updateUserBlockAction(accessToken, user.user_id, user.is_blocked, blocked, reason);
       setNotice(blocked ? "Account suspended." : "Account restored.");
+      setUsers((currentUsers) =>
+        currentUsers.map((currentUser) =>
+          currentUser.user_id === user.user_id
+            ? { ...currentUser, is_blocked: blocked }
+            : currentUser
+        )
+      );
       setModal(null);
-      await loadAdminData();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     }
@@ -274,8 +294,18 @@ export default function AdminDashboard() {
     try {
       await disposeItemAction(accessToken, item.post_id, method, reason, previous);
       setNotice("Disposal audit approved and item moved to Purged.");
+      setItems((currentItems) =>
+        currentItems.map((currentItem) =>
+          currentItem.post_id === item.post_id
+            ? {
+                ...currentItem,
+                status: "Purged",
+                last_handled_by: profile.user_id,
+              }
+            : currentItem
+        )
+      );
       setModal(null);
-      await loadAdminData();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     }
@@ -300,8 +330,21 @@ export default function AdminDashboard() {
     try {
       await adminDeletePostAction(accessToken, item.post_id, reason);
       setNotice("Post deleted and moved to Purged.");
+      setItems((currentItems) =>
+        currentItems.map((currentItem) =>
+          currentItem.post_id === item.post_id
+            ? {
+                ...currentItem,
+                status: "Purged",
+                deleted_by: profile.user_id,
+                deletion_reason: reason,
+                deleted_at: new Date().toISOString(),
+                last_handled_by: profile.user_id,
+              }
+            : currentItem
+        )
+      );
       setModal(null);
-      await loadAdminData();
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     }
@@ -534,6 +577,10 @@ function UsersView({ users, items, onSuspend, onRestore, onHistory }: { users: A
                         <button onClick={() => onHistory(user)} className="rounded-md border border-outline-variant/30 px-3 py-2 text-xs font-bold text-secondary transition hover:bg-surface-container-low">History</button>
                         {user.is_blocked ? (
                           <button onClick={() => onRestore(user)} className="rounded-md bg-primary px-3 py-2 text-xs font-bold text-white transition hover:bg-primary-container">Restore</button>
+                        ) : isProtectedAdminAccount(user) ? (
+                          <span className="inline-flex items-center rounded-md border border-[#44afa9]/25 bg-[#8df4ec]/15 px-3 py-2 text-xs font-bold text-primary">
+                            Protected Admin
+                          </span>
                         ) : (
                           <button onClick={() => onSuspend(user)} className="rounded-md bg-red-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-red-700">Suspend</button>
                         )}
@@ -624,7 +671,7 @@ function AuditView({ logs }: { logs: AuditLog[] }) {
 
   return (
     <>
-      <PageHeader eyebrow="System Logs" title="Audit Trail" description="Student-to-student claim logs appear only after the handoff is completed, while student-to-admin claims remain visible throughout the office flow." />
+      <PageHeader eyebrow="System Logs" title="Audit Trail" description="Review claim activity, account events, returns, deletions, and disposal history from one consolidated audit stream." />
       <div className="mb-6 flex flex-wrap gap-2">
         {groupedLogs.map((group) => (
           <span key={group.category} className="rounded-full bg-surface-container px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">

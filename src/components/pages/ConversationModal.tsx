@@ -56,14 +56,18 @@ export default function ConversationModal({
     const initializeConversation = async () => {
       try {
         setIsLoading(true);
-        const conversation = await getOrCreateConversation(itemPostId, currentUserId, otherUserId);
+        const [conversation, usersResult] = await Promise.all([
+          getOrCreateConversation(itemPostId, currentUserId, otherUserId),
+          supabase
+            .from('users')
+            .select('user_id, avatar_url')
+            .in('user_id', [currentUserId, otherUserId]),
+        ]);
+
         setConversationId(conversation.conversation_id);
 
-        const { data } = await supabase
-          .from('users')
-          .select('user_id, avatar_url')
-          .in('user_id', [currentUserId, otherUserId]);
-          
+        const { data } = usersResult;
+
         if (data) {
           const current = data.find((u) => u.user_id === currentUserId);
           const other = data.find((u) => u.user_id === otherUserId);

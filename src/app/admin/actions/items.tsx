@@ -1,13 +1,15 @@
 "use server";
 
-import { verifyAdminAccess } from "./core";
+import { resolvePostClaimFlowType, verifyAdminAccess } from "./core";
+
+type AuditState = Record<string, unknown>;
 
 export async function verifyClaimAction(
   accessToken: string,
   postId: string,
   claimantName: string,
   studentId: string,
-  previousState: any
+  previousState: AuditState
 ) {
   const { adminClient, profile } = await verifyAdminAccess(accessToken);
 
@@ -36,7 +38,7 @@ export async function disposeItemAction(
   postId: string,
   method: string,
   reason: string,
-  previousState: any
+  previousState: AuditState
 ) {
   const { adminClient, profile } = await verifyAdminAccess(accessToken);
 
@@ -126,19 +128,22 @@ export async function approveOfficeClaimAction(
     .single();
 
   if (claimError || !claim) throw new Error("Claim request not found.");
-  if (claim.flow_type !== "Office") {
+
+  // Fetch the linked item's current status for the audit trail
+  const { data: item } = await adminClient
+    .from("lost_items")
+    .select("status, reported_by, current_possession")
+    .eq("post_id", claim.post_id)
+    .single();
+
+  const effectiveFlowType = await resolvePostClaimFlowType(adminClient, item ?? {}, claim.flow_type);
+
+  if (effectiveFlowType !== "Office") {
     throw new Error("This action is only valid for Office (In_Office) claims.");
   }
   if (claim.status !== "Pending") {
     throw new Error(`Cannot approve a claim that is currently '${claim.status}'.`);
   }
-
-  // Fetch the linked item's current status for the audit trail
-  const { data: item } = await adminClient
-    .from("lost_items")
-    .select("status")
-    .eq("post_id", claim.post_id)
-    .single();
 
   const { error: updateError } = await adminClient
     .from("claim_requests")
@@ -160,7 +165,7 @@ export async function approveOfficeClaimAction(
     },
     new_state: {
       claim_id: claimId,
-      flow_type: "Office",
+      flow_type: effectiveFlowType,
       claim_status: "Approved",
       approved_by: profile.user_id,
       claimant_name: claim.claimant_name,
@@ -189,19 +194,22 @@ export async function finalizeOfficeReleaseAction(
     .single();
 
   if (claimError || !claim) throw new Error("Claim request not found.");
-  if (claim.flow_type !== "Office") {
+
+  // Fetch current item state for audit trail
+  const { data: item } = await adminClient
+    .from("lost_items")
+    .select("status, reported_by, current_possession")
+    .eq("post_id", claim.post_id)
+    .single();
+
+  const effectiveFlowType = await resolvePostClaimFlowType(adminClient, item ?? {}, claim.flow_type);
+
+  if (effectiveFlowType !== "Office") {
     throw new Error("This action is only valid for Office (In_Office) claims.");
   }
   if (claim.status !== "Approved") {
     throw new Error("The claim must be approved before the office release can be confirmed.");
   }
-
-  // Fetch current item state for audit trail
-  const { data: item } = await adminClient
-    .from("lost_items")
-    .select("status")
-    .eq("post_id", claim.post_id)
-    .single();
 
   // Call the atomic database function to finalize the handoff
   const { error: rpcError } = await adminClient.rpc("finalize_item_handoff", {
@@ -223,7 +231,7 @@ export async function finalizeOfficeReleaseAction(
     new_state: {
       status: "Released",
       claim_id: claimId,
-      flow_type: "Office",
+      flow_type: effectiveFlowType,
       claimant_name: claim.claimant_name,
       claimant_school_id: claim.claimant_school_id,
       released_by: profile.user_id,
@@ -288,4 +296,110 @@ export async function rejectClaimAction(
   });
 
   return { success: true };
+}
+
+/**
+ * Staff manually resolves a claim as returned from the claim review screen.
+ * This removes the item from the public board and records which claimant received it.
+ */
+export async function markClaimReturnedByAdminAction(
+  accessToken: string,
+  postId: string,
+  claimId: string
+) {
+  const { adminClient, profile } = await verifyAdminAccess(accessToken);
+  const returnedAt = new Date().toISOString();
+  const autoRejectedNote = "Item marked as returned to another claimant.";
+
+  const { data: item, error: itemError } = await adminClient
+    .from("lost_items")
+    .select("post_id, status")
+    .eq("post_id", postId)
+    .single();
+
+  if (itemError || !item) {
+    throw new Error("Item not found.");
+  }
+
+  if (["Returned", "Purged", "Released"].includes(item.status)) {
+    throw new Error("This item has already been resolved.");
+  }
+
+  const { data: claim, error: claimError } = await adminClient
+    .from("claim_requests")
+    .select("claim_id, post_id, status, flow_type, claimant_name, claimant_school_id")
+    .eq("claim_id", claimId)
+    .eq("post_id", postId)
+    .single();
+
+  if (claimError || !claim) {
+    throw new Error("Claim request not found.");
+  }
+
+  if (!["Pending", "Approved"].includes(claim.status)) {
+    throw new Error("Only active claims can be marked as returned.");
+  }
+
+  const { error: selectedClaimError } = await adminClient
+    .from("claim_requests")
+    .update({
+      status: "Released",
+      updated_at: returnedAt,
+    })
+    .eq("claim_id", claimId);
+
+  if (selectedClaimError) {
+    throw new Error(selectedClaimError.message);
+  }
+
+  const { error: otherClaimsError } = await adminClient
+    .from("claim_requests")
+    .update({
+      status: "Rejected",
+      admin_notes: autoRejectedNote,
+      updated_at: returnedAt,
+    })
+    .eq("post_id", postId)
+    .neq("claim_id", claimId)
+    .in("status", ["Pending", "Approved"]);
+
+  if (otherClaimsError) {
+    throw new Error(otherClaimsError.message);
+  }
+
+  const { error: itemUpdateError } = await adminClient
+    .from("lost_items")
+    .update({
+      status: "Returned",
+      returned_at: returnedAt,
+      last_handled_by: profile.user_id,
+    })
+    .eq("post_id", postId);
+
+  if (itemUpdateError) {
+    throw new Error(itemUpdateError.message);
+  }
+
+  await adminClient.from("audit_logs").insert({
+    post_id: postId,
+    actor_id: profile.user_id,
+    action: "CLAIM_MARKED_RETURNED_BY_ADMIN",
+    previous_state: {
+      status: item.status,
+      claim_status: claim.status,
+      flow_type: claim.flow_type,
+    },
+    new_state: {
+      status: "Returned",
+      claim_id: claimId,
+      claim_status: "Released",
+      flow_type: claim.flow_type,
+      claimant_name: claim.claimant_name,
+      claimant_school_id: claim.claimant_school_id,
+      returned_at: returnedAt,
+      resolved_by: profile.user_id,
+    },
+  });
+
+  return { success: true, returnedAt };
 }

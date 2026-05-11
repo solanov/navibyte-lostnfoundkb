@@ -29,6 +29,7 @@ interface LostItemsSectionProps {
 
 export default function LostItemsSection({ items }: LostItemsSectionProps) {
   const { notify } = useNotification();
+  const [visibleItems, setVisibleItems] = useState(items);
   const [selectedItem, setSelectedItem] = useState<LostItem | null>(null);
   const [claimItem, setClaimItem] = useState<LostItem | null>(null);
   const [conversationItem, setConversationItem] = useState<LostItem | null>(null);
@@ -42,6 +43,10 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
   const [studentId, setStudentId] = useState('');
   const [itemDescription, setItemDescription] = useState('');
   const [isSubmittingClaim, setIsSubmittingClaim] = useState(false);
+
+  useEffect(() => {
+    setVisibleItems(items);
+  }, [items]);
 
   useEffect(() => {
     let isMounted = true;
@@ -223,8 +228,10 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
 
       await userDeletePostAction(accessToken, selectedItem.post_id);
       notify("Post deleted successfully.", "success");
+      setVisibleItems((currentItems) =>
+        currentItems.filter((item) => item.post_id !== selectedItem.post_id)
+      );
       handleCloseModal();
-      window.location.reload();
     } catch (err) {
       notify(`Error deleting post: ${err instanceof Error ? err.message : String(err)}`, "error");
     }
@@ -234,13 +241,13 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
     <>
       {/* Items Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-        {items.length === 0 ? (
+        {visibleItems.length === 0 ? (
           <div className="col-span-full py-12 text-center text-slate-400">
             <span className="material-symbols-outlined text-5xl mb-4 opacity-50">inbox</span>
             <p className="font-medium">No items found.</p>
           </div>
         ) : (
-          items.map((item) => {
+          visibleItems.map((item) => {
             const [title] = (item.general_description || '').split('\n\n');
             const icon = item.categories?.icon_identifier || 'help_outline';
             const reference = `LF-${item.post_id.substring(0, 4).toUpperCase()}`;
