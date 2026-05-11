@@ -24,6 +24,23 @@ async function verifyUserSession(accessToken: string) {
   return user;
 }
 
+type ArchiveItemRow = {
+  post_id: string;
+  category_id: number | null;
+  color: string | null;
+  zone: string | null;
+  general_description: string | null;
+  status: string;
+  image_url: string | null;
+  reported_by: string | null;
+  created_timestamp: string;
+  deleted_by: string | null;
+  deletion_reason: string | null;
+  deleted_at: string | null;
+  returned_at: string | null;
+  categories: { name: string | null; icon_identifier: string | null } | { name: string | null; icon_identifier: string | null }[] | null;
+};
+
 /**
  * User soft-deletes their own post.
  * No deletion reason required — just moves to Purged status.
@@ -146,7 +163,7 @@ export async function fetchUserArchiveAction(accessToken: string) {
   if (error) throw new Error(error.message);
 
   // Resolve who deleted each item (admin vs self)
-  const enriched = (items ?? []).map((item: any) => {
+  const enriched = ((items ?? []) as ArchiveItemRow[]).map((item) => {
     let archiveLabel: string;
     if (item.status === "Returned") {
       archiveLabel = "Marked as Returned";
@@ -159,4 +176,183 @@ export async function fetchUserArchiveAction(accessToken: string) {
   });
 
   return enriched;
+}
+
+// ---------------------------------------------------------------------------
+// DUAL-PATH CLAIM SYSTEM — Student-Facing Actions
+// ---------------------------------------------------------------------------
+
+/**
+ * Submit a claim request for a lost item.
+ *
+ * Automatically determines the flow type based on the item's current_possession:
+ *   - 'With_Finder' → flow_type: 'P2P'  (student-to-student handoff)
+ *   - 'In_Office'   → flow_type: 'Office' (pick-up from department office)
+ *
+ * An optional item description (for blind verification) can also be included.
+ */
+export async function submitClaimAction(
+  accessToken: string,
+  postId: string,
+  claimantName: string,
+  studentId: string,
+  itemDescription?: string
+) {
+  const user = await verifyUserSession(accessToken);
+  const adminClient = getAdminClient();
+  const normalizedClaimantName = claimantName.trim();
+  const normalizedStudentId = studentId.trim();
+  const normalizedItemDescription = itemDescription?.trim() || null;
+
+  if (!normalizedClaimantName) {
+    throw new Error("Claimant name is required.");
+  }
+
+  if (!normalizedStudentId) {
+    throw new Error("Student ID is required.");
+  }
+
+  // Fetch the item to determine possession state and current status
+  const { data: item, error: itemError } = await adminClient
+    .from("lost_items")
+    .select("post_id, reported_by, status, current_possession")
+    .eq("post_id", postId)
+    .single();
+
+  if (itemError || !item) throw new Error("Item not found.");
+  if (item.reported_by === user.id) throw new Error("You cannot claim your own item.");
+  if (["Returned", "Purged", "Released"].includes(item.status)) {
+    throw new Error("This item is no longer available for claiming.");
+  }
+
+  // Prevent duplicate pending claims from the same claimant
+  const { data: existingClaim } = await adminClient
+    .from("claim_requests")
+    .select("claim_id, status")
+    .eq("post_id", postId)
+    .eq("claimant_id", user.id)
+    .in("status", ["Pending", "Approved"])
+    .maybeSingle();
+
+  if (existingClaim) {
+    throw new Error("You already have an active claim request for this item.");
+  }
+
+  // Determine the claim flow from the item's possession state
+  const flowType: "P2P" | "Office" =
+    item.current_possession === "With_Finder" ? "P2P" : "Office";
+
+  const { data: claim, error: claimError } = await adminClient
+    .from("claim_requests")
+    .insert({
+      post_id: postId,
+      claimant_id: user.id,
+      claimant_name: normalizedClaimantName,
+      claimant_school_id: normalizedStudentId,
+      item_description_verification: normalizedItemDescription,
+      flow_type: flowType,
+      status: "Pending",
+    })
+    .select("claim_id")
+    .single();
+
+  if (claimError || !claim) throw new Error(claimError?.message ?? "Failed to submit claim.");
+
+  const { error: auditError } = await adminClient.from("audit_logs").insert({
+    post_id: postId,
+    actor_id: user.id,
+    action: "CLAIM_SUBMITTED",
+    previous_state: { status: item.status },
+    new_state: {
+      claim_id: claim.claim_id,
+      flow_type: flowType,
+      claimant_name: normalizedClaimantName,
+      claimant_school_id: normalizedStudentId,
+      claim_status: "Pending",
+    },
+  });
+
+  if (auditError) {
+    await adminClient
+      .from("claim_requests")
+      .delete()
+      .eq("claim_id", claim.claim_id);
+
+    throw new Error(`Claim audit logging failed: ${auditError.message}`);
+  }
+
+  return { success: true, claimId: claim.claim_id, flowType };
+}
+
+/**
+ * Finder confirms they have physically handed the item to the owner.
+ * Only the original reporter (the finder) can call this action.
+ *
+ * Calls the finalize_item_handoff PostgreSQL function to atomically:
+ *   - Mark the claim as 'Released'
+ *   - Update the item status to 'Released'
+ *   - Create a structured audit log entry
+ */
+export async function finalizeP2PReturnAction(
+  accessToken: string,
+  postId: string,
+  claimId: string
+) {
+  const user = await verifyUserSession(accessToken);
+  const adminClient = getAdminClient();
+
+  // Verify the caller is the original finder
+  const { data: item } = await adminClient
+    .from("lost_items")
+    .select("post_id, reported_by, status")
+    .eq("post_id", postId)
+    .single();
+
+  if (!item) throw new Error("Item not found.");
+  if (item.reported_by !== user.id) {
+    throw new Error("Only the original finder can confirm a P2P handoff.");
+  }
+  if (["Returned", "Purged", "Released"].includes(item.status)) {
+    throw new Error("This item has already been resolved.");
+  }
+
+  // Verify the claim is in the correct state
+  const { data: claim } = await adminClient
+    .from("claim_requests")
+    .select("claim_id, status, flow_type, claimant_name, claimant_school_id")
+    .eq("claim_id", claimId)
+    .eq("post_id", postId)
+    .single();
+
+  if (!claim) throw new Error("Claim request not found.");
+  if (claim.flow_type !== "P2P") throw new Error("This action is only valid for P2P claims.");
+  if (claim.status !== "Approved") {
+    throw new Error("The claim must be approved before the handoff can be confirmed.");
+  }
+
+  // Call the atomic database function to finalize the handoff
+  const { error: rpcError } = await adminClient.rpc("finalize_item_handoff", {
+    target_claim_id: claimId,
+    actor_id: user.id,
+  });
+
+  if (rpcError) throw new Error(`Handoff finalization failed: ${rpcError.message}`);
+
+  // Supplemental audit log with claimant identity details
+  await adminClient.from("audit_logs").insert({
+    post_id: postId,
+    actor_id: user.id,
+    action: "P2P_HANDOFF_CONFIRMED",
+    previous_state: { status: item.status, claim_status: claim.status, flow_type: "P2P" },
+    new_state: {
+      status: "Released",
+      claim_id: claimId,
+      flow_type: "P2P",
+      claimant_name: claim.claimant_name,
+      claimant_school_id: claim.claimant_school_id,
+      confirmed_by: user.id,
+    },
+  });
+
+  return { success: true };
 }

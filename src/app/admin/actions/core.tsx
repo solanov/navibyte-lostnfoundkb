@@ -33,7 +33,7 @@ export async function verifyAdminAccess(accessToken: string) {
     .eq("user_id", user.id)
     .single();
 
-  if (!profile || !["Admin", "Staff"].includes(profile.role)) {
+  if (!profile || !["admin", "staff"].includes(String(profile.role).toLowerCase())) {
     throw new Error("Forbidden: This action requires Admin or Staff privileges.");
   }
 

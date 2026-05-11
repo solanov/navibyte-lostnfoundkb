@@ -8,9 +8,22 @@ import { FormEvent, useCallback, useEffect, useMemo, useState, useRef } from "re
 import { fetchAdminData } from "./actions/fetchData";
 import { verifyClaimAction, disposeItemAction, adminDeletePostAction } from "./actions/items";
 import { updateUserBlockAction } from "./actions/users";
+import {
+  buildOwnedClaimOverview,
+  ClaimOverviewEntry,
+  ClaimOverviewItemRow,
+  ClaimOverviewRequestRow,
+} from "@/src/lib/claimOverview";
+import {
+  AUDIT_CATEGORY_LABELS,
+  AuditCategoryKey,
+  getAuditCategory,
+  getAuditCategoryLabel,
+  getAuditTargetValue,
+} from "@/src/lib/adminAudit";
 
-type AdminTab = "vault" | "users" | "disposal" | "audit" | "reports";
-type ItemStatus = "Reported" | "Found" | "Returned" | "Purged";
+type AdminTab = "vault" | "users" | "claims" | "disposal" | "audit" | "reports";
+type ItemStatus = "Reported" | "Found" | "Returned" | "Released" | "Purged";
 type UserRole = "Public" | "Staff" | "Admin";
 
 type AdminProfile = {
@@ -57,6 +70,15 @@ type AuditLog = {
   created_at: string;
 };
 
+type ClaimRequestSummary = {
+  claim_id: string;
+  post_id: string;
+  flow_type: "P2P" | "Office";
+  status: "Pending" | "Approved" | "Rejected" | "Released";
+  created_at: string;
+  updated_at: string;
+};
+
 type ModalState =
   | { type: "verify"; item: LostItem }
   | { type: "suspend"; user: AdminProfile }
@@ -70,10 +92,15 @@ type ModalState =
 const tabs: Array<{ id: AdminTab; label: string; icon: string }> = [
   { id: "vault", label: "Secure Vault", icon: "enhanced_encryption" },
   { id: "users", label: "User Management", icon: "group" },
+  { id: "claims", label: "My Post Claims", icon: "assignment" },
   { id: "disposal", label: "Disposal Queue", icon: "delete_sweep" },
   { id: "audit", label: "Audit Trail", icon: "history_edu" },
   { id: "reports", label: "Reports", icon: "summarize" },
 ];
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Something went wrong.";
+}
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -82,6 +109,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<AdminProfile[]>([]);
   const [items, setItems] = useState<LostItem[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [claimRequests, setClaimRequests] = useState<ClaimRequestSummary[]>([]);
   const [modal, setModal] = useState<ModalState>(null);
   const [query, setQuery] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
@@ -114,8 +142,9 @@ export default function AdminDashboard() {
       setUsers(data.users as AdminProfile[]);
       setItems(data.items as LostItem[]);
       setAuditLogs(data.auditLogs as AuditLog[]);
-    } catch (err: any) {
-      setError(err.message);
+      setClaimRequests((data.claimRequests || []) as ClaimRequestSummary[]);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
     }
     
     setLoading(false);
@@ -160,6 +189,17 @@ export default function AdminDashboard() {
   const activeItems = filteredItems.filter((item) => item.status !== "Purged");
   const returnedItems = items.filter((item) => item.status === "Returned");
   const blockedUsers = users.filter((user) => user.is_blocked);
+  const ownedClaimEntries = useMemo<ClaimOverviewEntry[]>(
+    () =>
+      profile
+        ? buildOwnedClaimOverview(
+            filteredItems as unknown as ClaimOverviewItemRow[],
+            claimRequests as ClaimOverviewRequestRow[],
+            profile.user_id
+          )
+        : [],
+    [claimRequests, filteredItems, profile]
+  );
 
   async function verifyClaim(item: LostItem, claimantName: string, studentId: string) {
     if (!profile) return;
@@ -182,8 +222,8 @@ export default function AdminDashboard() {
       setNotice("Claim verified and item marked as Returned.");
       setModal(null);
       await loadAdminData();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
     }
     
     setBusy(false);
@@ -208,8 +248,8 @@ export default function AdminDashboard() {
       setNotice(blocked ? "Account suspended." : "Account restored.");
       setModal(null);
       await loadAdminData();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
     }
 
     setBusy(false);
@@ -236,8 +276,8 @@ export default function AdminDashboard() {
       setNotice("Disposal audit approved and item moved to Purged.");
       setModal(null);
       await loadAdminData();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
     }
 
     setBusy(false);
@@ -262,8 +302,8 @@ export default function AdminDashboard() {
       setNotice("Post deleted and moved to Purged.");
       setModal(null);
       await loadAdminData();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err));
     }
 
     setBusy(false);
@@ -387,8 +427,9 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {activeTab === "vault" && <VaultView items={activeItems} onVerify={(item) => setModal({ type: "verify", item })} onReview={(item) => setModal({ type: "reviewPost", item })} onDelete={(item) => setModal({ type: "adminDelete", item })} />}
+          {activeTab === "vault" && <VaultView items={activeItems} onReview={(item) => setModal({ type: "reviewPost", item })} onDelete={(item) => setModal({ type: "adminDelete", item })} />}
           {activeTab === "users" && <UsersView users={filteredUsers} items={items} onSuspend={(user) => setModal({ type: "suspend", user })} onRestore={(user) => setModal({ type: "restore", user })} onHistory={(user) => setModal({ type: "history", user })} />}
+          {activeTab === "claims" && <ClaimsDeskView entries={ownedClaimEntries} />}
           {activeTab === "disposal" && <DisposalView items={disposalItems} onDispose={(item) => setModal({ type: "dispose", item })} />}
           {activeTab === "audit" && <AuditView logs={auditLogs} />}
           {activeTab === "reports" && <ReportsView itemCount={items.length} returnedCount={returnedItems.length} blockedCount={blockedUsers.length} onExport={exportReport} />}
@@ -406,7 +447,7 @@ export default function AdminDashboard() {
   );
 }
 
-function VaultView({ items, onVerify, onReview, onDelete }: { items: LostItem[]; onVerify: (item: LostItem) => void; onReview: (item: LostItem) => void; onDelete: (item: LostItem) => void }) {
+function VaultView({ items, onReview, onDelete }: { items: LostItem[]; onReview: (item: LostItem) => void; onDelete: (item: LostItem) => void }) {
   return (
     <>
       <PageHeader eyebrow="Secure Repository" title="Secure Vault" description="Central repository for high-value assets requiring administrative oversight and unredacted verification." />
@@ -415,7 +456,7 @@ function VaultView({ items, onVerify, onReview, onDelete }: { items: LostItem[];
           <div className="col-span-3">Asset Details</div>
           <div className="col-span-2">Unredacted View</div>
           <div className="col-span-3">Hidden Note</div>
-          <div className="col-span-2">Log Date / Bin</div>
+          <div className="col-span-2">Log Date</div>
           <div className="col-span-2 text-right">Action</div>
         </div>
         <div className="divide-y divide-surface-container-low">
@@ -434,12 +475,10 @@ function VaultView({ items, onVerify, onReview, onDelete }: { items: LostItem[];
               </div>
               <div className="space-y-2 md:col-span-2">
                 <p className="text-sm font-semibold text-primary">{formatDate(item.created_timestamp)}</p>
-                <BinBadge bin={item.bin_number} />
                 <StatusPill status={item.status} />
               </div>
               <div className="flex justify-start md:col-span-2 md:justify-end pr-2">
                 <EllipsisMenu 
-                  onVerify={item.status !== "Returned" ? () => onVerify(item) : undefined}
                   onReview={() => onReview(item)}
                   onDelete={() => onDelete(item)}
                 />
@@ -564,35 +603,152 @@ function DisposalView({ items, onDispose }: { items: LostItem[]; onDispose: (ite
 }
 
 function AuditView({ logs }: { logs: AuditLog[] }) {
+  const groupedLogs = useMemo(() => {
+    const groups = new Map<AuditCategoryKey, AuditLog[]>();
+
+    logs.forEach((log) => {
+      const category = getAuditCategory(log);
+      const current = groups.get(category) || [];
+      current.push(log);
+      groups.set(category, current);
+    });
+
+    return (Object.keys(AUDIT_CATEGORY_LABELS) as AuditCategoryKey[])
+      .map((category) => ({
+        category,
+        label: AUDIT_CATEGORY_LABELS[category],
+        logs: groups.get(category) || [],
+      }))
+      .filter((group) => group.logs.length > 0);
+  }, [logs]);
+
   return (
     <>
-      <PageHeader eyebrow="System Logs" title="Audit Trail" description="Trace administrative account, verification, and disposal actions." />
-      <div className="overflow-hidden rounded-xl border border-outline-variant/15 bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[860px] text-left text-sm">
-            <thead className="bg-surface-container-high text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-              <tr>
-                <th className="px-6 py-4">Timestamp</th>
-                <th className="px-6 py-4">Admin/Actor ID</th>
-                <th className="px-6 py-4">Action Taken</th>
-                <th className="px-6 py-4">Target</th>
-                <th className="px-6 py-4">Notes</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-surface-container-low">
-              {logs.map((log) => (
-                <tr key={log.log_id} className="transition hover:bg-surface-container-low/50">
-                  <td className="px-6 py-4 font-mono text-xs text-on-surface-variant">{formatDateTime(log.created_at)}</td>
-                  <td className="px-6 py-4 font-mono text-xs text-primary">{shortId(log.actor_id)}</td>
-                  <td className="px-6 py-4 font-bold text-primary">{log.action.replaceAll("_", " ")}</td>
-                  <td className="px-6 py-4 font-mono text-xs text-on-surface-variant">{shortId(log.post_id)}</td>
-                  <td className="px-6 py-4 text-on-surface-variant">{stateSummary(log.new_state)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <PageHeader eyebrow="System Logs" title="Audit Trail" description="Student-to-student claim logs appear only after the handoff is completed, while student-to-admin claims remain visible throughout the office flow." />
+      <div className="mb-6 flex flex-wrap gap-2">
+        {groupedLogs.map((group) => (
+          <span key={group.category} className="rounded-full bg-surface-container px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+            {group.label}: {group.logs.length}
+          </span>
+        ))}
+      </div>
+      <div className="space-y-6">
+        {groupedLogs.map((group) => (
+          <div key={group.category} className="overflow-hidden rounded-xl border border-outline-variant/15 bg-white shadow-sm">
+            <div className="border-b border-outline-variant/10 bg-surface-container-high px-6 py-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">{group.label}</p>
+              <p className="mt-1 text-sm text-primary">{group.logs.length} logged event{group.logs.length === 1 ? "" : "s"}</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[980px] text-left text-sm">
+                <thead className="bg-white text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                  <tr>
+                    <th className="px-6 py-4">Timestamp</th>
+                    <th className="px-6 py-4">Actor ID</th>
+                    <th className="px-6 py-4">Action Taken</th>
+                    <th className="px-6 py-4">Category</th>
+                    <th className="px-6 py-4">Target</th>
+                    <th className="px-6 py-4">Notes</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-surface-container-low">
+                  {group.logs.map((log) => (
+                    <tr key={log.log_id} className="transition hover:bg-surface-container-low/50">
+                      <td className="px-6 py-4 font-mono text-xs text-on-surface-variant">{formatDateTime(log.created_at)}</td>
+                      <td className="px-6 py-4 font-mono text-xs text-primary">{shortId(log.actor_id)}</td>
+                      <td className="px-6 py-4 font-bold text-primary">{log.action.replaceAll("_", " ")}</td>
+                      <td className="px-6 py-4">
+                        <span className="rounded-full bg-primary-fixed/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+                          {getAuditCategoryLabel(log)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 font-mono text-xs text-on-surface-variant">{shortId(getAuditTargetValue(log))}</td>
+                      <td className="px-6 py-4 text-on-surface-variant">{stateSummary(log.new_state)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
         {logs.length === 0 && <EmptyState label="No audit entries found." />}
+        {groupedLogs.length === 0 && logs.length > 0 && <EmptyState label="No categorized audit entries found." />}
+      </div>
+    </>
+  );
+}
+
+function ClaimsDeskView({ entries }: { entries: ClaimOverviewEntry[] }) {
+  return (
+    <>
+      <PageHeader
+        eyebrow="Claim Oversight"
+        title="Claims On My Posts"
+        description="Track claim activity on items you personally reported and open the full review flow for each post."
+      />
+      <div className="overflow-hidden rounded-xl border border-outline-variant/15 bg-white shadow-[0_20px_40px_rgba(0,36,51,0.02)]">
+        <div className="hidden grid-cols-12 gap-4 bg-surface-container-high px-6 py-4 text-xs font-bold uppercase tracking-wider text-primary md:grid">
+          <div className="col-span-4">Post</div>
+          <div className="col-span-3">Claim Summary</div>
+          <div className="col-span-3">Latest Activity</div>
+          <div className="col-span-2 text-right">Action</div>
+        </div>
+        <div className="divide-y divide-surface-container-low">
+          {entries.map((entry) => (
+            <div key={entry.postId} className="grid gap-4 px-6 py-5 transition hover:bg-surface-bright md:grid-cols-12 md:items-center">
+              <div className="flex items-start gap-4 md:col-span-4">
+                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary-fixed/15 text-primary">
+                  <span className="material-symbols-outlined">{entry.iconIdentifier}</span>
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate font-headline font-bold text-primary">{entry.title}</p>
+                  <p className="mt-1 text-xs text-on-surface-variant">
+                    {entry.zone} · {entry.categoryName}
+                  </p>
+                  <StatusPill status={entry.itemStatus as ItemStatus} />
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 md:col-span-3">
+                <span className="rounded-full bg-surface-container px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+                  {entry.totalClaims} total
+                </span>
+                {entry.pendingClaims > 0 && (
+                  <span className="rounded-full bg-amber-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-700">
+                    {entry.pendingClaims} pending
+                  </span>
+                )}
+                {entry.approvedClaims > 0 && (
+                  <span className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-700">
+                    {entry.approvedClaims} approved
+                  </span>
+                )}
+                {entry.rejectedClaims > 0 && (
+                  <span className="rounded-full bg-red-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-700">
+                    {entry.rejectedClaims} rejected
+                  </span>
+                )}
+                {entry.releasedClaims > 0 && (
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+                    {entry.releasedClaims} released
+                  </span>
+                )}
+              </div>
+              <div className="space-y-2 md:col-span-3">
+                <p className="text-sm font-semibold text-primary">{formatDateTime(entry.latestClaimAt)}</p>
+              </div>
+              <div className="flex justify-start md:col-span-2 md:justify-end">
+                <Link
+                  href={`/admin/claims/${entry.postId}`}
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-primary-container"
+                >
+                  Review Claims
+                  <span className="material-symbols-outlined text-base">arrow_forward</span>
+                </Link>
+              </div>
+            </div>
+          ))}
+          {entries.length === 0 && <EmptyState label="No claim requests on your posts yet." />}
+        </div>
       </div>
     </>
   );
@@ -600,7 +756,7 @@ function AuditView({ logs }: { logs: AuditLog[] }) {
 
 function ReportsView({ itemCount, returnedCount, blockedCount, onExport }: { itemCount: number; returnedCount: number; blockedCount: number; onExport: (type: string, startDate: string, endDate: string) => void }) {
   const today = new Date().toISOString().slice(0, 10);
-  const [type, setType] = useState("Inventory Summary");
+  const [type, setType] = useState("User Activity");
   const [startDate, setStartDate] = useState(today.slice(0, 8) + "01");
   const [endDate, setEndDate] = useState(today);
 
@@ -617,7 +773,6 @@ function ReportsView({ itemCount, returnedCount, blockedCount, onExport }: { ite
         >
           <label className="mb-3 block font-headline text-lg font-bold text-primary">Report Parameter</label>
           <select value={type} onChange={(event) => setType(event.target.value)} className="mb-8 w-full rounded-md border border-outline-variant/30 bg-surface py-3.5 pl-4 pr-10 text-on-surface outline-none focus:ring-2 focus:ring-[#44afa9]">
-            <option>Inventory Summary</option>
             <option>User Activity</option>
             <option>Audit Logs</option>
             <option>Disposal Manifest</option>
@@ -1031,6 +1186,7 @@ function StatusPill({ status }: { status: ItemStatus }) {
     Reported: "bg-primary-fixed text-on-primary-fixed",
     Found: "bg-[#8df4ec]/35 text-primary",
     Returned: "bg-green-50 text-green-700",
+    Released: "bg-emerald-50 text-emerald-700",
     Purged: "bg-red-50 text-red-700",
   }[status];
   return <span className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-bold ${classes}`}>{status}</span>;
@@ -1096,10 +1252,17 @@ function reportRows(type: string, startDate: string, endDate: string, items: Los
 
   if (type === "Audit Logs") {
     return [
-      ["Timestamp", "Staff ID", "Action", "Post ID", "Notes"],
+      ["Timestamp", "Staff ID", "Action", "Category", "Post ID", "Notes"],
       ...logs
         .filter((log) => inRange(log.created_at, start, end))
-        .map((log) => [log.created_at, log.actor_id ?? "", log.action, log.post_id ?? "", stateSummary(log.new_state)]),
+        .map((log) => [
+          log.created_at,
+          log.actor_id ?? "",
+          log.action,
+          getAuditCategoryLabel(log),
+          getAuditTargetValue(log),
+          stateSummary(log.new_state),
+        ]),
     ];
   }
 

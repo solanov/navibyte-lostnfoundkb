@@ -37,13 +37,14 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [zone, setZone] = useState('');
-  const [hiddenNote, setHiddenNote] = useState('');
   const [fieldErrors, setFieldErrors] = useState<CreateEntryErrors>({});
   
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [acknowledgeNoExplicitContent, setAcknowledgeNoExplicitContent] = useState(false);
+  const [acknowledgeNoConfidentialInfo, setAcknowledgeNoConfidentialInfo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -109,7 +110,6 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
     title: string;
     description: string;
     zone: string;
-    hiddenNote: string;
     selectedCategory: number | null;
     selectedColor: string | null;
   }>) => ({
@@ -119,12 +119,12 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
     title: overrides?.title ?? title,
     description: overrides?.description ?? description,
     zone: overrides?.zone ?? zone,
-    hiddenNote: overrides?.hiddenNote ?? hiddenNote,
+    hiddenNote: "",
     imageUrl: null,
   });
 
   const validateDraft = (overrides?: Parameters<typeof buildDraftInput>[0]) =>
-    validateCreateEntryInput(buildDraftInput(overrides));
+    validateCreateEntryInput(buildDraftInput(overrides), { requireImage: false });
 
   const applyFieldValidation = (
     field: keyof CreateEntryErrors,
@@ -147,13 +147,11 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
       title: normalizeCreateEntryText(title),
       zone: normalizeCreateEntryText(zone),
       description: normalizeCreateEntryText(description, { multiline: true }),
-      hiddenNote: normalizeCreateEntryText(hiddenNote, { multiline: true }),
     };
 
     setTitle(sanitizedValues.title);
     setZone(sanitizedValues.zone);
     setDescription(sanitizedValues.description);
-    setHiddenNote(sanitizedValues.hiddenNote);
 
     const validation = validateDraft(sanitizedValues);
     setFieldErrors(validation.ok ? {} : validation.errors);
@@ -198,6 +196,20 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!file) {
+      setFieldErrors((current) => ({
+        ...current,
+        image: "Upload at least one image before posting your entry.",
+      }));
+      notify("An image is required before posting your entry.", "warning");
+      return;
+    }
+
+    if (!acknowledgeNoExplicitContent || !acknowledgeNoConfidentialInfo) {
+      notify("Please confirm both posting acknowledgements before submitting.", "warning");
+      return;
+    }
 
     const validation = commitFieldValidation();
     if (!validation.ok) {
@@ -250,12 +262,16 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
       setTitle('');
       setDescription('');
       setZone('');
-      setHiddenNote('');
       setFieldErrors({});
       setFile(null);
       setPreview(null);
       setSelectedCategory(null);
       setSelectedColor(null);
+      setAcknowledgeNoExplicitContent(false);
+      setAcknowledgeNoConfidentialInfo(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       onSuccess?.();
     } catch (err) {
       console.error(err);
@@ -414,7 +430,7 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
           {/* Image Upload */}
           <div>
             <label className="block font-headline font-bold text-primary mb-2 text-sm uppercase tracking-tight">
-              Visual Evidence
+              Visual Evidence <span className="text-error">*</span>
             </label>
             <div className="flex items-start gap-2 mb-3 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-300">
               <span className="material-symbols-outlined text-amber-500 text-base mt-0.5 shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -488,44 +504,39 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
             {fieldErrors.color && <p className="mt-3 text-xs font-medium text-red-700">{fieldErrors.color}</p>}
           </div>
 
-          {/* Hidden Note */}
-          <div>
-            <label className="flex items-center gap-2 font-headline font-bold text-primary mb-2 text-sm uppercase tracking-tight">
-              <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-                lock
-              </span>
-              Hidden Note
-            </label>
-            <textarea 
-              rows={2}
-              value={hiddenNote}
-              onChange={(e) => {
-                setHiddenNote(e.target.value);
-                clearFieldError("hiddenNote");
-              }}
-              onBlur={() => {
-                const normalizedValue = normalizeCreateEntryText(hiddenNote, { multiline: true });
-                setHiddenNote(normalizedValue);
-                applyFieldValidation("hiddenNote", { hiddenNote: normalizedValue });
-              }}
-              placeholder="Private details for admin verification only (e.g. serial number, specific internal markings)..." 
-              aria-invalid={Boolean(fieldErrors.hiddenNote)}
-              className={`w-full border rounded-lg p-4 focus:ring-1 focus:ring-primary text-on-surface transition-all text-sm italic placeholder:text-outline/60 ${
-                fieldErrors.hiddenNote
-                  ? 'bg-red-50 border-red-300 focus:ring-red-200'
-                  : 'bg-surface-container-low border-primary/20'
-              }`} 
-            />
-            {fieldErrors.hiddenNote && <p className="mt-2 text-xs font-medium text-red-700">{fieldErrors.hiddenNote}</p>}
-          </div>
-
           {/* Footer Action */}
           <div className="pt-6 border-t border-outline-variant/20">
+            <div className="mb-5 rounded-xl border border-outline-variant/20 bg-surface-container-low p-4">
+              <p className="text-sm font-bold uppercase tracking-tight text-primary">Posting Acknowledgement</p>
+              <p className="mt-1 text-xs leading-5 text-on-surface-variant">
+                Review these rules before your post is published to the archive.
+              </p>
+              <label className="mt-4 flex items-start gap-3 text-sm text-on-surface-variant">
+                <input
+                  type="checkbox"
+                  checked={acknowledgeNoExplicitContent}
+                  onChange={(event) => setAcknowledgeNoExplicitContent(event.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-outline-variant text-[#44afa9]"
+                />
+                I confirm this post does not contain explicit, graphic, or inappropriate content.
+              </label>
+              <label className="mt-3 flex items-start gap-3 text-sm text-on-surface-variant">
+                <input
+                  type="checkbox"
+                  checked={acknowledgeNoConfidentialInfo}
+                  onChange={(event) => setAcknowledgeNoConfidentialInfo(event.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-outline-variant text-[#44afa9]"
+                />
+                I confirm no confidential or personally identifiable information is visible in the uploaded image or post details.
+              </label>
+            </div>
             <button 
               type="submit" 
-              disabled={isSubmitting}
+              disabled={isSubmitting || !acknowledgeNoExplicitContent || !acknowledgeNoConfidentialInfo}
               className={`w-full text-white font-headline font-black py-4 rounded-lg uppercase tracking-widest text-sm shadow-[0_8px_20px_rgba(68,175,169,0.3)] transition-all ${
-                isSubmitting ? 'bg-outline opacity-70 cursor-not-allowed' : 'bg-[#44afa9] hover:brightness-110 active:scale-[0.98]'
+                isSubmitting || !acknowledgeNoExplicitContent || !acknowledgeNoConfidentialInfo
+                  ? 'bg-outline opacity-70 cursor-not-allowed'
+                  : 'bg-[#44afa9] hover:brightness-110 active:scale-[0.98]'
               }`}
             >
               {isSubmitting ? 'Uploading to Archive...' : 'Post Entry to Archive'}

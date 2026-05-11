@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/src/lib/supabase';
 
 export interface Message {
@@ -14,19 +14,31 @@ export interface Message {
 
 export interface Conversation {
   conversation_id: string;
-  post_id: string;
+  post_id: string | null;
   initiator_id: string;
   receiver_id: string;
   created_at: string;
 }
 
-export function useConversation(conversationId: string | null) {
+export function useConversation(
+  conversationIds: string[],
+  targetConversationId?: string | null
+) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const conversationKey = useMemo(
+    () => Array.from(new Set(conversationIds)).sort().join(","),
+    [conversationIds]
+  );
+  const normalizedConversationIds = useMemo(
+    () => (conversationKey ? conversationKey.split(",") : []),
+    [conversationKey]
+  );
+  const targetId = targetConversationId || normalizedConversationIds[0] || null;
 
   useEffect(() => {
-    if (!conversationId) {
+    if (normalizedConversationIds.length === 0) {
       setMessages([]);
       setLoading(false);
       setError(null);
@@ -41,7 +53,7 @@ export function useConversation(conversationId: string | null) {
         const { data, error: fetchError } = await supabase
           .from('messages')
           .select('*')
-          .eq('conversation_id', conversationId)
+          .in('conversation_id', normalizedConversationIds)
           .order('created_at', { ascending: true });
 
         if (fetchError) throw fetchError;
@@ -56,24 +68,36 @@ export function useConversation(conversationId: string | null) {
     fetchMessages();
 
     const subscription = supabase
-      .channel(`messages:${conversationId}`)
+      .channel(`messages:${conversationKey}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'messages',
-          filter: `conversation_id=eq.${conversationId}`,
         },
         (payload) => {
+          const nextMessage = payload.new as Message;
+          const previousMessage = payload.old as Message;
+          const relevantConversationId =
+            nextMessage?.conversation_id || previousMessage?.conversation_id;
+
+          if (
+            !relevantConversationId ||
+            !normalizedConversationIds.includes(relevantConversationId)
+          ) {
+            return;
+          }
+
           if (payload.eventType === 'INSERT') {
             setMessages((prev) => {
-              const nextMessage = payload.new as Message;
               if (prev.some((message) => message.message_id === nextMessage.message_id)) {
                 return prev;
               }
 
-              return [...prev, nextMessage];
+              return [...prev, nextMessage].sort(
+                (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+              );
             });
           } else if (payload.eventType === 'UPDATE') {
             setMessages((prev) =>
@@ -91,10 +115,10 @@ export function useConversation(conversationId: string | null) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [conversationId]);
+  }, [conversationKey, normalizedConversationIds]);
 
   const sendMessage = useCallback(async (content: string, senderId: string) => {
-    if (!conversationId) {
+    if (!targetId) {
       throw new Error('Conversation is not ready yet');
     }
 
@@ -102,7 +126,7 @@ export function useConversation(conversationId: string | null) {
       setError(null);
       const { error: insertError } = await supabase.from('messages').insert([
         {
-          conversation_id: conversationId,
+          conversation_id: targetId,
           sender_id: senderId,
           content,
           is_read: false,
@@ -114,7 +138,7 @@ export function useConversation(conversationId: string | null) {
       setError(err instanceof Error ? err.message : 'Failed to send message');
       throw err;
     }
-  }, [conversationId]);
+  }, [targetId]);
 
   const markAsRead = useCallback(async (messageId: string) => {
     try {
@@ -150,6 +174,11 @@ function normalizeParticipants(
     : { initiatorId: userB, receiverId: userA };
 }
 
+export function getConversationPairKey(userA: string, userB: string) {
+  const { initiatorId, receiverId } = normalizeParticipants(userA, userB);
+  return `${initiatorId}:${receiverId}`;
+}
+
 export async function getOrCreateConversation(
   postId: string,
   currentUserId: string,
@@ -164,13 +193,13 @@ export async function getOrCreateConversation(
 
   try {
     // Look for an existing one-on-one conversation between these two users
-    // for this specific post using the canonical participant order.
+    // regardless of the specific post, using the canonical participant order.
     const { data: existingConversations, error: queryError } = await supabase
       .from('conversations')
       .select('*')
-      .eq('post_id', postId)
       .eq('initiator_id', initiatorId)
       .eq('receiver_id', receiverId)
+      .order('created_at', { ascending: true })
       .limit(1);
 
     if (queryError) throw queryError;
@@ -198,9 +227,9 @@ export async function getOrCreateConversation(
         const { data: retryConversation, error: retryError } = await supabase
           .from('conversations')
           .select('*')
-          .eq('post_id', postId)
           .eq('initiator_id', initiatorId)
           .eq('receiver_id', receiverId)
+          .order('created_at', { ascending: true })
           .limit(1)
           .single();
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import StatusBadge from './StatusBadge';
 
 interface ItemDetailModalProps {
@@ -23,7 +24,7 @@ interface ItemDetailModalProps {
   onContactClick: () => void;
   isOwner?: boolean;
   onDeletePost?: () => void;
-  onMarkReturned?: () => void;
+  claimsHref?: string;
 }
 
 export default function ItemDetailModal({
@@ -34,7 +35,7 @@ export default function ItemDetailModal({
   onContactClick,
   isOwner,
   onDeletePost,
-  onMarkReturned,
+  claimsHref,
 }: ItemDetailModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -238,16 +239,15 @@ export default function ItemDetailModal({
         <div className="sticky bottom-0 bg-surface-container-lowest border-t border-outline-variant/20 px-6 py-4 flex gap-3">
           {isOwner ? (
             <>
-              {item.status !== 'Returned' && item.status !== 'Purged' && onMarkReturned && (
-                <button
-                  onClick={onMarkReturned}
-                  className="flex-1 bg-surface-container-low text-primary border border-outline-variant/30 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all active:scale-95"
+              {item.status !== 'Returned' && item.status !== 'Purged' && (
+                <Link
+                  href={claimsHref || `/board/claims/${item.post_id}`}
+                  onClick={onClose}
+                  className="flex-1 bg-surface-container-low text-primary border border-outline-variant/30 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="material-symbols-outlined text-lg">verified</span>
-                    Mark as Returned
-                  </span>
-                </button>
+                  <span className="material-symbols-outlined text-lg">assignment</span>
+                  View Claims
+                </Link>
               )}
               {onDeletePost && (
                 <button
