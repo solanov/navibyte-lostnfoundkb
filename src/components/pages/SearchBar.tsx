@@ -33,6 +33,8 @@ export default function SearchBar() {
         params.delete('q');
       }
 
+      params.delete('page');
+
       startTransition(() => {
         router.replace(`${pathname}?${params.toString()}`, { scroll: false });
       });

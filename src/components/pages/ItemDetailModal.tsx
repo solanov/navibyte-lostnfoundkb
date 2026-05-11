@@ -239,7 +239,7 @@ export default function ItemDetailModal({
         <div className="sticky bottom-0 bg-surface-container-lowest border-t border-outline-variant/20 px-6 py-4 flex gap-3">
           {isOwner ? (
             <>
-              {item.status !== 'Returned' && item.status !== 'Purged' && (
+              {item.status !== 'Returned' && item.status !== 'Released' && item.status !== 'Purged' && (
                 <Link
                   href={claimsHref || `/board/claims/${item.post_id}`}
                   onClick={onClose}

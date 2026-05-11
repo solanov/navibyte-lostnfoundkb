@@ -356,3 +356,96 @@ export async function finalizeP2PReturnAction(
 
   return { success: true };
 }
+
+export async function markClaimReturnedByOwnerAction(
+  accessToken: string,
+  postId: string,
+  claimId: string
+) {
+  const user = await verifyUserSession(accessToken);
+  const adminClient = getAdminClient();
+  const returnedAt = new Date().toISOString();
+  const autoRejectedNote = "Item marked as returned to another claimant.";
+
+  const { data: item, error: itemError } = await adminClient
+    .from("lost_items")
+    .select("post_id, reported_by, status")
+    .eq("post_id", postId)
+    .single();
+
+  if (itemError || !item) throw new Error("Item not found.");
+  if (item.reported_by !== user.id) {
+    throw new Error("Only the original poster can mark this item as returned.");
+  }
+  if (["Returned", "Purged", "Released"].includes(item.status)) {
+    throw new Error("This item has already been resolved.");
+  }
+
+  const { data: claim, error: claimError } = await adminClient
+    .from("claim_requests")
+    .select("claim_id, post_id, status, flow_type, claimant_name, claimant_school_id")
+    .eq("claim_id", claimId)
+    .eq("post_id", postId)
+    .single();
+
+  if (claimError || !claim) throw new Error("Claim request not found.");
+  if (!["Pending", "Approved"].includes(claim.status)) {
+    throw new Error("Only active claims can be marked as returned.");
+  }
+
+  const { error: itemUpdateError } = await adminClient
+    .from("lost_items")
+    .update({
+      status: "Returned",
+      returned_at: returnedAt,
+    })
+    .eq("post_id", postId);
+
+  if (itemUpdateError) throw new Error(itemUpdateError.message);
+
+  const { error: claimUpdateError } = await adminClient
+    .from("claim_requests")
+    .update({
+      status: "Released",
+      updated_at: returnedAt,
+    })
+    .eq("claim_id", claimId);
+
+  if (claimUpdateError) throw new Error(claimUpdateError.message);
+
+  const { error: otherClaimsError } = await adminClient
+    .from("claim_requests")
+    .update({
+      status: "Rejected",
+      admin_notes: autoRejectedNote,
+      updated_at: returnedAt,
+    })
+    .eq("post_id", postId)
+    .neq("claim_id", claimId)
+    .in("status", ["Pending", "Approved"]);
+
+  if (otherClaimsError) throw new Error(otherClaimsError.message);
+
+  await adminClient.from("audit_logs").insert({
+    post_id: postId,
+    actor_id: user.id,
+    action: "CLAIM_MARKED_RETURNED_BY_OWNER",
+    previous_state: {
+      status: item.status,
+      claim_status: claim.status,
+      flow_type: claim.flow_type,
+    },
+    new_state: {
+      status: "Returned",
+      claim_id: claimId,
+      claim_status: "Released",
+      flow_type: claim.flow_type,
+      claimant_name: claim.claimant_name,
+      claimant_school_id: claim.claimant_school_id,
+      returned_at: returnedAt,
+      resolved_by: user.id,
+    },
+  });
+
+  return { success: true, returnedAt };
+}

@@ -5,7 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import useSWR from "swr";
 import { supabase } from "@/src/lib/supabase";
-import { finalizeP2PReturnAction } from "@/src/app/admin/actions/posts";
+import {
+  finalizeP2PReturnAction,
+  markClaimReturnedByOwnerAction,
+} from "@/src/app/admin/actions/posts";
 import { fetchOwnedPostClaimsAction } from "@/src/app/admin/actions/claims";
 import { useNotification } from "@/src/hooks/useNotification";
 
@@ -44,6 +47,8 @@ const FLOW_LABELS: Record<string, string> = {
   P2P: "Student-to-Student",
   Office: "Office Pickup",
 };
+
+const RETURN_REJECTION_NOTE = "Item marked as returned to another claimant.";
 
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString("en-US", {
@@ -105,12 +110,7 @@ export default function UserClaimsPage() {
     }
   }, [accessToken, authLoading, router]);
 
-  const {
-    data,
-    error,
-    isLoading,
-    mutate,
-  } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     accessToken ? ["owned-post-claims", accessToken, postId] : null,
     () => fetchOwnedPostClaimsAction(accessToken as string, postId),
     {
@@ -123,6 +123,34 @@ export default function UserClaimsPage() {
   const loading = authLoading || (Boolean(accessToken) && isLoading);
   const errorMessage =
     error instanceof Error ? error.message : error ? String(error) : null;
+
+  const buildReturnedOptimisticData = (claimId: string, nextTimestamp: string) =>
+    data
+      ? {
+          ...data,
+          post: data.post ? { ...data.post, status: "Returned" } : data.post,
+          claims: data.claims.map((claim) => {
+            if (claim.claim_id === claimId) {
+              return {
+                ...claim,
+                status: "Released" as ClaimRequest["status"],
+                updated_at: nextTimestamp,
+              };
+            }
+
+            if (["Pending", "Approved"].includes(claim.status)) {
+              return {
+                ...claim,
+                status: "Rejected" as ClaimRequest["status"],
+                admin_notes: RETURN_REJECTION_NOTE,
+                updated_at: nextTimestamp,
+              };
+            }
+
+            return claim;
+          }),
+        }
+      : data;
 
   const handleConfirmP2PHandoff = async (claimId: string) => {
     const confirmed = window.confirm(
@@ -138,9 +166,7 @@ export default function UserClaimsPage() {
       const optimisticData = data
         ? {
             ...data,
-            post: data.post
-              ? { ...data.post, status: "Released" }
-              : data.post,
+            post: data.post ? { ...data.post, status: "Released" } : data.post,
             claims: data.claims.map((claim) =>
               claim.claim_id === claimId
                 ? {
@@ -166,6 +192,51 @@ export default function UserClaimsPage() {
       );
 
       notify("Item successfully marked as handed off.", "success");
+    } catch (err) {
+      notify(
+        `Error: ${err instanceof Error ? err.message : String(err)}`,
+        "error"
+      );
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleMarkReturned = async (
+    claimId: string,
+    claimantName: string
+  ) => {
+    const confirmed = window.confirm(
+      `Mark this item as returned to ${claimantName}? This will remove it from the public board and close the other active claims.`
+    );
+    if (!confirmed) return;
+
+    setActionLoading(claimId + "-returned");
+    try {
+      if (!accessToken) throw new Error("Authentication token missing.");
+
+      const nextTimestamp = new Date().toISOString();
+      const optimisticData = buildReturnedOptimisticData(
+        claimId,
+        nextTimestamp
+      );
+
+      await mutate(
+        async () => {
+          await markClaimReturnedByOwnerAction(accessToken, postId, claimId);
+          return optimisticData;
+        },
+        {
+          optimisticData,
+          rollbackOnError: true,
+          revalidate: false,
+        }
+      );
+
+      notify(
+        "Item marked as returned and removed from the public board.",
+        "success"
+      );
     } catch (err) {
       notify(
         `Error: ${err instanceof Error ? err.message : String(err)}`,
@@ -208,7 +279,9 @@ export default function UserClaimsPage() {
             href="/board/claims"
             className="inline-flex items-center gap-2 px-6 py-3 bg-[#44afa9] text-white font-bold rounded-xl hover:bg-[#3b9691] transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span className="material-symbols-outlined text-[18px]">
+              arrow_back
+            </span>
             Back to Board
           </Link>
         </div>
@@ -218,7 +291,6 @@ export default function UserClaimsPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f3f3]">
-      {/* Page Header */}
       <div className="bg-white border-b border-[#002433]/5 px-6 py-5 flex items-center gap-4">
         <Link
           href="/board/claims"
@@ -247,7 +319,6 @@ export default function UserClaimsPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-4">
-        {/* Info Banner */}
         <div className="bg-[#002433]/5 border border-[#002433]/10 rounded-2xl p-4 flex gap-3">
           <span className="material-symbols-outlined text-[#002433] mt-0.5 shrink-0">
             info
@@ -256,14 +327,14 @@ export default function UserClaimsPage() {
             <p className="font-bold mb-1">How this works</p>
             <p className="text-[#41484c] leading-relaxed">
               Students who believe this item is theirs will submit claim
-              requests here. For{" "}
-              <strong>P2P claims</strong>, you confirm the handoff directly after the student verifies ownership via the messaging chat. For{" "}
-              <strong>Office claims</strong>, staff will handle the verification and release.
+              requests here. For <strong>P2P claims</strong>, you can mark the
+              matching claim as returned once the handoff is complete. For{" "}
+              <strong>Office claims</strong>, staff can resolve the pickup for
+              you from the admin side.
             </p>
           </div>
         </div>
 
-        {/* Claims List */}
         {claims.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border border-[#002433]/5 p-12 text-center">
             <span className="material-symbols-outlined text-5xl text-[#41484c]/30 mb-4 block">
@@ -284,7 +355,6 @@ export default function UserClaimsPage() {
                 key={claim.claim_id}
                 className="bg-white rounded-2xl shadow-sm border border-[#002433]/5 p-5"
               >
-                {/* Claim Header */}
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div>
                     <p className="font-black text-[#002433]">
@@ -309,7 +379,6 @@ export default function UserClaimsPage() {
                   </div>
                 </div>
 
-                {/* Verification Description */}
                 {claim.item_description_verification && (
                   <div className="bg-[#f5f3f3] rounded-xl p-4 mb-4">
                     <p className="text-[10px] font-black uppercase tracking-widest text-[#41484c] mb-1">
@@ -321,7 +390,6 @@ export default function UserClaimsPage() {
                   </div>
                 )}
 
-                {/* Admin Notes / Rejection Reason */}
                 {claim.admin_notes && (
                   <div
                     className={`rounded-xl p-4 mb-4 ${
@@ -341,30 +409,53 @@ export default function UserClaimsPage() {
                   </div>
                 )}
 
-                {/* Footer */}
                 <div className="flex items-center justify-between gap-4 pt-3 border-t border-[#002433]/5">
                   <p className="text-[11px] text-[#41484c]/60">
                     Submitted {formatDate(claim.created_at)}
                   </p>
 
-                  {/* P2P Finder Confirm Handoff — only when approved */}
-                  {claim.flow_type === "P2P" &&
-                    claim.status === "Approved" &&
-                    post?.reported_by === currentUserId && (
-                      <button
-                        onClick={() =>
-                          handleConfirmP2PHandoff(claim.claim_id)
-                        }
-                        disabled={actionLoading === claim.claim_id}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-black rounded-xl hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">
-                          handshake
-                        </span>
-                        {actionLoading === claim.claim_id
-                          ? "Confirming..."
-                          : "Confirm Handoff"}
-                      </button>
+                  {post?.reported_by === currentUserId &&
+                    post?.status !== "Returned" &&
+                    post?.status !== "Released" && (
+                      <div className="flex items-center gap-2 flex-wrap justify-end">
+                        {["Pending", "Approved"].includes(claim.status) && (
+                          <button
+                            onClick={() =>
+                              handleMarkReturned(
+                                claim.claim_id,
+                                claim.claimant_name
+                              )
+                            }
+                            disabled={!!actionLoading}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-[#002433] text-white text-xs font-black rounded-xl hover:bg-[#05364b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">
+                              assignment_turned_in
+                            </span>
+                            {actionLoading === claim.claim_id + "-returned"
+                              ? "Marking..."
+                              : "Mark as Returned"}
+                          </button>
+                        )}
+
+                        {claim.flow_type === "P2P" &&
+                          claim.status === "Approved" && (
+                            <button
+                              onClick={() =>
+                                handleConfirmP2PHandoff(claim.claim_id)
+                              }
+                              disabled={!!actionLoading}
+                              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-black rounded-xl hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">
+                                handshake
+                              </span>
+                              {actionLoading === claim.claim_id
+                                ? "Confirming..."
+                                : "Confirm Handoff"}
+                            </button>
+                          )}
+                      </div>
                     )}
                 </div>
               </div>

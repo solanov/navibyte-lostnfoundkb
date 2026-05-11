@@ -2,12 +2,14 @@
 
 import { verifyAdminAccess } from "./core";
 
+type AuditState = Record<string, unknown>;
+
 export async function verifyClaimAction(
   accessToken: string,
   postId: string,
   claimantName: string,
   studentId: string,
-  previousState: any
+  previousState: AuditState
 ) {
   const { adminClient, profile } = await verifyAdminAccess(accessToken);
 
@@ -36,7 +38,7 @@ export async function disposeItemAction(
   postId: string,
   method: string,
   reason: string,
-  previousState: any
+  previousState: AuditState
 ) {
   const { adminClient, profile } = await verifyAdminAccess(accessToken);
 
@@ -288,4 +290,110 @@ export async function rejectClaimAction(
   });
 
   return { success: true };
+}
+
+/**
+ * Staff manually resolves a claim as returned from the claim review screen.
+ * This removes the item from the public board and records which claimant received it.
+ */
+export async function markClaimReturnedByAdminAction(
+  accessToken: string,
+  postId: string,
+  claimId: string
+) {
+  const { adminClient, profile } = await verifyAdminAccess(accessToken);
+  const returnedAt = new Date().toISOString();
+  const autoRejectedNote = "Item marked as returned to another claimant.";
+
+  const { data: item, error: itemError } = await adminClient
+    .from("lost_items")
+    .select("post_id, status")
+    .eq("post_id", postId)
+    .single();
+
+  if (itemError || !item) {
+    throw new Error("Item not found.");
+  }
+
+  if (["Returned", "Purged", "Released"].includes(item.status)) {
+    throw new Error("This item has already been resolved.");
+  }
+
+  const { data: claim, error: claimError } = await adminClient
+    .from("claim_requests")
+    .select("claim_id, post_id, status, flow_type, claimant_name, claimant_school_id")
+    .eq("claim_id", claimId)
+    .eq("post_id", postId)
+    .single();
+
+  if (claimError || !claim) {
+    throw new Error("Claim request not found.");
+  }
+
+  if (!["Pending", "Approved"].includes(claim.status)) {
+    throw new Error("Only active claims can be marked as returned.");
+  }
+
+  const { error: selectedClaimError } = await adminClient
+    .from("claim_requests")
+    .update({
+      status: "Released",
+      updated_at: returnedAt,
+    })
+    .eq("claim_id", claimId);
+
+  if (selectedClaimError) {
+    throw new Error(selectedClaimError.message);
+  }
+
+  const { error: otherClaimsError } = await adminClient
+    .from("claim_requests")
+    .update({
+      status: "Rejected",
+      admin_notes: autoRejectedNote,
+      updated_at: returnedAt,
+    })
+    .eq("post_id", postId)
+    .neq("claim_id", claimId)
+    .in("status", ["Pending", "Approved"]);
+
+  if (otherClaimsError) {
+    throw new Error(otherClaimsError.message);
+  }
+
+  const { error: itemUpdateError } = await adminClient
+    .from("lost_items")
+    .update({
+      status: "Returned",
+      returned_at: returnedAt,
+      last_handled_by: profile.user_id,
+    })
+    .eq("post_id", postId);
+
+  if (itemUpdateError) {
+    throw new Error(itemUpdateError.message);
+  }
+
+  await adminClient.from("audit_logs").insert({
+    post_id: postId,
+    actor_id: profile.user_id,
+    action: "CLAIM_MARKED_RETURNED_BY_ADMIN",
+    previous_state: {
+      status: item.status,
+      claim_status: claim.status,
+      flow_type: claim.flow_type,
+    },
+    new_state: {
+      status: "Returned",
+      claim_id: claimId,
+      claim_status: "Released",
+      flow_type: claim.flow_type,
+      claimant_name: claim.claimant_name,
+      claimant_school_id: claim.claimant_school_id,
+      returned_at: returnedAt,
+      resolved_by: profile.user_id,
+    },
+  });
+
+  return { success: true, returnedAt };
 }
