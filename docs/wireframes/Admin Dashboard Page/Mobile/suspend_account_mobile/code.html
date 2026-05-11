@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Suspend Account Modal - Mobile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Public+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#00201e",
+                        "inverse-on-surface": "#f3f0f0",
+                        "tertiary-container": "#003e3b",
+                        "secondary-fixed": "#bde9ff",
+                        "outline-variant": "#c1c7cd",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#a1cce6",
+                        "on-secondary-fixed": "#001f2a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001e2c",
+                        "tertiary": "#002624",
+                        "surface-tint": "#38637a",
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "secondary": "#0d6682",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "primary": "#002433",
+                        "outline": "#71787d",
+                        "on-background": "#1b1c1c",
+                        "surface-container": "#f0eded",
+                        "tertiary-fixed": "#8df4ec",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#1b1c1c",
+                        "inverse-primary": "#a1cce6",
+                        "surface-dim": "#dcd9d9",
+                        "surface-bright": "#fbf9f8",
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "background": "#fbf9f8",
+                        "inverse-surface": "#303030",
+                        "on-primary-container": "#7aa5be",
+                        "surface": "#fbf9f8",
+                        "surface-container-low": "#f5f3f3",
+                        "surface-container-highest": "#e4e2e1",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#c2e8ff",
+                        "on-tertiary-container": "#44afa9",
+                        "secondary-container": "#98defe",
+                        "primary-container": "#053b50",
+                        "on-surface-variant": "#41484c",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e4e2e1",
+                        "on-secondary-container": "#05637f",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Public Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface h-screen w-full flex flex-col md:hidden overflow-hidden">
+<!-- Modal Overlay Backdrop (Full Screen Mobile) -->
+<div class="fixed inset-0 z-50 flex flex-col bg-surface h-full w-full">
+<!-- Header -->
+<div class="bg-[#053B50] px-6 pt-12 pb-4 flex items-center gap-4 text-white shadow-sm">
+<button class="hover:bg-white/10 p-2 rounded-full transition-colors -ml-2">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h2 class="font-headline font-semibold text-xl tracking-tight">Suspend Account</h2>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto px-6 py-6">
+<!-- Warning Banner -->
+<div class="bg-error-container text-on-error-container px-4 py-3 rounded-xl flex items-start gap-3 mb-6">
+<span class="material-symbols-outlined shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">person_off</span>
+<div>
+<p class="font-headline font-bold text-sm">Critical administrative action</p>
+<p class="font-body text-sm opacity-90 mt-0.5">This action will immediately restrict the user's access.</p>
+</div>
+</div>
+<!-- Targeted User Info -->
+<div class="bg-surface-container-low rounded-xl p-5 flex gap-4 items-center mb-8 border border-outline-variant/15">
+<img alt="User Profile Image" class="w-14 h-14 rounded-full object-cover shadow-sm bg-surface-container-highest" data-alt="A portrait photography style headshot of a university student or faculty member. The lighting should be soft and professional, typical of an academic ID photo, but with a subtle warm tone. The subject is looking slightly off-camera, conveying a sense of thought or study. The background should be a blurred, neutral institutional setting to keep focus on the individual." src="https://lh3.googleusercontent.com/aida/ADBb0ugVvquat9Y2CyVdVqVi11CpaehdQBHpax2o7iqafzh6XbmaVEd8ClA6A7Y7GzB4ONUmVqJwrwOsdUKgt_9JVvwbe42i2ABlpZLDJOg8V9V6d3OJeTkjRoFhVGeWwzFvq5TDZmi4GWq8EUtK4ErEIQ9Y_At7Z-qnB_1S8aYHxQG6Kf6d2Jr2ce7fXi0hS7M1T4hvJ3aEl0OYuViACdKDwktLFVnB-kxs09FIlGiq9BuC6NSVPlnaiScNwOdpfMggTa5hGaVec8H2Wws"/>
+<div class="flex-1">
+<h3 class="font-headline font-semibold text-primary text-lg leading-tight">Elena Rostova</h3>
+<p class="font-body text-on-surface-variant text-sm mt-0.5">ID: 8492-AX · Dept: Architecture</p>
+</div>
+<div class="bg-surface-container-highest text-on-surface-variant text-xs font-label uppercase tracking-widest px-2 py-1 rounded-DEFAULT font-medium">
+                    Active
+                </div>
+</div>
+<form class="space-y-8">
+<!-- Duration Toggles -->
+<fieldset>
+<legend class="font-headline font-semibold text-primary mb-4 text-base">Suspension Duration</legend>
+<div class="grid grid-cols-2 gap-3">
+<label class="relative cursor-pointer">
+<input checked="" class="peer sr-only" name="duration" type="radio"/>
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-4 text-center peer-checked:bg-error/5 peer-checked:border-error peer-checked:text-error transition-all hover:bg-surface-container-low">
+<span class="block font-body font-medium text-on-surface text-sm peer-checked:text-error">24 Hours</span>
+</div>
+</label>
+<label class="relative cursor-pointer">
+<input class="peer sr-only" name="duration" type="radio"/>
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-4 text-center peer-checked:bg-error/5 peer-checked:border-error peer-checked:text-error transition-all hover:bg-surface-container-low">
+<span class="block font-body font-medium text-on-surface text-sm peer-checked:text-error">7 Days</span>
+</div>
+</label>
+<label class="relative cursor-pointer">
+<input class="peer sr-only" name="duration" type="radio"/>
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-4 text-center peer-checked:bg-error/5 peer-checked:border-error peer-checked:text-error transition-all hover:bg-surface-container-low">
+<span class="block font-body font-medium text-on-surface text-sm peer-checked:text-error">30 Days</span>
+</div>
+</label>
+<label class="relative cursor-pointer">
+<input class="peer sr-only" name="duration" type="radio"/>
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-4 text-center peer-checked:bg-error/10 peer-checked:border-error peer-checked:text-error transition-all hover:bg-surface-container-low">
+<span class="block font-body font-bold text-on-surface text-sm peer-checked:text-error">Indefinite</span>
+</div>
+</label>
+</div>
+</fieldset>
+<!-- Reason Field -->
+<div>
+<label class="block font-headline font-semibold text-primary mb-2 text-base" for="reason">Reason for Suspension</label>
+<div class="relative">
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant/20 rounded-lg p-4 font-body text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:border-error focus:ring-1 focus:ring-error focus:bg-surface-container-lowest transition-colors resize-none" id="reason" placeholder="Provide detailed institutional justification..." rows="4"></textarea>
+</div>
+<p class="font-body text-xs text-on-surface-variant mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                        This note will be added to the user's permanent academic log.
+                    </p>
+</div>
+</form>
+</div>
+<!-- Sticky Bottom Action -->
+<div class="bg-surface-container-lowest border-t border-outline-variant/10 p-6 pb-safe pt-4 mt-auto shadow-[0_-10px_30px_rgba(0,36,51,0.03)]">
+<button class="w-full bg-error text-on-error font-headline font-bold text-base py-4 rounded-lg flex items-center justify-center gap-2 hover:bg-error/90 active:scale-[0.98] transition-all shadow-[0_4px_12px_rgba(186,26,26,0.2)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gavel</span>
+                Confirm Suspension
+            </button>
+<button class="w-full mt-3 py-3 text-secondary font-body font-medium text-sm hover:bg-surface-container-low rounded-lg transition-colors">
+                Cancel Action
+            </button>
+</div>
+</div>
+</body></html>

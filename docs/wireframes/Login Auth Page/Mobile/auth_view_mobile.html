@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEU Knowledge Board - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Public+Sans:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#8ad0ef",
+                        "inverse-on-surface": "#f3f0f0",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#001e2c",
+                        "inverse-primary": "#a1cce6",
+                        "surface-bright": "#fbf9f8",
+                        "surface": "#fbf9f8",
+                        "secondary-container": "#98defe",
+                        "tertiary-fixed": "#8df4ec",
+                        "primary": "#002433",
+                        "on-tertiary-fixed-variant": "#00504c",
+                        "surface-container-low": "#f5f3f3",
+                        "inverse-surface": "#303030",
+                        "tertiary-fixed-dim": "#70d7d0",
+                        "on-tertiary": "#ffffff",
+                        "secondary": "#0d6682",
+                        "on-secondary-fixed": "#001f2a",
+                        "on-error": "#ffffff",
+                        "surface-container": "#f0eded",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#a1cce6",
+                        "tertiary-container": "#003e3b",
+                        "on-tertiary-fixed": "#00201e",
+                        "on-secondary-container": "#05637f",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#dcd9d9",
+                        "outline": "#71787d",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#41484c",
+                        "on-primary-fixed-variant": "#1d4c61",
+                        "surface-variant": "#e4e2e1",
+                        "surface-tint": "#38637a",
+                        "on-surface": "#1b1c1c",
+                        "primary-container": "#053b50",
+                        "on-primary": "#ffffff",
+                        "on-background": "#1b1c1c",
+                        "primary-fixed": "#c2e8ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#eae8e7",
+                        "on-secondary-fixed-variant": "#004d64",
+                        "on-tertiary-container": "#44afa9",
+                        "background": "#fbf9f8",
+                        "secondary-fixed": "#bde9ff",
+                        "tertiary": "#002624",
+                        "outline-variant": "#c1c7cd",
+                        "on-primary-container": "#7aa5be",
+                        "surface-container-highest": "#e4e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Public Sans", "sans-serif"],
+                        "display": ["Public Sans", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container min-h-screen flex flex-col justify-center items-center p-6 font-body text-on-surface antialiased selection:bg-on-tertiary-container selection:text-white">
+<main class="w-full max-w-sm">
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.06)] p-8 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-primary-container"></div>
+<div class="flex flex-col items-center mb-8 pt-2">
+<div class="w-16 h-16 bg-surface-container-low rounded-full flex items-center justify-center mb-4 text-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="school" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<h1 class="font-display font-bold text-2xl text-primary-container text-center tracking-tight">NEU Knowledge Board</h1>
+<p class="text-on-surface-variant text-sm mt-1 text-center font-body">Institutional Access Portal</p>
+</div>
+<form action="#" class="flex flex-col gap-5" method="POST">
+<div class="flex flex-col gap-1.5">
+<label class="font-label text-[11px] font-semibold uppercase tracking-widest text-on-surface-variant" for="email">Email Address</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-outline">
+<span class="material-symbols-outlined text-lg" data-icon="mail">mail</span>
+</span>
+<input class="w-full bg-surface-bright border border-outline-variant/30 rounded-lg pl-10 pr-4 py-3 text-sm text-on-surface placeholder:text-outline/50 focus:outline-none focus:border-on-tertiary-container focus:ring-1 focus:ring-on-tertiary-container transition-all" id="email" name="email" placeholder="@neu.edu.ph" required="" type="email"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<label class="font-label text-[11px] font-semibold uppercase tracking-widest text-on-surface-variant" for="password">Password</label>
+<a class="text-[11px] text-on-tertiary-container font-medium hover:underline" href="#">Forgot?</a>
+</div>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-outline">
+<span class="material-symbols-outlined text-lg" data-icon="lock">lock</span>
+</span>
+<input class="w-full bg-surface-bright border border-outline-variant/30 rounded-lg pl-10 pr-4 py-3 text-sm text-on-surface placeholder:text-outline/50 focus:outline-none focus:border-on-tertiary-container focus:ring-1 focus:ring-on-tertiary-container transition-all" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<div class="mt-4 flex flex-col gap-3">
+<button class="w-full bg-on-tertiary-container text-on-primary font-label font-semibold text-sm py-3.5 rounded-lg hover:opacity-90 transition-opacity shadow-sm flex items-center justify-center gap-2" type="submit">
+                        Login
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="w-full bg-transparent text-secondary border border-outline-variant/20 font-label font-medium text-sm py-3.5 rounded-lg hover:bg-surface-container-low transition-colors flex items-center justify-center" type="button">
+                        Register Account
+                    </button>
+</div>
+</form>
+</div>
+<div class="mt-8 text-center">
+<p class="text-xs text-outline font-body tracking-wide">
+                © 2024 The Academic Curator.<br/>All rights reserved.
+            </p>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Chats</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffdbd0",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "primary-fixed": "#dae1ff",
+                        "on-surface-variant": "#424656",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "surface-bright": "#f7f9fb",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-container-highest": "#e0e3e5",
+                        "inverse-primary": "#b3c5ff",
+                        "outline-variant": "#c2c6d8",
+                        "on-surface": "#191c1e",
+                        "on-secondary-fixed": "#0b1c30",
+                        "error-container": "#ffdad6",
+                        "primary": "#0050cb",
+                        "tertiary": "#a33200",
+                        "surface-tint": "#0054d6",
+                        "error": "#ba1a1a",
+                        "secondary": "#505f76",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-container": "#d0e1fb",
+                        "on-primary-container": "#f8f7ff",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary-fixed-variant": "#832600",
+                        "on-tertiary-fixed": "#390c00",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "surface-dim": "#d8dadc",
+                        "outline": "#727687",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "secondary-fixed": "#d3e4fe",
+                        "background": "#f7f9fb",
+                        "on-primary-fixed": "#001849",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-tertiary-container": "#fff6f4",
+                        "surface-container": "#eceef0",
+                        "surface": "#f7f9fb",
+                        "tertiary-container": "#cc4204",
+                        "on-background": "#191c1e",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#f2f4f6",
+                        "on-primary-fixed-variant": "#003fa4",
+                        "surface-variant": "#e0e3e5",
+                        "primary-container": "#0066ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "2rem",
+                        "md": "1rem",
+                        "margin": "1.5rem",
+                        "lg": "1.5rem",
+                        "gutter": "1rem",
+                        "xs": "0.25rem",
+                        "sm": "0.5rem"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "h2": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "h1": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "h2": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "h1": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .pt-safe { padding-top: env(safe-area-inset-top); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="bg-white dark:bg-slate-950 font-['Inter'] tracking-tight docked full-width top-0 border-b border-[#E2E8F0] dark:border-slate-800 flat no-shadow flex items-center justify-between px-4 h-16 w-full max-w-full sticky z-40 pt-safe">
+<div class="flex items-center gap-sm">
+<button class="relative w-8 h-8 rounded-full overflow-hidden active:opacity-80 transition-opacity duration-200 focus:outline-none focus:ring-2 focus:ring-primary-container">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A close-up portrait of a professional woman with a soft, natural smile, shot against a clean, out-of-focus background. The lighting is bright and even, highlighting her features and creating a modern, approachable corporate aesthetic suitable for an app profile picture. The color palette is composed of soft skin tones and a light, airy background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuArWBVvfe4hA2B6z6UqBzQZSQpODMv2z1EyRSFVuc8f83qECCnHymGhuASFmXjsazS0EGcom-cLylVtB1ZQgSdCOWLhIniE2bMmesdFcmekZDILW4mnVKHH5HBQyMqO5L9ElW-x04o-ysyvSibQ5vql6ZVpOz8Vq6WgxjceMjxYqrTqIWnmgYBZWhfuLprhJnymI_ImoJ6ixVsosMvlvy_UUMuDw097MtRX_a0xxwStKcy4byJbieaC9EPtZjeuVyOb96YR1J9kMYtl"/>
+</button>
+<h1 class="text-2xl font-bold text-slate-900 dark:text-white font-h1 text-h1">Chats</h1>
+</div>
+<button class="text-[#0066FF] active:opacity-80 transition-opacity duration-200 hover:bg-slate-50 dark:hover:bg-slate-900 w-10 h-10 rounded-full flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">edit_square</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow overflow-y-auto pb-safe">
+<!-- Search Bar -->
+<div class="px-4 py-sm bg-background sticky top-0 z-30">
+<div class="relative flex items-center w-full h-10 rounded-full bg-surface-container-high border border-outline-variant focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all duration-200">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">search</span>
+<input class="w-full h-full bg-transparent border-none focus:ring-0 pl-10 pr-4 text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant outline-none rounded-full" placeholder="Search chats" type="text"/>
+</div>
+</div>
+<!-- Chat List -->
+<ul class="flex flex-col">
+<!-- Unread Item 1 -->
+<li class="relative hover:bg-surface-container-low transition-colors duration-150 cursor-pointer group active:bg-surface-container">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary-container rounded-r-full"></div>
+<div class="flex items-center px-4 py-sm h-[72px] gap-md">
+<div class="relative shrink-0">
+<img alt="Sarah Jenkins" class="w-12 h-12 rounded-full object-cover" data-alt="A portrait of a young woman with a friendly expression, smiling warmly at the camera. She is set against a subtle, light-colored background, emphasizing a clean and professional corporate modern look. The image features bright, soft lighting that perfectly complements a light-mode UI color scheme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLQhvXk0PbUpPG1SiaoJFAAyyOmbKa81nD_iDY5RuDnEIeovEnH3hVi3pnolwpxG2B2lMRBFB7HMElANWe63cBnO3fg-OsAqjgGyABZUQY_Yo4J8ZwdlND_jSbE_uZ0Vki-QMGzSGAKvk-cJTVFkWnrS0YP1Bp8NOIe4ebSCMkw0Yrhv1BVO6yCY5lvOUH1TjL90mKOZIyzVtSGJ9m_AL381kthAM3oS7UhFdRVR4Bch2wekCvTtm8m4eeSBZESZSOcP_3-b8Wjcvm"/>
+<span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+</div>
+<div class="flex flex-col flex-grow min-w-0 justify-center h-full">
+<div class="flex justify-between items-baseline mb-xs">
+<span class="font-label-md text-label-md text-on-surface truncate">Sarah Jenkins</span>
+<span class="font-label-sm text-label-sm text-primary-container shrink-0 ml-2">10:42 AM</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="font-body-md text-body-md text-on-surface truncate font-semibold">I've prepared a few variations for the new dashboard layout. Let me know when you have time to review.</span>
+</div>
+</div>
+</div>
+</li>
+<!-- Unread Item 2 -->
+<li class="relative hover:bg-surface-container-low transition-colors duration-150 cursor-pointer group active:bg-surface-container">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary-container rounded-r-full"></div>
+<div class="flex items-center px-4 py-sm h-[72px] gap-md">
+<div class="relative shrink-0 w-12 h-12 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-h2 text-h2">
+                        MC
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-amber-500 border-2 border-white rounded-full"></span>
+</div>
+<div class="flex flex-col flex-grow min-w-0 justify-center h-full">
+<div class="flex justify-between items-baseline mb-xs">
+<span class="font-label-md text-label-md text-on-surface truncate">Marcus Chen</span>
+<span class="font-label-sm text-label-sm text-primary-container shrink-0 ml-2">9:15 AM</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="font-body-md text-body-md text-on-surface truncate font-semibold">Can we reschedule our 1:1 to tomorrow?</span>
+</div>
+</div>
+</div>
+</li>
+<!-- Read Item 1 -->
+<li class="relative hover:bg-surface-container-low transition-colors duration-150 cursor-pointer group active:bg-surface-container">
+<div class="flex items-center px-4 py-sm h-[72px] gap-md">
+<div class="relative shrink-0">
+<div class="w-12 h-12 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">groups</span>
+</div>
+</div>
+<div class="flex flex-col flex-grow min-w-0 justify-center h-full">
+<div class="flex justify-between items-baseline mb-xs">
+<span class="font-label-md text-label-md text-on-surface truncate">Engineering Main</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant shrink-0 ml-2">Yesterday</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="font-body-md text-body-md text-on-surface-variant truncate">Alex: I'll review the deployment logs shortly.</span>
+</div>
+</div>
+</div>
+</li>
+<!-- Read Item 2 -->
+<li class="relative hover:bg-surface-container-low transition-colors duration-150 cursor-pointer group active:bg-surface-container">
+<div class="flex items-center px-4 py-sm h-[72px] gap-md">
+<div class="relative shrink-0">
+<img alt="David Lee" class="w-12 h-12 rounded-full object-cover" data-alt="A headshot of a confident man with a short beard and glasses, looking directly at the viewer. He is positioned against a clean, neutral grey background that emphasizes a minimalist corporate aesthetic. The lighting is bright and structured, perfectly aligned with a light-mode UI design style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnuqM9lZ_Kx3ccxooaxClqXSJv-Ve-vgHA8-JzQXTJVUmG0iGDd4SwvCot5fOT1DHfqxhWQUR__2_Ph6c6uE5XTQx_VD0da3yC9ABVkrA1NzV3PX39HIX7IusP7aEDsAix-P94CM-4GEu7tr3M2Je3E5cUFEydRKoY3MsddCGsWILPIMsb6K2glMstbowbqaHUPc39iuQrYDWqJZhCIMs0dehGGp6zlCeHwFrybV90MqSLv7TS5wr_Mk5vdKaWqgtOu6T_xWzxNZRg"/>
+</div>
+<div class="flex flex-col flex-grow min-w-0 justify-center h-full">
+<div class="flex justify-between items-baseline mb-xs">
+<span class="font-label-md text-label-md text-on-surface truncate">David Lee</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant shrink-0 ml-2">Tue</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" style="font-variation-settings: 'FILL' 0;">done_all</span>
+<span class="font-body-md text-body-md text-on-surface-variant truncate">Sounds good, thanks!</span>
+</div>
+</div>
+</div>
+</li>
+<!-- Read Item 3 -->
+<li class="relative hover:bg-surface-container-low transition-colors duration-150 cursor-pointer group active:bg-surface-container">
+<div class="flex items-center px-4 py-sm h-[72px] gap-md">
+<div class="relative shrink-0">
+<img alt="Emily Watson" class="w-12 h-12 rounded-full object-cover" data-alt="A portrait of an adult woman with light hair, looking thoughtful. She is photographed against a bright, airy background, consistent with a clean and modern corporate UI aesthetic. The overall lighting is soft and high-key, suitable for a light-mode interface element." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJdTbE4AwwaiDrem88ctCLA8rSQ9Ob-wVfu42H1tQzcIsUFXnigNMeYpKV1XEBYXEB0vx0BVXesVf12oCt3czarLcNjgLU4uQMuAnnEoLl8uUtnRtp109pii2qlm9irL7iUy3UtK-JjI2K56sD79v1nByG7OVttUPBObnCRQJY8cMajpWc6gg0q6MV3XDgyUVLcyJpSxOllXpBrJf1r000Mv9jgF7hDzbnuUp1FpqkxHUg1s6AArAZNT7y_1TIJ1dSOuSmW9a8LuQf"/>
+</div>
+<div class="flex flex-col flex-grow min-w-0 justify-center h-full">
+<div class="flex justify-between items-baseline mb-xs">
+<span class="font-label-md text-label-md text-on-surface truncate">Emily Watson</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant shrink-0 ml-2">Mon</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="font-body-md text-body-md text-on-surface-variant truncate">The quarterly report is attached.</span>
+</div>
+</div>
+</div>
+</li>
+</ul>
+</main>
+<!-- BottomNavBar -->
+</body></html>

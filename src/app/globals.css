@@ -1,26 +1,71 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbf9f8;
+  --foreground: #1b1c1c;
+  
+  /* Brand Colors from HTML Config */
+  --primary: #002433;
+  --primary-container: #053b50;
+  --on-primary-container: #7aa5be;
+  --primary-fixed: #c2e8ff;
+  --primary-fixed-dim: #a1cce6;
+  
+  --secondary: #0d6682;
+  --secondary-container: #98defe;
+  
+  --tertiary: #44afa9;
+  --on-tertiary: #ffffff;
+  --tertiary-fixed: #8df4ec;
+  --on-tertiary-container: #44afa9;
+  
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f5f3f3;
+  --on-surface: #1b1c1c;
+  --on-surface-variant: #41484c;
+  --outline: #71787d;
+  --outline-variant: #c1c7cd;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  
+  --color-primary: var(--primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-primary-fixed: var(--primary-fixed);
+  --color-primary-fixed-dim: var(--primary-fixed-dim);
+  
+  --color-secondary: #0d6682;
+  --color-secondary-container: #98defe;
+  
+  --color-tertiary: var(--tertiary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-tertiary-fixed: var(--tertiary-fixed);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+  
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  --font-body: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-headline: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-label: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.btn-tertiary {
+  background-color: var(--tertiary);
+}
+
+.btn-claim {
+  background-color: #0d6682;
+  color: #ffffff;
 }

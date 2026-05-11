@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Academic Curator - Secure Vault</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed": "#c2e8ff",
+                    "tertiary-fixed-dim": "#70d7d0",
+                    "surface-bright": "#fbf9f8",
+                    "surface": "#fbf9f8",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#002433",
+                    "on-secondary-fixed-variant": "#004d64",
+                    "on-primary-fixed-variant": "#1d4c61",
+                    "inverse-on-surface": "#f3f0f0",
+                    "secondary-container": "#98defe",
+                    "on-secondary-container": "#05637f",
+                    "outline-variant": "#c1c7cd",
+                    "on-tertiary-fixed": "#00201e",
+                    "error": "#ba1a1a",
+                    "surface-variant": "#e4e2e1",
+                    "background": "#fbf9f8",
+                    "surface-container-highest": "#e4e2e1",
+                    "primary-container": "#053b50",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed": "#8df4ec",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#bde9ff",
+                    "surface-dim": "#dcd9d9",
+                    "secondary-fixed-dim": "#8ad0ef",
+                    "surface-container-low": "#f5f3f3",
+                    "surface-tint": "#38637a",
+                    "on-surface-variant": "#41484c",
+                    "primary-fixed-dim": "#a1cce6",
+                    "on-surface": "#1b1c1c",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "tertiary": "#002624",
+                    "on-tertiary-fixed-variant": "#00504c",
+                    "on-primary": "#ffffff",
+                    "surface-container-high": "#eae8e7",
+                    "on-secondary-fixed": "#001f2a",
+                    "on-tertiary-container": "#44afa9",
+                    "tertiary-container": "#003e3b",
+                    "on-primary-fixed": "#001e2c",
+                    "on-primary-container": "#7aa5be",
+                    "secondary": "#0d6682",
+                    "outline": "#71787d",
+                    "on-background": "#1b1c1c",
+                    "surface-container": "#f0eded",
+                    "on-tertiary": "#ffffff",
+                    "inverse-surface": "#303030",
+                    "inverse-primary": "#a1cce6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": [
+                            "Public Sans"
+                    ],
+                    "display": [
+                            "Public Sans"
+                    ],
+                    "body": [
+                            "Inter"
+                    ],
+                    "label": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {}
+    },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .display-font { font-family: 'Public Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col overflow-x-hidden selection:bg-on-tertiary-container selection:text-white">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-[60] shadow-[0_20px_40px_rgba(0,36,51,0.06)] bg-[#053B50]/85 dark:bg-slate-950/85 backdrop-blur-xl">
+<div class="flex justify-between items-center h-16 px-8 w-full font-['Public_Sans'] tracking-tight text-sm">
+<div class="flex items-center gap-6">
+<span class="text-lg font-bold tracking-[-2%] text-white">The Academic Curator</span>
+<div class="hidden md:flex items-center gap-6 ml-8">
+<!-- Top nav items suppressed based on JSON shell logic, mostly side nav driven -->
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-sm">search</span>
+<input class="pl-9 pr-4 py-1.5 rounded-full bg-white/10 border-none text-white placeholder-slate-300 focus:ring-2 focus:ring-[#44afa9] focus:bg-white/20 transition-colors text-sm w-48 lg:w-64" placeholder="Search archive..." type="text"/>
+</div>
+<button class="text-slate-300 hover:text-[#44afa9] transition-all duration-200 active:scale-95 transition-transform flex items-center justify-center w-8 h-8 rounded-full">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="text-slate-300 hover:text-[#44afa9] transition-all duration-200 active:scale-95 transition-transform flex items-center justify-center w-8 h-8 rounded-full">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-white/20 ml-2">
+<img alt="Admin Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBF2lStloM8HLkDzfcUqEQGak_yqopMrOXMZm8QfH1laX9UMhBWDGCVVwaxeRw95wIKeTaE5pzxcKSBZrD4QplmhJAXMGRFarb6NfEed4JA5ixN48rl00ltbRIa73YKJMW7knfGCPn06sYYi3stXngy5_Jae4QpGLVQ4gbJsS8CkvJUFUn2ml7e8W9Qv8CQkq2IAWK2BqVDCme3bm5NHfvJhtWjtb3WEsJtMLGR1xzcfvoCapdqOB79mlR3IMPrMXmcS7f-z-aAIj3T"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- App Container -->
+<div class="flex flex-1 pt-16">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-72 pt-20 z-50 bg-white dark:bg-slate-900 shadow-xl shadow-[#002433]/5 border-r border-[#f5f3f3] dark:border-slate-800/50 hidden md:flex flex-col text-[#002433] dark:text-slate-100 font-['Inter'] font-medium uppercase tracking-[5%] text-[11px]">
+<div class="flex flex-col gap-2 p-6 h-full">
+<div class="mb-8 flex items-center gap-4 px-2">
+<div class="w-10 h-10 rounded-DEFAULT bg-primary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+<div>
+<h2 class="font-['Public_Sans'] font-bold text-sm text-primary tracking-tight capitalize leading-tight">Admin Console</h2>
+<p class="text-[10px] text-on-surface-variant normal-case mt-0.5">System Oversight</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 bg-[#44afa9]/10 text-[#44afa9] font-bold px-4 py-3 rounded-md active:scale-95 transition-transform translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined text-[18px]">enhanced_encryption</span>
+                        Secure Vault
+                    </a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-md active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-[18px]">group</span>
+                        User Management
+                    </a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-md active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+                        Disposal Queue
+                    </a>
+<a class="flex items-center gap-3 text-slate-500 dark:text-slate-400 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-md active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-[18px]">history_edu</span>
+                        Audit Trail
+                    </a>
+</nav>
+<div class="mt-auto pt-4">
+<button class="w-full bg-primary-container text-white py-3 rounded-md font-['Inter'] font-semibold text-xs tracking-wider uppercase hover:bg-primary transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">summarize</span>
+                        Generate Report
+                    </button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 md:ml-72 p-8 lg:p-12 min-h-screen bg-surface-container-low">
+<header class="mb-10 max-w-7xl mx-auto">
+<h1 class="font-['Public_Sans'] font-extrabold text-3xl md:text-4xl text-primary tracking-[-2%] mb-2">Secure Vault</h1>
+<p class="text-on-surface-variant text-sm max-w-2xl leading-relaxed">Central repository for high-value assets requiring administrative oversight and unredacted verification.</p>
+</header>
+<div class="max-w-7xl mx-auto">
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_20px_40px_rgba(0,36,51,0.02)] overflow-hidden flex flex-col border border-outline-variant/15">
+<!-- Table Header -->
+<div class="bg-surface-container-high px-6 py-4 grid grid-cols-12 gap-4 items-center">
+<div class="col-span-3 text-xs font-semibold text-primary uppercase tracking-[5%]">Asset Details</div>
+<div class="col-span-2 text-xs font-semibold text-primary uppercase tracking-[5%]">Unredacted View</div>
+<div class="col-span-3 text-xs font-semibold text-primary uppercase tracking-[5%]">Hidden Note</div>
+<div class="col-span-2 text-xs font-semibold text-primary uppercase tracking-[5%]">Log Date / Bin</div>
+<div class="col-span-2 text-xs font-semibold text-primary uppercase tracking-[5%] text-right">Action</div>
+</div>
+<!-- Table Body -->
+<div class="flex flex-col">
+<!-- Row 1: Standard Item -->
+<div class="px-6 py-5 grid grid-cols-12 gap-4 items-center bg-surface transition-colors hover:bg-surface-bright group border-b border-surface-container-low last:border-0 relative">
+<!-- Depth effect on hover via pseudo-element instead of standard shadow -->
+<div class="absolute inset-0 bg-transparent group-hover:bg-surface-bright transition-colors duration-300 pointer-events-none z-0"></div>
+<div class="col-span-3 relative z-10 flex flex-col gap-1">
+<span class="font-['Public_Sans'] font-semibold text-primary">Prototype Device Delta</span>
+<span class="text-xs text-on-surface-variant font-mono bg-surface-container px-2 py-0.5 rounded w-fit">REF: 884-X9</span>
+</div>
+<div class="col-span-2 relative z-10">
+<div class="w-16 h-16 rounded bg-surface-container overflow-hidden border border-outline-variant/20">
+<!-- Use of Canvas Image -->
+<img class="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-alt="A macro photography shot of complex, futuristic circuitry inside a small metallic device, illuminated by cool, crisp white lighting against a stark minimalist white background. The intricate details of the exposed wires and silver components suggest an advanced technological prototype. The overall aesthetic is highly detailed, modern, and clinical, reflecting a light-mode high-tech laboratory setting." src="https://lh3.googleusercontent.com/aida/ADBb0uiUHVV5Xu_mLL1JhoYZjaV_xcOjYJ93sTVFEgjnMKj6iEERHihRVwyHndcDoW-NStxs6jxrwwIO8LuFSWu7m7P1leVa2Jo6khbsk4NC3QZQZot3e5RgZnmP2kYATeLp_PQHbAQMEEUA32Hjq_iXX1nkAy1Jw3cWsMc_S1RRpozbwymJXdnWGr0SzSoOldysJxAYZVuiMijNjjmM0bwD7bW6q4NMdw2ycg9Owyq_CFVxDqAsEfPzxSHlur37K6ZbMd8SL0h-iD0kIpw"/>
+</div>
+</div>
+<div class="col-span-3 relative z-10 pr-4">
+<div class="text-sm text-on-surface-variant italic border-l-2 border-on-tertiary-container/30 pl-3 py-1">
+                                    "Found near main engineering hall. Battery removed for safety."
+                                </div>
+</div>
+<div class="col-span-2 relative z-10 flex flex-col gap-1.5">
+<span class="text-sm font-medium text-primary">Oct 12, 2023</span>
+<div class="inline-flex items-center gap-1.5 bg-tertiary-fixed text-on-tertiary-fixed px-2 py-0.5 rounded-sm text-[10px] uppercase font-bold tracking-wider w-fit">
+<span class="material-symbols-outlined text-[12px]">inventory_2</span>
+                                    A-04
+                                </div>
+</div>
+<div class="col-span-2 relative z-10 flex justify-end">
+<button class="bg-on-tertiary-container hover:bg-primary-container text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-sm flex items-center gap-2 bg-gradient-to-br from-on-tertiary-container to-[#389691]">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+                                    Verify
+                                </button>
+</div>
+</div>
+<!-- Row 2: Lifecycle Highlight Row -->
+<div class="px-6 py-5 grid grid-cols-12 gap-4 items-center bg-error-container/20 transition-colors hover:bg-error-container/30 group border-b border-surface-container-low last:border-0 relative">
+<div class="col-span-3 relative z-10 flex flex-col gap-1">
+<span class="font-['Public_Sans'] font-semibold text-primary">Confidential Manuscript</span>
+<span class="text-xs text-on-surface-variant font-mono bg-surface-container px-2 py-0.5 rounded w-fit">REF: 102-M2</span>
+</div>
+<div class="col-span-2 relative z-10">
+<div class="w-16 h-16 rounded bg-surface-container overflow-hidden border border-outline-variant/20 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[24px]">description</span>
+</div>
+</div>
+<div class="col-span-3 relative z-10 pr-4">
+<div class="text-sm text-on-surface-variant italic border-l-2 border-on-tertiary-container/30 pl-3 py-1">
+                                    "Unmarked envelope. Contains sensitive departmental data."
+                                </div>
+</div>
+<div class="col-span-2 relative z-10 flex flex-col gap-1.5">
+<span class="text-sm font-bold text-error flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                                    42 DAYS AGO
+                                </span>
+<div class="inline-flex items-center gap-1.5 bg-tertiary-fixed text-on-tertiary-fixed px-2 py-0.5 rounded-sm text-[10px] uppercase font-bold tracking-wider w-fit">
+<span class="material-symbols-outlined text-[12px]">inventory_2</span>
+                                    B-12
+                                </div>
+</div>
+<div class="col-span-2 relative z-10 flex justify-end">
+<button class="bg-error hover:bg-on-error-container text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">gavel</span>
+                                    Audit Now
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
