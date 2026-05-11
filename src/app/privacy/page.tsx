@@ -9,7 +9,7 @@ export default function PrivacyPolicy() {
           <div className="flex items-center gap-3">
             <Image src="/navibyte-logo-v2.svg" alt="Navibyte Logo" width={40} height={40} className="drop-shadow-md" />
             <span className="text-xl font-black text-white tracking-[-2%] font-headline drop-shadow-md">
-              Navibyte KB
+              NEUvigate
             </span>
           </div>
         </header>
@@ -25,7 +25,7 @@ export default function PrivacyPolicy() {
               <section>
                 <h2 className="font-headline text-2xl font-bold text-primary mb-4 tracking-tight">1. Collection of Unredacted Asset Data</h2>
                 <p className="mb-4">
-                  In accordance with the SECI Knowledge Framework, Navibyte KB platform securely stores detailed, unredacted records of institutional assets. This includes, but is not limited to, "Hidden Notes," internal provenance records, and high-resolution, unredacted imagery necessary for staff verification and historical accuracy.
+                  In accordance with the SECI Knowledge Framework, NEUvigate platform securely stores detailed, unredacted records of institutional assets. This includes, but is not limited to, "Hidden Notes," internal provenance records, and high-resolution, unredacted imagery necessary for staff verification and historical accuracy.
                 </p>
                 <p>
                   Access to these unredacted layers is strictly limited to authorized curatorial staff and administrative personnel. The system employs rigorous access control lists (ACLs) to ensure that public-facing views automatically redact sensitive information, preserving both historical integrity and necessary privacy protocols.

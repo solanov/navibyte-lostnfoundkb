@@ -86,7 +86,7 @@ export default function SideNav() {
         </div>
         {!isCollapsed && (
           <div className="whitespace-nowrap overflow-hidden transition-all duration-300">
-            <h1 className="text-[#002433] font-black text-xl leading-tight font-headline tracking-tight">Navibyte KB</h1>
+            <h1 className="text-[#002433] font-black text-xl leading-tight font-headline tracking-tight">NEUvigate</h1>
             <p className="text-[#41484c] text-xs font-medium uppercase tracking-widest mt-0.5">Lost &amp; Found</p>
           </div>
         )}

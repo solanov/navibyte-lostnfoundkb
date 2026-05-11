@@ -344,7 +344,7 @@ export default function AdminDashboard() {
       <header className="fixed top-0 z-[60] flex h-16 w-full items-center justify-between bg-[#053B50]/90 px-4 text-white shadow-[0_20px_40px_rgba(0,36,51,0.06)] backdrop-blur-xl md:px-8">
         <div className="flex items-center gap-3">
           <Image src="/navibyte-logo-v2.svg" alt="Navibyte Logo" width={36} height={36} className="drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] transform hover:scale-110 transition-all duration-300 will-change-transform" />
-          <span className="font-headline text-lg font-black tracking-tight drop-shadow-md">Navibyte Admin</span>
+          <span className="font-headline text-lg font-black tracking-tight drop-shadow-md">NEUvigate Admin</span>
         </div>
         <div className="hidden max-w-md flex-1 px-8 md:block">
           <div className="relative">

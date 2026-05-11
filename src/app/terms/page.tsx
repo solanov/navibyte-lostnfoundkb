@@ -9,7 +9,7 @@ export default function TermsOfService() {
           <div className="flex items-center gap-3">
             <Image src="/navibyte-logo-v2.svg" alt="Navibyte Logo" width={40} height={40} className="drop-shadow-md" />
             <span className="text-xl font-black text-white tracking-[-2%] font-headline drop-shadow-md">
-              Navibyte KB
+              NEUvigate
             </span>
           </div>
         </header>
@@ -19,7 +19,7 @@ export default function TermsOfService() {
             <span className="text-[10px] font-bold uppercase tracking-widest text-on-tertiary-container bg-tertiary-fixed px-2 py-1 rounded mb-4 inline-block">Legal Directory / Policies</span>
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tighter text-primary mb-2">Terms of Service &amp;<br/>Operational Mandates</h1>
             <p className="text-on-surface-variant font-medium mt-4">
-              Governing the collection, retention, and systematic disposal of physical and digital artifacts within the Navibyte KB ecosystem. Last updated May, 2026.
+              Governing the collection, retention, and systematic disposal of physical and digital artifacts within the NEUvigate ecosystem. Last updated May, 2026.
             </p>
           </div>
         </header>
@@ -32,7 +32,7 @@ export default function TermsOfService() {
             </h2>
             <div className="text-on-surface-variant text-sm space-y-6">
               <p className="leading-relaxed">
-                Navibyte KB enforces a strict thirty-day retention policy to prevent physical storage drift and maintain digital database integrity. All items logged into the system are subject to this lifecycle mandate, beginning precisely at the timestamp of initial intake.
+                NEUvigate enforces a strict thirty-day retention policy to prevent physical storage drift and maintain digital database integrity. All items logged into the system are subject to this lifecycle mandate, beginning precisely at the timestamp of initial intake.
               </p>
               <ul className="list-none space-y-4 ml-2">
                 <li className="flex items-start gap-3">
