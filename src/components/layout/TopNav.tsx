@@ -46,7 +46,7 @@ export default function TopNav() {
         )}
 
         <h1 className="truncate text-center font-headline text-lg font-black tracking-tight text-[#002433]">
-          {isMessagesPage ? "Messages" : "Navibyte KB"}
+          {isMessagesPage ? "Messages" : "NEUvigate"}
         </h1>
 
         <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#002433]/10 bg-white">

@@ -298,7 +298,7 @@ export default function ResetPassword() {
             <div className="flex items-center gap-4 mb-12">
               <Image src="/navibyte-logo-v2.svg" alt="Navibyte Logo" width={64} height={64} className="drop-shadow-[0_8px_16px_rgba(0,0,0,0.6)] transform hover:scale-110 transition-all duration-500 will-change-transform" />
               <span className="text-white font-headline font-black tracking-tighter text-3xl drop-shadow-lg">
-                Navibyte KB
+                NEUvigate
               </span>
             </div>
             <h2 className="text-white font-headline text-4xl font-extrabold leading-tight tracking-tight mb-5">
@@ -342,7 +342,7 @@ export default function ResetPassword() {
             <div className="flex items-center gap-3 mb-2 md:hidden">
               <Image src="/navibyte-logo-v2.svg" alt="Navibyte Logo" width={36} height={36} className="drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] transform hover:scale-105 transition-all duration-300 will-change-transform" />
               <span className="text-[#053B50] font-headline font-black text-xl tracking-tight">
-                Navibyte KB
+                NEUvigate
               </span>
             </div>
             <h1 className="text-[#053B50] font-headline font-black text-3xl tracking-tight">

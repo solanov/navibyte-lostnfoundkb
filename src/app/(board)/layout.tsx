@@ -1,4 +1,5 @@
 import TopNav from "@/src/components/layout/TopNav";
+import BottomNavBar from "@/src/components/layout/BottomNavBar";
 
 // Layout for the (board) route group — authenticated pages only.
 export default function BoardLayout({
@@ -16,6 +17,8 @@ export default function BoardLayout({
       <div className="flex-1 w-full relative">
         {children}
       </div>
+
+      <BottomNavBar />
       
     </div>
   );
