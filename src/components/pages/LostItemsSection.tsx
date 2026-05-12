@@ -6,6 +6,7 @@ import ItemCard from './ItemCard';
 import ConversationModal from './ConversationModal';
 import ItemDetailModal from './ItemDetailModal';
 import { submitClaimAction, userDeletePostAction, markAsReturnedAction } from '@/src/app/admin/actions/posts';
+import { submitReportAction, ReportReason } from '@/src/app/admin/actions/reports';
 import { useNotification } from '@/src/hooks/useNotification';
 
 interface LostItem {
@@ -32,9 +33,11 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
   const [visibleItems, setVisibleItems] = useState(items);
   const [selectedItem, setSelectedItem] = useState<LostItem | null>(null);
   const [claimItem, setClaimItem] = useState<LostItem | null>(null);
+  const [reportItem, setReportItem] = useState<LostItem | null>(null);
   const [conversationItem, setConversationItem] = useState<LostItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isConversationOpen, setIsConversationOpen] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currentUserName, setCurrentUserName] = useState('You');
@@ -260,6 +263,29 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
     }
   };
 
+  // ── Report handlers ─────────────────────────────────────────────────
+  const handleOpenReport = () => {
+    if (!selectedItem) return;
+    setReportItem(selectedItem);
+    setIsModalOpen(false);
+    setIsReportModalOpen(true);
+  };
+
+  const handleSubmitReport = async (reason: ReportReason, details: string) => {
+    if (!reportItem) return;
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) throw new Error('Authentication token missing.');
+      await submitReportAction(accessToken, reportItem.post_id, reason, details);
+      notify('Report submitted. Our team will review it shortly.', 'success');
+      setIsReportModalOpen(false);
+      setReportItem(null);
+    } catch (err) {
+      notify(`Error: ${err instanceof Error ? err.message : String(err)}`, 'error');
+    }
+  };
+
   return (
     <>
       {/* Items Grid */}
@@ -320,6 +346,7 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
         onContactClick={handleContactPoster}
         onDeletePost={handleDeletePost}
         onMarkAsReturned={handleMarkAsReturned}
+        onReportClick={currentUserId && currentUserId !== selectedItem?.reported_by ? handleOpenReport : undefined}
         onClose={handleCloseModal}
       />
 
@@ -429,6 +456,93 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
           </div>
         </div>
       )}
+
+      {/* ── Report Post Modal ─────────────────────────────────── */}
+      {isReportModalOpen && reportItem && (
+        <ReportModal
+          item={reportItem}
+          onClose={() => { setIsReportModalOpen(false); setReportItem(null); }}
+          onSubmit={handleSubmitReport}
+        />
+      )}
     </>
+  );
+}
+
+// ── ReportModal ──────────────────────────────────────────────────────────────
+const REPORT_REASONS: ReportReason[] = [
+  'Spam',
+  'Inappropriate Content',
+  'Fake/Scam',
+  'Duplicate',
+  'Other',
+];
+
+function ReportModal({
+  item,
+  onClose,
+  onSubmit,
+}: {
+  item: { post_id: string; general_description: string };
+  onClose: () => void;
+  onSubmit: (reason: ReportReason, details: string) => Promise<void>;
+}) {
+  const [reason, setReason] = useState<ReportReason | ''>('');
+  const [details, setDetails] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [title] = (item.general_description || '').split('\n\n');
+  const reference = `LF-${item.post_id.substring(0, 4).toUpperCase()}`;
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!reason) return;
+    setBusy(true);
+    await onSubmit(reason as ReportReason, details);
+    setBusy(false);
+  }
+
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-[#002433]/35 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-[0_20px_40px_rgba(0,36,51,0.2)]">
+        <div className="flex items-center justify-between bg-[#ba1a1a] px-6 py-5">
+          <div>
+            <h2 className="font-headline text-xl font-bold text-white">Report Post</h2>
+            <p className="mt-0.5 text-sm text-red-100">Ref: {reference}</p>
+          </div>
+          <button onClick={onClose} disabled={busy} className="text-red-100 transition hover:text-white disabled:opacity-60" aria-label="Close">
+            <span className="material-symbols-outlined text-2xl">close</span>
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-5 p-6">
+          <div className="rounded-xl bg-[#f5f3f3] p-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#41484c]/60">Reporting</p>
+            <p className="mt-1 text-sm font-bold text-[#002433] line-clamp-2">{title || 'Unknown Item'}</p>
+          </div>
+          <fieldset>
+            <legend className="mb-2 block text-xs font-bold uppercase tracking-widest text-[#41484c]">
+              Reason <span className="text-[#ba1a1a]">*</span>
+            </legend>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {REPORT_REASONS.map((r) => (
+                <label key={r} className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition-all ${reason === r ? 'border-[#ba1a1a] bg-red-50 text-[#ba1a1a]' : 'border-[#002433]/10 hover:border-[#ba1a1a]/40 hover:bg-red-50/50 text-[#41484c]'}`}>
+                  <input type="radio" name="report-reason" value={r} checked={reason === r} onChange={() => setReason(r)} className="sr-only" />
+                  <span className="text-sm font-semibold">{r}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <label className="block">
+            <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-[#41484c]">
+              Additional Details <span className="font-normal text-[#41484c]/50">(optional)</span>
+            </span>
+            <textarea value={details} onChange={(e) => setDetails(e.target.value)} rows={3} disabled={busy} placeholder="Any extra context for our review team." className="w-full rounded-md border border-[#002433]/10 bg-[#f5f3f3] px-4 py-3 text-sm outline-none transition focus:border-[#ba1a1a] focus:ring-1 focus:ring-[#ba1a1a] disabled:opacity-60" />
+          </label>
+          <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button type="button" onClick={onClose} disabled={busy} className="rounded-md border border-[#002433]/10 px-5 py-3 text-sm font-bold text-[#41484c] transition hover:bg-[#f5f3f3] disabled:opacity-60">Cancel</button>
+            <button type="submit" disabled={busy || !reason} className="rounded-md bg-[#ba1a1a] px-5 py-3 text-sm font-bold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60">{busy ? 'Submitting...' : 'Submit Report'}</button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
