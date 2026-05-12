@@ -46,7 +46,7 @@ function getSingleParam(value: string | string[] | undefined) {
 // Helper to clear a parameter
 function buildFilterHref(
   searchParams: SearchParamMap,
-  paramKeyToRemove?: 'category' | 'color' | 'building'
+  paramKeyToRemove?: 'category' | 'color' | 'building' | 'type'
 ) {
   const params = new URLSearchParams();
 
@@ -68,7 +68,7 @@ function buildFilterHref(
 }
 
 // Helper to toggle a parameter (add it, or remove it if already active)
-function buildToggleHref(searchParams: SearchParamMap, key: 'category' | 'color' | 'building', value: string) {
+function buildToggleHref(searchParams: SearchParamMap, key: 'category' | 'color' | 'building' | 'type', value: string) {
   const currentVal = getSingleParam(searchParams[key]);
   if (currentVal === value) {
     return buildFilterHref(searchParams, key); // Remove if already active
@@ -132,6 +132,24 @@ function matchesFilter(value: string | undefined, selectedValue: string | undefi
   return value.trim().toLowerCase() === selectedValue.trim().toLowerCase();
 }
 
+function matchesItemType(status: string | undefined, selectedType: string | undefined) {
+  if (!selectedType) return true;
+  if (!status) return false;
+
+  const normalizedStatus = status.trim().toLowerCase();
+  const normalizedType = selectedType.trim().toLowerCase();
+
+  if (normalizedType === 'lost') {
+    return normalizedStatus === 'reported' || normalizedStatus === 'lost';
+  }
+
+  if (normalizedType === 'found') {
+    return normalizedStatus === 'found';
+  }
+
+  return true;
+}
+
 function getCategoryName(
   item: LostItemWithCategory,
   categoryMap?: Map<string, string>
@@ -152,6 +170,7 @@ export default async function PublicBoard({
   const selectedCategory = getSingleParam(resolvedSearchParams.category);
   const selectedColor = getSingleParam(resolvedSearchParams.color);
   const selectedBuilding = getSingleParam(resolvedSearchParams.building);
+  const selectedType = getSingleParam(resolvedSearchParams.type);
   const searchQuery = getSingleParam(resolvedSearchParams.q);
   const requestedPage = Number.parseInt(getSingleParam(resolvedSearchParams.page) || '1', 10);
 
@@ -226,6 +245,7 @@ const categoryOptionsFromTable = (categoriesResult.data || []).map((category) =>
 
     return (
       matchesSearch && // <-- Add this line to the return statement
+      matchesItemType(item.status, selectedType) &&
       matchesFilter(getCategoryName(item, discoveredCategoryMap), selectedCategory) &&
       matchesFilter(item.color, selectedColor) &&
       matchesFilter(item.zone, selectedBuilding)
@@ -285,7 +305,7 @@ const categoryOptionsFromTable = (categoriesResult.data || []).map((category) =>
                   </div>
 
                   {/* Mobile Clear Button */}
-                  {(selectedCategory || selectedColor || selectedBuilding) && (
+                  {(selectedType || selectedCategory || selectedColor || selectedBuilding) && (
                     <Link 
                       href="/board" 
                       className="text-[10px] font-bold uppercase tracking-widest text-[#ba1a1a] hover:underline md:hidden"
@@ -297,6 +317,44 @@ const categoryOptionsFromTable = (categoriesResult.data || []).map((category) =>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
+                  <FilterDetails name="board-filters" className="relative group shrink-0">
+                    <summary className="list-none [&::-webkit-details-marker]:hidden flex w-full justify-between cursor-pointer items-center rounded-lg bg-[#f5f3f3] px-3 md:px-4 py-2 text-xs font-semibold text-[#41484c] hover:bg-[#002433]/10 transition-all select-none">
+                      <div className="flex items-center gap-2">
+                        Type
+                        {selectedType && <span className="w-2 h-2 rounded-full bg-[#44afa9]"></span>}
+                      </div>
+                      <span className="material-symbols-outlined text-[16px] group-open:rotate-180 transition-transform">expand_more</span>
+                    </summary>
+                    <div className="absolute left-0 top-full mt-2 w-40 rounded-xl bg-[#ffffff] p-2 shadow-[0_20px_40px_rgba(0,36,51,0.1)] border border-[#002433]/5 z-50">
+                      <Link
+                        href={buildFilterHref(resolvedSearchParams, 'type')}
+                        scroll={false}
+                        className={`block w-full rounded-md px-3 py-2 text-left text-xs font-semibold transition-all ${
+                          !selectedType ? "bg-[#002433] text-white" : "text-[#41484c] hover:bg-[#f5f3f3]"
+                        }`}
+                      >
+                        All Items
+                      </Link>
+                      {[
+                        { label: 'Lost', value: 'lost' },
+                        { label: 'Found', value: 'found' },
+                      ].map((itemType) => (
+                        <Link
+                          key={itemType.value}
+                          href={buildToggleHref(resolvedSearchParams, 'type', itemType.value)}
+                          scroll={false}
+                          className={`mt-1 block w-full rounded-md px-3 py-2 text-left text-xs font-semibold transition-all ${
+                            selectedType?.toLowerCase() === itemType.value
+                              ? "bg-[#002433] text-white"
+                              : "text-[#41484c] hover:bg-[#f5f3f3]"
+                          }`}
+                        >
+                          {itemType.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </FilterDetails>
+
                   {/* Category Dropdown */}
                   {categoryOptions.length > 0 && (
                     <FilterDetails name="board-filters" className="relative group shrink-0">
@@ -407,7 +465,7 @@ const categoryOptionsFromTable = (categoriesResult.data || []).map((category) =>
                 </div>
 
                 {/* Desktop Clear Button */}
-                {(selectedCategory || selectedColor || selectedBuilding) && (
+                {(selectedType || selectedCategory || selectedColor || selectedBuilding) && (
                   <Link 
                     href="/board" 
                     className="hidden md:block ml-auto text-[10px] font-bold uppercase tracking-widest text-[#ba1a1a] hover:underline px-2 shrink-0"

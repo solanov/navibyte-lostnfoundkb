@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import StatusBadge from './StatusBadge';
+import { resolveIcon } from '@/src/lib/resolveIcon';
 
 interface ItemDetailModalProps {
   isOpen: boolean;
@@ -79,7 +80,7 @@ export default function ItemDetailModal({
 
   const [title] = (item.general_description || '').split('\n\n');
   const description = (item.general_description || '').split('\n\n').slice(1).join('\n\n');
-  const icon = item.categories?.icon_identifier || 'help_outline';
+  const icon = resolveIcon(item.categories?.icon_identifier);
   const reference = `AC-${item.post_id.substring(0, 4).toUpperCase()}`;
   const displayStatus = item.status === 'Reported' ? 'Lost' : item.status;
   const placeholderIcon = item.status.toLowerCase() === 'found' ? 'lock' : 'visibility_off';
