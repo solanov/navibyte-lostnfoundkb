@@ -68,3 +68,33 @@
 - **[Change the Color of the UI](https://github.com/solanov/navibyte-lostnfoundkb/issues/76)**
   - [Added Footer and Color UI Changes](https://github.com/solanov/navibyte-lostnfoundkb/pull/81)
 
+## Polishing, Bugfixes, and Documentation (Beta)
+- **[Fix Bug - Unintended Polling](https://github.com/solanov/navibyte-lostnfoundkb/issues/84)**
+  - [Polling Logic Fix](https://github.com/solanov/navibyte-lostnfoundkb/pull/85)
+
+- **[Implement Role-Based Access Control (RBAC)](https://github.com/solanov/navibyte-lostnfoundkb/issues/36)**
+  - [RBAC and Admin Protection](https://github.com/solanov/navibyte-lostnfoundkb/pull/87)
+
+- **[Build Admin Moderation API](https://github.com/solanov/navibyte-lostnfoundkb/issues/37)**
+  - [Admin API Moderation](https://github.com/solanov/navibyte-lostnfoundkb/pull/88)
+
+- **[Add Dropdown when Clicking UI Avatar](https://github.com/solanov/navibyte-lostnfoundkb/issues/70)**
+  - [Avatar Dropdown and Burger Button Logic](https://github.com/solanov/navibyte-lostnfoundkb/pull/82)
+
+- **[Add functionality on burger button (Mobile View)](https://github.com/solanov/navibyte-lostnfoundkb/issues/72)**
+  - [Avatar Dropdown and Burger Button Logic](https://github.com/solanov/navibyte-lostnfoundkb/pull/82)
+
+- **[Automate Data Censorship](https://github.com/solanov/navibyte-lostnfoundkb/issues/79)**
+  - [Data Censorship and Anonymity Options](https://github.com/solanov/navibyte-lostnfoundkb/pull/95)
+
+- **[Add Camera Upload Option](https://github.com/solanov/navibyte-lostnfoundkb/issues/102)**
+  - [Camera Integration for Direct Upload](https://github.com/solanov/navibyte-lostnfoundkb/pull/107)
+
+- **[Remove "Claim Item" Button (Direct Contact)](https://github.com/solanov/navibyte-lostnfoundkb/issues/106)**
+  - [Updated User Contact Flow](https://github.com/solanov/navibyte-lostnfoundkb/pull/108)
+
+# Version 1.0.0 (Release)
+- **Final Deployment Prep**
+  - [Final Bug Inspection and Failure Analysis](https://github.com/solanov/navibyte-lostnfoundkb/pull/110)
+  
+  - [Documentation Update](https://github.com/solanov/navibyte-lostnfoundkb/pull/111)
