@@ -26,7 +26,7 @@ const fallbackCategories = [
   { id: 2, label: 'Keys', icon: 'vpn_key' },
   { id: 3, label: 'ID', icon: 'badge' },
   { id: 4, label: 'Tech', icon: 'devices' },
-  { id: 5, label: 'Others', icon: 'category' },
+  { id: 62, label: 'Others', icon: 'category' },
 ];
 
 export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProps) {
@@ -118,16 +118,22 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
     zone: string;
     selectedCategory: number | null;
     selectedColor: string | null;
-  }>) => ({
-    entryType,
-    selectedCategory: overrides?.selectedCategory ?? selectedCategory,
-    selectedColor: overrides?.selectedColor ?? selectedColor,
-    title: overrides?.title ?? title,
-    description: overrides?.description ?? description,
-    zone: overrides?.zone ?? zone,
-    hiddenNote: "",
-    imageUrl: null,
-  });
+  }>) => {
+    const nextSelectedCategory = overrides?.selectedCategory ?? selectedCategory;
+
+    return {
+      entryType,
+      selectedCategory: nextSelectedCategory,
+      selectedCategoryName:
+        categories.find((category) => category.id === nextSelectedCategory)?.label ?? null,
+      selectedColor: overrides?.selectedColor ?? selectedColor,
+      title: overrides?.title ?? title,
+      description: overrides?.description ?? description,
+      zone: overrides?.zone ?? zone,
+      hiddenNote: "",
+      imageUrl: null,
+    };
+  };
 
   const validateDraft = (overrides?: Parameters<typeof buildDraftInput>[0]) =>
     validateCreateEntryInput(buildDraftInput(overrides), { requireImage: false });
