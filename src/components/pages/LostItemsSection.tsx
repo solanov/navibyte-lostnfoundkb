@@ -8,6 +8,7 @@ import ItemDetailModal from './ItemDetailModal';
 import { submitClaimAction, userDeletePostAction, markAsReturnedAction } from '@/src/app/admin/actions/posts';
 import { submitReportAction, ReportReason } from '@/src/app/admin/actions/reports';
 import { useNotification } from '@/src/hooks/useNotification';
+import { resolveIcon } from '@/src/lib/resolveIcon';
 
 interface LostItem {
   post_id: string;
@@ -298,7 +299,7 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
         ) : (
           visibleItems.map((item) => {
             const [title] = (item.general_description || '').split('\n\n');
-            const icon = item.categories?.icon_identifier || 'help_outline';
+            const icon = resolveIcon(item.categories?.icon_identifier);
             const reference = `LF-${item.post_id.substring(0, 4).toUpperCase()}`;
             const displayStatus = item.status === 'Reported' ? 'Lost' : item.status;
 

@@ -1,4 +1,5 @@
 "use client";
+import { resolveIcon } from '@/src/lib/resolveIcon';
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/src/lib/supabase";
@@ -76,7 +77,7 @@ export default function ArchiveClient() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {items.map((item) => {
           const [title] = (item.general_description || "").split("\n\n");
-          const icon = item.categories?.icon_identifier || "help_outline";
+          const icon = resolveIcon(item.categories?.icon_identifier);
           const reference = `AC-${item.post_id.substring(0, 4).toUpperCase()}`;
 
           // Map archiveLabel to visual styling
