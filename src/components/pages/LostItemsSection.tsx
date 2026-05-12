@@ -311,111 +311,93 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
       )}
 
       {isClaimModalOpen && claimItem && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-[#002433]/40 p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200">
-          
-          {/* Main Modal Container - Added max-height flex constraints */}
-          <div className="w-full max-w-2xl flex flex-col max-h-[90vh] sm:max-h-[85vh] overflow-hidden rounded-2xl bg-white shadow-[0_20px_40px_rgba(0,36,51,0.2)] animate-in zoom-in-95 duration-200">
-            
-            {/* Header - Fixed at the top */}
-            <div className="flex shrink-0 items-center justify-between bg-[#053b50] px-5 sm:px-6 py-4 sm:py-5 border-b border-[#002433]/10">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-[#002433]/35 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-[0_20px_40px_rgba(0,36,51,0.2)]">
+            <div className="flex items-center justify-between bg-primary-container px-6 py-5">
               <div>
-                <h2 className="font-headline text-lg sm:text-2xl font-black text-white tracking-tight">Submit Claim</h2>
-                <p className="mt-0.5 text-[10px] font-bold text-[#8df4ec] uppercase tracking-widest">
+                <h2 className="font-headline text-2xl font-bold text-white">Submit Claim</h2>
+                <p className="mt-1 text-sm text-on-primary-container">
                   Reference: LF-{claimItem.post_id.substring(0, 4).toUpperCase()}
                 </p>
               </div>
               <button
                 onClick={handleCloseClaimModal}
                 disabled={isSubmittingClaim}
-                className="text-white/60 hover:text-white hover:bg-white/10 transition-all p-2 rounded-lg disabled:cursor-not-allowed disabled:opacity-60"
+                className="text-on-primary-container transition hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
                 aria-label="Close claim form"
               >
-                <span className="material-symbols-outlined text-xl sm:text-2xl">close</span>
+                <span className="material-symbols-outlined text-2xl">close</span>
               </button>
             </div>
 
-            {/* Scrollable Form Content */}
-            <form onSubmit={handleSubmitClaim} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
-              
-              <div className="rounded-xl bg-[#f5f3f3] p-4 border border-[#002433]/5">
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#41484c]">
+            <form onSubmit={handleSubmitClaim} className="space-y-5 p-6">
+              <div className="rounded-xl bg-surface-container-low p-4">
+                <p className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
                   Claiming Item
                 </p>
-                <p className="mt-1.5 text-base sm:text-lg font-bold text-[#002433] leading-tight">
+                <p className="mt-2 text-lg font-bold text-primary">
                   {(claimItem.general_description || '').split('\n\n')[0] || 'Selected Item'}
                 </p>
-                <p className="mt-2 text-xs sm:text-sm text-[#41484c]/80 leading-relaxed font-medium">
+                <p className="mt-1 text-sm text-on-surface-variant">
                   Add your identity details and a short ownership description so the request can be reviewed and stored in the claim log.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <label className="block">
-                  <span className="mb-2 block text-[10px] font-black uppercase tracking-widest text-[#41484c]">
-                    Claimant Name
-                  </span>
-                  <input
-                    value={claimantName}
-                    onChange={(event) => setClaimantName(event.target.value)}
-                    required
-                    disabled={isSubmittingClaim}
-                    placeholder="Enter your full name"
-                    className="w-full rounded-xl border border-[#002433]/10 bg-white px-4 py-3 text-sm font-medium text-[#002433] outline-none transition-all focus:border-[#44afa9] focus:ring-1 focus:ring-[#44afa9] disabled:opacity-60"
-                  />
-                </label>
-
-                <label className="block">
-                  <span className="mb-2 block text-[10px] font-black uppercase tracking-widest text-[#41484c]">
-                    Student ID
-                  </span>
-                  <input
-                    value={studentId}
-                    onChange={(event) => setStudentId(event.target.value)}
-                    required
-                    disabled={isSubmittingClaim}
-                    placeholder="e.g. 2026-00123"
-                    className="w-full rounded-xl border border-[#002433]/10 bg-white px-4 py-3 text-sm font-medium text-[#002433] outline-none transition-all focus:border-[#44afa9] focus:ring-1 focus:ring-[#44afa9] disabled:opacity-60"
-                  />
-                </label>
-              </div>
+              <label className="block">
+                <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+                  Claimant Name
+                </span>
+                <input
+                  value={claimantName}
+                  onChange={(event) => setClaimantName(event.target.value)}
+                  required
+                  disabled={isSubmittingClaim}
+                  className="w-full rounded-md border border-outline-variant/30 bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-[#44afa9] disabled:opacity-60"
+                />
+              </label>
 
               <label className="block">
-                <span className="mb-2 block text-[10px] font-black uppercase tracking-widest text-[#41484c]">
+                <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+                  Student ID
+                </span>
+                <input
+                  value={studentId}
+                  onChange={(event) => setStudentId(event.target.value)}
+                  required
+                  disabled={isSubmittingClaim}
+                  className="w-full rounded-md border border-outline-variant/30 bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-[#44afa9] disabled:opacity-60"
+                />
+              </label>
+
+              <label className="block">
+                <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-on-surface-variant">
                   Ownership Description
                 </span>
                 <textarea
                   value={itemDescription}
                   onChange={(event) => setItemDescription(event.target.value)}
-                  rows={4}
+                  rows={5}
                   disabled={isSubmittingClaim}
-                  placeholder="Describe a detail that helps verify the item is yours (e.g. specific scratches, contents, wallpaper)."
-                  className="w-full rounded-xl border border-[#002433]/10 bg-white px-4 py-3 text-sm font-medium text-[#002433] outline-none transition-all focus:border-[#44afa9] focus:ring-1 focus:ring-[#44afa9] disabled:opacity-60 resize-none"
+                  placeholder="Describe a detail that helps verify the item is yours."
+                  className="w-full rounded-md border border-outline-variant/30 bg-surface px-4 py-3 outline-none focus:ring-2 focus:ring-[#44afa9] disabled:opacity-60"
                 />
               </label>
 
-              {/* Action Buttons - Fixed at bottom of scrollable area */}
-              <div className="pt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end border-t border-[#002433]/5 mt-6">
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={handleCloseClaimModal}
                   disabled={isSubmittingClaim}
-                  className="rounded-xl border border-[#002433]/10 px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#41484c] transition-colors hover:bg-[#f5f3f3] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-md border border-outline-variant/30 px-5 py-3 font-bold text-on-surface transition hover:bg-surface disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmittingClaim || !claimantName.trim() || !studentId.trim()}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-[#44afa9] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all hover:bg-[#3d9e98] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:shadow-md"
+                  className="btn-claim rounded-md px-5 py-3 font-bold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isSubmittingClaim ? (
-                    <>
-                      <span className="material-symbols-outlined animate-spin text-[16px]">sync</span>
-                      Submitting...
-                    </>
-                  ) : (
-                    'Submit Claim'
-                  )}
+                  {isSubmittingClaim ? 'Submitting Claim...' : 'Submit Claim'}
                 </button>
               </div>
             </form>
