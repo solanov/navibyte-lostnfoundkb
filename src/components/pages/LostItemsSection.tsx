@@ -10,6 +10,7 @@ import { submitClaimAction, userDeletePostAction, markAsReturnedAction } from '@
 import { submitReportAction, ReportReason } from '@/src/app/admin/actions/reports';
 import { useNotification } from '@/src/hooks/useNotification';
 import { resolveIcon } from '@/src/lib/resolveIcon';
+import { useCurrentUserProfile } from '@/src/hooks/useAuthSession';
 
 interface LostItem {
   post_id: string;
@@ -32,6 +33,10 @@ interface LostItemsSectionProps {
 
 export default function LostItemsSection({ items }: LostItemsSectionProps) {
   const { notify } = useNotification();
+  const { profile } = useCurrentUserProfile();
+  const currentUserId = profile?.userId ?? null;
+  const currentUserName = profile?.fullName || profile?.email || 'You';
+  const currentUserRole = profile?.role || 'Public';
   const [visibleItems, setVisibleItems] = useState(items);
   const [selectedItem, setSelectedItem] = useState<LostItem | null>(null);
   const [claimItem, setClaimItem] = useState<LostItem | null>(null);
@@ -43,9 +48,6 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
   const [isConversationOpen, setIsConversationOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editPostId, setEditPostId] = useState<string | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [currentUserName, setCurrentUserName] = useState('You');
-  const [currentUserRole, setCurrentUserRole] = useState('Public');
   const [claimantName, setClaimantName] = useState('');
   const [studentId, setStudentId] = useState('');
   const [itemDescription, setItemDescription] = useState('');
@@ -54,57 +56,6 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
   useEffect(() => {
     setVisibleItems(items);
   }, [items]);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadCurrentUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!isMounted) return;
-
-      if (!user) {
-        setCurrentUserId(null);
-        setCurrentUserName('You');
-        setCurrentUserRole('Public');
-        return;
-      }
-
-      setCurrentUserId(user.id);
-      setCurrentUserName(
-        user.user_metadata?.full_name ||
-          user.user_metadata?.name ||
-          user.email ||
-          'You'
-      );
-
-      const { data: profile } = await supabase
-        .from('users')
-        .select('full_name,email,role')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (!isMounted || !profile) return;
-
-      setCurrentUserName(profile.full_name || profile.email || 'You');
-      setCurrentUserRole(profile.role || 'Public');
-    };
-
-    loadCurrentUser();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      loadCurrentUser();
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
 
   const handleItemClick = (item: LostItem) => {
     setSelectedItem(item);
