@@ -6,8 +6,6 @@ import Link from "next/link";
 import useSWR from "swr";
 import { supabase } from "@/src/lib/supabase";
 import {
-  approveOfficeClaimAction,
-  finalizeOfficeReleaseAction,
   markClaimReturnedByAdminAction,
   rejectClaimAction,
 } from "@/src/app/admin/actions/items";
@@ -149,94 +147,6 @@ export default function AdminClaimsPage({
           }),
         }
       : data;
-
-  const handleApprove = async (claimId: string) => {
-    setActionLoading(claimId + "-approve");
-    try {
-      if (!accessToken) throw new Error("Authentication token missing.");
-
-      const nextTimestamp = new Date().toISOString();
-      const optimisticData = data
-        ? {
-            ...data,
-            claims: data.claims.map((claim) =>
-              claim.claim_id === claimId
-                ? {
-                    ...claim,
-                    status: "Approved" as ClaimRequest["status"],
-                    updated_at: nextTimestamp,
-                  }
-                : claim
-            ),
-          }
-        : data;
-
-      await mutate(
-        async () => {
-          await approveOfficeClaimAction(accessToken, claimId);
-          return optimisticData;
-        },
-        {
-          optimisticData,
-          rollbackOnError: true,
-          revalidate: false,
-        }
-      );
-
-      notify("Claim approved. Student can now collect the item.", "success");
-    } catch (err) {
-      notify(`Error: ${err instanceof Error ? err.message : String(err)}`, "error");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleFinalizeRelease = async (claimId: string) => {
-    const confirmed = window.confirm(
-      "Confirm that the student has physically collected the item from the office? This cannot be undone."
-    );
-    if (!confirmed) return;
-
-    setActionLoading(claimId + "-release");
-    try {
-      if (!accessToken) throw new Error("Authentication token missing.");
-
-      const nextTimestamp = new Date().toISOString();
-      const optimisticData = data
-        ? {
-            ...data,
-            post: data.post ? { ...data.post, status: "Released" } : data.post,
-            claims: data.claims.map((claim) =>
-              claim.claim_id === claimId
-                ? {
-                    ...claim,
-                    status: "Released" as ClaimRequest["status"],
-                    updated_at: nextTimestamp,
-                  }
-                : claim
-            ),
-          }
-        : data;
-
-      await mutate(
-        async () => {
-          await finalizeOfficeReleaseAction(accessToken, claimId);
-          return optimisticData;
-        },
-        {
-          optimisticData,
-          rollbackOnError: true,
-          revalidate: false,
-        }
-      );
-
-      notify("Item released. Record updated to Released.", "success");
-    } catch (err) {
-      notify(`Error: ${err instanceof Error ? err.message : String(err)}`, "error");
-    } finally {
-      setActionLoading(null);
-    }
-  };
 
   const handleMarkReturned = async (
     claimId: string,
@@ -484,40 +394,6 @@ export default function AdminClaimsPage({
                   {post?.status !== "Returned" &&
                     post?.status !== "Released" && (
                       <div className="flex items-center gap-2 flex-wrap">
-                        {claim.flow_type === "Office" &&
-                          claim.status === "Pending" && (
-                            <button
-                              onClick={() => handleApprove(claim.claim_id)}
-                              disabled={!!actionLoading}
-                              className="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-xs font-black rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
-                            >
-                              <span className="material-symbols-outlined text-[15px]">
-                                thumb_up
-                              </span>
-                              {actionLoading === claim.claim_id + "-approve"
-                                ? "Approving..."
-                                : "Approve"}
-                            </button>
-                          )}
-
-                        {claim.flow_type === "Office" &&
-                          claim.status === "Approved" && (
-                            <button
-                              onClick={() =>
-                                handleFinalizeRelease(claim.claim_id)
-                              }
-                              disabled={!!actionLoading}
-                              className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 text-white text-xs font-black rounded-xl hover:bg-emerald-700 transition-colors disabled:opacity-50"
-                            >
-                              <span className="material-symbols-outlined text-[15px]">
-                                handshake
-                              </span>
-                              {actionLoading === claim.claim_id + "-release"
-                                ? "Finalizing..."
-                                : "Confirm Pickup"}
-                            </button>
-                          )}
-
                         {["Pending", "Approved"].includes(claim.status) && (
                           <button
                             onClick={() =>

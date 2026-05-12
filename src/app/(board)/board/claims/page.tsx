@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import useSWR from "swr";
 import SideNav from "@/src/components/layout/SideNav";
 import BottomNavBar from "@/src/components/layout/BottomNavBar";
-import { supabase } from "@/src/lib/supabase";
 import { fetchOwnedClaimsOverviewAction } from "@/src/app/admin/actions/claims";
+import { useAuthSession } from "@/src/hooks/useAuthSession";
 
 const STATUS_STYLES: Record<string, string> = {
   Pending: "bg-amber-50 text-amber-700 border-amber-200",
@@ -26,37 +25,9 @@ function formatDate(value: string) {
 }
 
 export default function PublicClaimsOverviewPage() {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const syncSession = async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
-
-      if (!isMounted) {
-        return;
-      }
-
-      setAccessToken(sessionData.session?.access_token ?? null);
-      setAuthLoading(false);
-    };
-
-    void syncSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setAccessToken(session?.access_token ?? null);
-      setAuthLoading(false);
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
+  const { data: session, isLoading: authLoading } = useAuthSession();
+  const accessToken = session?.access_token ?? null;
+  const currentUserId = session?.user?.id ?? null;
 
   const {
     data: entries = [],
@@ -64,7 +35,7 @@ export default function PublicClaimsOverviewPage() {
     isLoading,
     mutate,
   } = useSWR(
-    accessToken ? ["owned-claims-overview", accessToken] : null,
+    accessToken && currentUserId ? ["owned-claims-overview", currentUserId] : null,
     () => fetchOwnedClaimsOverviewAction(accessToken as string),
     {
       fallbackData: [],
@@ -188,22 +159,13 @@ export default function PublicClaimsOverviewPage() {
                                 {entry.pendingClaims} pending
                               </span>
                             )}
-                            {entry.approvedClaims > 0 && (
-                              <span className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-700">
-                                {entry.approvedClaims} approved
-                              </span>
-                            )}
-                            {entry.rejectedClaims > 0 && (
-                              <span className="rounded-full bg-red-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-red-700">
-                                {entry.rejectedClaims} rejected
-                              </span>
-                            )}
                             {entry.releasedClaims > 0 && (
                               <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700">
-                                {entry.releasedClaims} released
+                                {entry.releasedClaims} returned
                               </span>
                             )}
                           </div>
+
                         </div>
                       </div>
 

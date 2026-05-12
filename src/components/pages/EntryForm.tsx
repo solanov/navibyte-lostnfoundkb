@@ -1,11 +1,12 @@
 "use client";
 import CategoryButton from './CategoryButton';
 import ColorSwatch from './ColorSwatch';
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
+import { useSWRConfig } from "swr";
 import { supabase } from '@/src/lib/supabase';
 import { useNotification } from '@/src/hooks/useNotification';
 import { createEntryAction } from '@/app/(board)/create/actions';
-import { resolveIcon } from '@/src/lib/resolveIcon';
+import { useCategories } from '@/src/hooks/useCategories';
 import {
   CREATE_ENTRY_ALLOWED_COLORS,
   CREATE_ENTRY_ALLOWED_IMAGE_TYPES,
@@ -21,21 +22,14 @@ interface EntryFormProps {
   variant?: 'page' | 'modal';
 }
 
-const fallbackCategories = [
-  { id: 1, label: 'Wallet', icon: 'account_balance_wallet' },
-  { id: 2, label: 'Keys', icon: 'vpn_key' },
-  { id: 3, label: 'ID', icon: 'badge' },
-  { id: 4, label: 'Tech', icon: 'devices' },
-  { id: 62, label: 'Others', icon: 'category' },
-];
-
 export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProps) {
   const { notify } = useNotification();
+  const { mutate } = useSWRConfig();
+  const { data: categories = [] } = useCategories();
   const [entryType, setEntryType] = useState<'lost' | 'found'>('lost');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   
-  const [categories, setCategories] = useState<{id: number, label: string, icon: string}[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [zone, setZone] = useState('');
@@ -48,46 +42,6 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
   const [acknowledgeNoExplicitContent, setAcknowledgeNoExplicitContent] = useState(false);
   const [acknowledgeNoConfidentialInfo, setAcknowledgeNoConfidentialInfo] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    async function fetchOrSeedCategories() {
-      try {
-        const { data, error } = await supabase
-          .from('categories')
-          .select('category_id,name,icon_identifier,is_active')
-          .eq('is_active', true)
-          .order('name', { ascending: true });
-
-        if (error) {
-          throw error;
-        }
-
-        const mappedCategories = (data || [])
-          .map((category) => {
-            const rawIcon = category.icon_identifier || '';
-            const resolvedIcon = resolveIcon(rawIcon || undefined);
-            return {
-              id: category.category_id,
-              label: category.name,
-              icon: resolvedIcon,
-            };
-          })
-          .filter((category) => Boolean(category.id) && Boolean(category.label));
-
-        if (mappedCategories.length > 0) {
-          setCategories(mappedCategories);
-          return;
-        }
-
-        setCategories(fallbackCategories);
-      } catch (err) {
-        console.error("Error fetching categories:", err);
-        setCategories(fallbackCategories);
-      }
-    }
-
-    fetchOrSeedCategories();
-  }, []);
 
   const colorOptions: Array<{ class: string; value: (typeof CREATE_ENTRY_ALLOWED_COLORS)[number] }> = [
     { class: 'bg-[#303030]', value: 'Black' },
@@ -270,6 +224,11 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
       }
       
       notify("Entry successfully added!", "success");
+      void mutate(
+        (key) =>
+          Array.isArray(key) &&
+          (key[0] === "user-posts" || key[0] === "user-archive")
+      );
       // Reset form
       setTitle('');
       setDescription('');

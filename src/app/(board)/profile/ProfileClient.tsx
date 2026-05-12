@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { supabase } from '@/src/lib/supabase';
+import { useState } from 'react';
 import {
-  fetchUserPostsAction,
   markAsReturnedAction,
   userDeletePostAction,
 } from '@/src/app/admin/actions/posts';
@@ -11,30 +9,8 @@ import StatusBadge from '@/src/components/pages/StatusBadge';
 import ItemDetailModal from '@/src/components/pages/ItemDetailModal';
 import { useNotification } from '@/src/hooks/useNotification';
 import { resolveIcon } from '@/src/lib/resolveIcon';
-
-interface UserPost {
-  post_id: string;
-  general_description: string;
-  zone: string;
-  status: string;
-  image_url?: string | null;
-  created_timestamp: string;
-  reported_by?: string;
-  date_lost?: string;
-  // Supabase join inference returns either a single object or an array;
-  // we accept both here and normalise access via resolveCategory().
-  categories?:
-    | { name: string; icon_identifier: string }
-    | { name: string; icon_identifier: string }[]
-    | null;
-}
-
-interface UserProfile {
-  full_name: string | null;
-  email: string | null;
-  role: string | null;
-  avatar_url: string | null;
-}
+import { useCurrentUserProfile } from '@/src/hooks/useAuthSession';
+import { useUserPosts, type UserPost } from '@/src/hooks/useUserItemLists';
 
 function toTitleCase(str: string) {
   return str.replace(
@@ -57,60 +33,31 @@ const ROLE_STYLES: Record<string, { bg: string; text: string; label: string }> =
 
 export default function ProfileClient() {
   const { notify } = useNotification();
-
-  const [profile,      setProfile]      = useState<UserProfile | null>(null);
-  const [posts,        setPosts]         = useState<UserPost[]>([]);
-  const [loading,      setLoading]       = useState(true);
-  const [error,        setError]         = useState<string | null>(null);
+  const {
+    profile,
+    accessToken,
+    isLoading: profileLoading,
+    error: profileError,
+  } = useCurrentUserProfile();
+  const {
+    data: posts = [],
+    error: postsError,
+    isLoading: postsLoading,
+    mutate: mutatePosts,
+  } = useUserPosts(accessToken, profile?.userId);
   const [selectedItem, setSelectedItem]  = useState<UserPost | null>(null);
   const [isModalOpen,  setIsModalOpen]   = useState(false);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function load() {
-      try {
-        const { data: { user }, error: authErr } = await supabase.auth.getUser();
-        if (authErr || !user) throw new Error('You must be signed in to view your profile.');
-
-        // Pull profile record
-        const { data: profileRow } = await supabase
-          .from('users')
-          .select('full_name, email, role')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (!isMounted) return;
-
-        setProfile({
-          full_name: profileRow?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || null,
-          email:     profileRow?.email     || user.email || null,
-          role:      profileRow?.role      || 'Public',
-          avatar_url:
-            user.user_metadata?.avatar_url ||
-            user.user_metadata?.picture    ||
-            null,
-        });
-
-        // Pull ALL posts by this user via server action (bypasses RLS)
-        const { data: sessionData } = await supabase.auth.getSession();
-        const accessToken = sessionData.session?.access_token;
-        if (!accessToken) throw new Error('Session token missing.');
-
-        const postsData = await fetchUserPostsAction(accessToken);
-        if (!isMounted) return;
-
-        setPosts(postsData);
-      } catch (err) {
-        if (isMounted) setError(err instanceof Error ? err.message : 'Failed to load profile.');
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    }
-
-    load();
-    return () => { isMounted = false; };
-  }, []);
+  const loading = profileLoading || (Boolean(accessToken) && postsLoading && posts.length === 0);
+  const error =
+    profileError instanceof Error
+      ? profileError.message
+      : postsError instanceof Error
+        ? postsError.message
+        : profileError || postsError
+          ? 'Failed to load profile.'
+          : !loading && !profile
+            ? 'You must be signed in to view your profile.'
+            : null;
 
   // ── Modal helpers ──────────────────────────────────────────────────────────
   const handleItemClick = (post: UserPost) => {
@@ -132,17 +79,24 @@ export default function ProfileClient() {
     if (!confirmReturn) return;
 
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
       if (!accessToken) throw new Error('Authentication token missing.');
 
-      await markAsReturnedAction(accessToken, selectedItem.post_id);
-      notify('Item marked as returned. The post has been resolved.', 'success');
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.post_id === selectedItem.post_id ? { ...p, status: 'Returned' } : p
-        )
+      const nextPosts = posts.map((p) =>
+        p.post_id === selectedItem.post_id ? { ...p, status: 'Returned' } : p
       );
+
+      await mutatePosts(
+        async () => {
+          await markAsReturnedAction(accessToken, selectedItem.post_id);
+          return nextPosts;
+        },
+        {
+          optimisticData: nextPosts,
+          rollbackOnError: true,
+          revalidate: false,
+        }
+      );
+      notify('Item marked as returned. The post has been resolved.', 'success');
       handleCloseModal();
     } catch (err) {
       notify(`Error: ${err instanceof Error ? err.message : String(err)}`, 'error');
@@ -158,17 +112,24 @@ export default function ProfileClient() {
     if (!confirmDelete) return;
 
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
       if (!accessToken) throw new Error('Authentication token missing.');
 
-      await userDeletePostAction(accessToken, selectedItem.post_id);
-      notify('Post deleted successfully.', 'success');
-      setPosts((prev) =>
-        prev.map((p) =>
-          p.post_id === selectedItem.post_id ? { ...p, status: 'Purged' } : p
-        )
+      const nextPosts = posts.map((p) =>
+        p.post_id === selectedItem.post_id ? { ...p, status: 'Purged' } : p
       );
+
+      await mutatePosts(
+        async () => {
+          await userDeletePostAction(accessToken, selectedItem.post_id);
+          return nextPosts;
+        },
+        {
+          optimisticData: nextPosts,
+          rollbackOnError: true,
+          revalidate: false,
+        }
+      );
+      notify('Post deleted successfully.', 'success');
       handleCloseModal();
     } catch (err) {
       notify(`Error: ${err instanceof Error ? err.message : String(err)}`, 'error');
@@ -200,7 +161,7 @@ export default function ProfileClient() {
 
   // ── Derived display values ─────────────────────────────────────────────────
   const roleStyle   = ROLE_STYLES[profile?.role ?? 'Public'] ?? ROLE_STYLES.Public;
-  const displayName = profile?.full_name || profile?.email || 'Anonymous';
+  const displayName = profile?.fullName || profile?.email || 'Anonymous';
   const initials    = displayName
     .split(' ')
     .map((w) => w[0])
@@ -231,10 +192,10 @@ export default function ProfileClient() {
           <div className="flex flex-col gap-4 sm:grid sm:grid-cols-[auto,1fr] sm:items-end sm:gap-4">
             {/* Avatar */}
             <div className="-mt-12 relative z-10 w-24 h-24 rounded-2xl border-4 border-white shadow-lg overflow-hidden bg-[#f5f3f3] shrink-0">
-              {profile?.avatar_url ? (
+              {profile?.avatarUrl ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
-                  src={profile.avatar_url}
+                  src={profile.avatarUrl}
                   alt={displayName}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"

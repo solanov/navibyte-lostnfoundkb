@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import BottomNavBar from "@/src/components/layout/BottomNavBar";
 import { supabase } from "@/src/lib/supabase";
+import { useAuthSession } from "@/src/hooks/useAuthSession";
 import {
   Message,
   buildOptimisticMessage,
@@ -62,11 +63,11 @@ export default function MessagesView() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const { data: session, isLoading: authLoading } = useAuthSession();
+  const currentUserId = session?.user?.id ?? null;
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [authLoading, setAuthLoading] = useState(true);
   const [messageError, setMessageError] = useState<string | null>(null);
   const requestedConversationId = searchParams.get("conversation");
   const {
@@ -75,37 +76,6 @@ export default function MessagesView() {
     isLoading: bundlesLoading,
     mutate: mutateBundles,
   } = useMessagesInbox(currentUserId);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const syncCurrentUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!isMounted) {
-        return;
-      }
-
-      setCurrentUserId(user?.id ?? null);
-      setAuthLoading(false);
-    };
-
-    void syncCurrentUser();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setCurrentUserId(session?.user?.id ?? null);
-      setAuthLoading(false);
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
 
   useEffect(() => {
     if (!currentUserId) return;

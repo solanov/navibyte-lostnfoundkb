@@ -6,6 +6,7 @@ import { editPostAction, fetchPostEditDataAction } from '@/src/app/admin/actions
 import CategoryButton from './CategoryButton';
 import ColorSwatch from './ColorSwatch';
 import { useNotification } from '@/src/hooks/useNotification';
+import { useCategories } from '@/src/hooks/useCategories';
 import {
   CREATE_ENTRY_ALLOWED_COLORS,
   getCreateEntryErrorMessage,
@@ -13,7 +14,6 @@ import {
   type CreateEntryErrors,
   validateCreateEntryInput,
 } from '@/lib/createEntrySecurity';
-import { resolveIcon } from '@/src/lib/resolveIcon';
 
 export type EditPostSuccessPayload = {
   post_id: string;
@@ -29,14 +29,6 @@ interface EditPostModalProps {
   onSuccess: (updated: EditPostSuccessPayload) => void;
 }
 
-const fallbackCategories = [
-  { id: 1, label: 'Wallet', icon: 'account_balance_wallet' },
-  { id: 2, label: 'Keys', icon: 'vpn_key' },
-  { id: 3, label: 'ID', icon: 'badge' },
-  { id: 4, label: 'Tech', icon: 'devices' },
-  { id: 62, label: 'Others', icon: 'category' },
-];
-
 const colorOptions: Array<{ class: string; value: (typeof CREATE_ENTRY_ALLOWED_COLORS)[number] }> = [
   { class: 'bg-[#303030]', value: 'Black' },
   { class: 'bg-white', value: 'White' },
@@ -50,6 +42,7 @@ const colorOptions: Array<{ class: string; value: (typeof CREATE_ENTRY_ALLOWED_C
 
 export default function EditPostModal({ isOpen, postId, onClose, onSuccess }: EditPostModalProps) {
   const { notify } = useNotification();
+  const { data: categories = [] } = useCategories();
   const backdropRef = useRef<HTMLDivElement>(null);
 
   const [title, setTitle] = useState('');
@@ -59,7 +52,6 @@ export default function EditPostModal({ isOpen, postId, onClose, onSuccess }: Ed
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [hiddenNote, setHiddenNote] = useState('');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [categories, setCategories] = useState<{ id: number; label: string; icon: string }[]>([]);
   const [fieldErrors, setFieldErrors] = useState<CreateEntryErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,21 +70,9 @@ export default function EditPostModal({ isOpen, postId, onClose, onSuccess }: Ed
         const accessToken = sessionData.session?.access_token;
         if (!accessToken) throw new Error('Please sign in to edit this post.');
 
-        const [catResult, postData] = await Promise.all([
-          supabase
-            .from('categories')
-            .select('category_id,name,icon_identifier')
-            .eq('is_active', true)
-            .order('name', { ascending: true }),
-          fetchPostEditDataAction(accessToken, postId),
-        ]);
+        const postData = await fetchPostEditDataAction(accessToken, postId);
 
         if (!isMounted) return;
-
-        const mapped = (catResult.data ?? [])
-          .map((c) => ({ id: c.category_id, label: c.name, icon: resolveIcon(c.icon_identifier ?? undefined) }))
-          .filter((c) => c.id && c.label);
-        setCategories(mapped.length > 0 ? mapped : fallbackCategories);
 
         const [postTitle, ...rest] = (postData.general_description ?? '').split('\n\n');
         setTitle(postTitle ?? '');
