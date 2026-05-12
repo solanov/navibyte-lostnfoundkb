@@ -178,6 +178,36 @@ export async function fetchUserArchiveAction(accessToken: string) {
   return enriched;
 }
 
+/**
+ * Fetch ALL posts created by the authenticated user (active + archived).
+ * Uses the admin client to bypass RLS on lost_items.
+ */
+export async function fetchUserPostsAction(accessToken: string) {
+  const user = await verifyUserSession(accessToken);
+  const adminClient = getAdminClient();
+
+  const { data: posts, error } = await adminClient
+    .from('lost_items')
+    .select(`
+      post_id,
+      general_description,
+      zone,
+      status,
+      image_url,
+      created_timestamp,
+      categories (
+        name,
+        icon_identifier
+      )
+    `)
+    .eq('reported_by', user.id)
+    .order('created_timestamp', { ascending: false });
+
+  if (error) throw new Error(error.message);
+
+  return posts ?? [];
+}
+
 // ---------------------------------------------------------------------------
 // DUAL-PATH CLAIM SYSTEM — Student-Facing Actions
 // ---------------------------------------------------------------------------
