@@ -29,7 +29,10 @@ interface LostItemsSectionProps {
 
 export default function LostItemsSection({ items }: LostItemsSectionProps) {
   const { notify } = useNotification();
+  
+  // escares-fullstack: Local state for optimistic UI updates
   const [visibleItems, setVisibleItems] = useState(items);
+  
   const [selectedItem, setSelectedItem] = useState<LostItem | null>(null);
   const [claimItem, setClaimItem] = useState<LostItem | null>(null);
   const [conversationItem, setConversationItem] = useState<LostItem | null>(null);
@@ -44,6 +47,7 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
   const [itemDescription, setItemDescription] = useState('');
   const [isSubmittingClaim, setIsSubmittingClaim] = useState(false);
 
+  // escares-fullstack: Sync local state when props change
   useEffect(() => {
     setVisibleItems(items);
   }, [items]);
@@ -228,6 +232,8 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
 
       await userDeletePostAction(accessToken, selectedItem.post_id);
       notify("Post deleted successfully.", "success");
+      
+      // escares-fullstack: Instantly remove item from UI without page reload
       setVisibleItems((currentItems) =>
         currentItems.filter((item) => item.post_id !== selectedItem.post_id)
       );
@@ -241,6 +247,7 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
     <>
       {/* Items Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        {/* escares-fullstack: mapping over visibleItems instead of items */}
         {visibleItems.length === 0 ? (
           <div className="col-span-full py-12 text-center text-slate-400">
             <span className="material-symbols-outlined text-5xl mb-4 opacity-50">inbox</span>
@@ -310,13 +317,12 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
         />
       )}
 
+      {/* ortiz-ui: Mobile Responsive Modal */}
       {isClaimModalOpen && claimItem && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-[#002433]/40 p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200">
           
-          {/* Main Modal Container - Added max-height flex constraints */}
           <div className="w-full max-w-2xl flex flex-col max-h-[90vh] sm:max-h-[85vh] overflow-hidden rounded-2xl bg-white shadow-[0_20px_40px_rgba(0,36,51,0.2)] animate-in zoom-in-95 duration-200">
             
-            {/* Header - Fixed at the top */}
             <div className="flex shrink-0 items-center justify-between bg-[#053b50] px-5 sm:px-6 py-4 sm:py-5 border-b border-[#002433]/10">
               <div>
                 <h2 className="font-headline text-lg sm:text-2xl font-black text-white tracking-tight">Submit Claim</h2>
@@ -334,7 +340,6 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
               </button>
             </div>
 
-            {/* Scrollable Form Content */}
             <form onSubmit={handleSubmitClaim} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
               
               <div className="rounded-xl bg-[#f5f3f3] p-4 border border-[#002433]/5">
@@ -393,7 +398,6 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
                 />
               </label>
 
-              {/* Action Buttons - Fixed at bottom of scrollable area */}
               <div className="pt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end border-t border-[#002433]/5 mt-6">
                 <button
                   type="button"
