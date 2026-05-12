@@ -5,7 +5,7 @@ import { supabase } from '@/src/lib/supabase';
 import ItemCard from './ItemCard';
 import ConversationModal from './ConversationModal';
 import ItemDetailModal from './ItemDetailModal';
-import { submitClaimAction, userDeletePostAction } from '@/src/app/admin/actions/posts';
+import { submitClaimAction, userDeletePostAction, markAsReturnedAction } from '@/src/app/admin/actions/posts';
 import { useNotification } from '@/src/hooks/useNotification';
 
 interface LostItem {
@@ -237,6 +237,29 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
     }
   };
 
+  const handleMarkAsReturned = async () => {
+    if (!selectedItem || !currentUserId) return;
+
+    const confirmReturn = window.confirm("Mark this item as returned? This will resolve the post and move it to your archive.");
+    if (!confirmReturn) return;
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+
+      if (!accessToken) throw new Error("Authentication token missing.");
+
+      await markAsReturnedAction(accessToken, selectedItem.post_id);
+      notify("Item marked as returned. The post has been resolved.", "success");
+      setVisibleItems((currentItems) =>
+        currentItems.filter((item) => item.post_id !== selectedItem.post_id)
+      );
+      handleCloseModal();
+    } catch (err) {
+      notify(`Error marking item as returned: ${err instanceof Error ? err.message : String(err)}`, "error");
+    }
+  };
+
   return (
     <>
       {/* Items Grid */}
@@ -285,6 +308,7 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
         isOpen={isModalOpen}
         item={selectedItem}
         isOwner={!!currentUserId && currentUserId === selectedItem?.reported_by}
+        isLostItem={selectedItem?.status === 'Reported' || selectedItem?.status === 'Lost'}
         claimsHref={
           selectedItem
             ? currentUserRole === 'Admin' || currentUserRole === 'Staff'
@@ -295,6 +319,7 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
         onClaimClick={handleClaimItem}
         onContactClick={handleContactPoster}
         onDeletePost={handleDeletePost}
+        onMarkAsReturned={handleMarkAsReturned}
         onClose={handleCloseModal}
       />
 

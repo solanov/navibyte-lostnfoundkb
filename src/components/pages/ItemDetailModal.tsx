@@ -25,6 +25,10 @@ interface ItemDetailModalProps {
   isOwner?: boolean;
   onDeletePost?: () => void;
   claimsHref?: string;
+  /** True when the item was posted as a Lost report (vs. a Found item). */
+  isLostItem?: boolean;
+  /** Called when the owner clicks "Mark as Returned" on a Lost item. */
+  onMarkAsReturned?: () => void;
 }
 
 export default function ItemDetailModal({
@@ -36,6 +40,8 @@ export default function ItemDetailModal({
   isOwner,
   onDeletePost,
   claimsHref,
+  isLostItem = false,
+  onMarkAsReturned,
 }: ItemDetailModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -227,8 +233,11 @@ export default function ItemDetailModal({
               <div className="text-sm text-on-surface">
                 <p className="font-semibold mb-1">Need help?</p>
                 <p className="text-on-surface-variant">
-                  Contact the item curator or use the buttons below to claim this item or get in touch
-                  with the poster.
+                  {isLostItem
+                    ? isOwner
+                      ? 'Once your item has been recovered, mark it as returned to resolve this post.'
+                      : 'Contact the poster directly to help them locate their missing item.'
+                    : 'Contact the item curator or use the buttons below to claim this item or get in touch with the poster.'}
                 </p>
               </div>
             </div>
@@ -239,30 +248,60 @@ export default function ItemDetailModal({
         <div className="sticky bottom-0 bg-surface-container-lowest border-t border-outline-variant/20 px-6 py-4 flex gap-3">
           {isOwner ? (
             <>
-              {item.status !== 'Returned' && item.status !== 'Released' && item.status !== 'Purged' && (
-                <Link
-                  href={claimsHref || `/board/claims/${item.post_id}`}
-                  onClick={onClose}
-                  className="flex-1 bg-surface-container-low text-primary border border-outline-variant/30 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all active:scale-95 flex items-center justify-center gap-2"
-                >
-                  <span className="material-symbols-outlined text-lg">assignment</span>
-                  View Claims
-                </Link>
-              )}
-              {onDeletePost && (
-                <button
-                  onClick={onDeletePost}
-                  className="flex-1 bg-red-50 text-red-600 border border-red-200 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-red-100 transition-all active:scale-95"
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="material-symbols-outlined text-lg">delete</span>
-                    Delete Post
-                  </span>
-                </button>
+              {isLostItem ? (
+                /* Lost item owner: Mark as Returned + Delete */
+                <>
+                  {item.status !== 'Returned' && item.status !== 'Purged' && onMarkAsReturned && (
+                    <button
+                      onClick={onMarkAsReturned}
+                      className="flex-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-emerald-100 transition-all active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-lg">check_circle</span>
+                      Mark as Returned
+                    </button>
+                  )}
+                  {onDeletePost && (
+                    <button
+                      onClick={onDeletePost}
+                      className="flex-1 bg-red-50 text-red-600 border border-red-200 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-red-100 transition-all active:scale-95"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-lg">delete</span>
+                        Delete Post
+                      </span>
+                    </button>
+                  )}
+                </>
+              ) : (
+                /* Found item owner: View Claims + Delete */
+                <>
+                  {item.status !== 'Returned' && item.status !== 'Released' && item.status !== 'Purged' && (
+                    <Link
+                      href={claimsHref || `/board/claims/${item.post_id}`}
+                      onClick={onClose}
+                      className="flex-1 bg-surface-container-low text-primary border border-outline-variant/30 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      <span className="material-symbols-outlined text-lg">assignment</span>
+                      View Claims
+                    </Link>
+                  )}
+                  {onDeletePost && (
+                    <button
+                      onClick={onDeletePost}
+                      className="flex-1 bg-red-50 text-red-600 border border-red-200 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-red-100 transition-all active:scale-95"
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="material-symbols-outlined text-lg">delete</span>
+                        Delete Post
+                      </span>
+                    </button>
+                  )}
+                </>
               )}
             </>
           ) : (
             <>
+              {/* Non-owner: Contact always shown */}
               <button
                 onClick={onContactClick}
                 className="flex-1 bg-surface-container-low text-primary border border-outline-variant/30 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all active:scale-95"
@@ -272,15 +311,18 @@ export default function ItemDetailModal({
                   Contact
                 </span>
               </button>
-              <button
-                onClick={onClaimClick}
-                className="btn-claim flex-1 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:brightness-110 transition-all active:scale-95"
-              >
-                <span className="flex items-center justify-center gap-2">
-                  <span className="material-symbols-outlined text-lg">check_circle</span>
-                  Claim Item
-                </span>
-              </button>
+              {/* Claim Item only available for Found items */}
+              {!isLostItem && (
+                <button
+                  onClick={onClaimClick}
+                  className="btn-claim flex-1 px-6 py-3 rounded-lg font-bold text-sm tracking-tight hover:brightness-110 transition-all active:scale-95"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="material-symbols-outlined text-lg">check_circle</span>
+                    Claim Item
+                  </span>
+                </button>
+              )}
             </>
           )}
         </div>
