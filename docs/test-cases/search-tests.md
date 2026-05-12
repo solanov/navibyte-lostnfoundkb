@@ -78,6 +78,3 @@ The system successfully handles the excessively long query without crashing.
 Successful
 
 ## Notes
-
-
----
