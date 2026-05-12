@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { fetchAdminData } from "./actions/fetchData";
 import { verifyClaimAction, disposeItemAction, adminDeletePostAction } from "./actions/items";
+import { fetchFlaggedPostsAction, fetchPostReportDetailsAction, dismissReportsAction, actionReportDeletePostAction, FlaggedPost, ReportDetail } from "./actions/reports";
 import { updateUserBlockAction } from "./actions/users";
 import {
   buildOwnedClaimOverview,
@@ -22,7 +23,7 @@ import {
   getAuditTargetValue,
 } from "@/src/lib/adminAudit";
 
-type AdminTab = "overview" | "vault" | "users" | "claims" | "disposal" | "audit" | "reports";
+type AdminTab = "overview" | "vault" | "users" | "claims" | "disposal" | "audit" | "reports" | "exports";
 type ItemStatus = "Reported" | "Found" | "Returned" | "Released" | "Purged";
 type UserRole = "Public" | "Staff" | "Admin";
 
@@ -96,7 +97,8 @@ const tabs: Array<{ id: AdminTab; label: string; icon: string }> = [
   { id: "claims", label: "My Post Claims", icon: "assignment" },
   { id: "disposal", label: "Disposal Queue", icon: "delete_sweep" },
   { id: "audit", label: "Audit Trail", icon: "history_edu" },
-  { id: "reports", label: "Reports", icon: "summarize" },
+  { id: "reports", label: "Flagged Posts", icon: "flag" },
+  { id: "exports", label: "Export Reports", icon: "summarize" },
 ];
 
 function getErrorMessage(error: unknown) {
@@ -121,6 +123,7 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   // Added Avatar State
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -154,15 +157,17 @@ export default function AdminDashboard() {
     // Fetch the Avatar URL directly from Auth Metadata
     setAvatarUrl(currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || null);
 
-    const accessToken = sessionData.session?.access_token;
-    if (!accessToken) {
+    const sessionToken = sessionData.session?.access_token;
+    if (!sessionToken) {
       setError("No valid access token available.");
       setLoading(false);
       return;
     }
 
+    setAccessToken(sessionToken);
+
     try {
-      const data = await fetchAdminData(accessToken);
+      const data = await fetchAdminData(sessionToken);
       setProfile(data.profile);
       setUsers(data.users as AdminProfile[]);
       setItems(data.items as LostItem[]);
@@ -435,19 +440,19 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <nav className="flex flex-1 flex-col gap-2">
+        {/* Tab Navigation — scrollable so all 8 tabs fit without pushing the profile card off */}
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto pr-0.5 scrollbar-thin">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-4 rounded-xl px-4 py-3 text-left transition-all duration-300 ${
+              className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-left transition-all duration-300 ${
                 activeTab === tab.id
                   ? "bg-[#ffffff] font-bold text-[#002433] shadow-[0_8px_16px_rgba(0,36,51,0.04)]"
                   : "text-[#41484c] hover:bg-[#ffffff]/60 hover:text-[#002433]"
               }`}
             >
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: activeTab === tab.id ? "'FILL' 1" : "'FILL' 0" }}>{tab.icon}</span>
+              <span className="material-symbols-outlined shrink-0 text-[20px]" style={{ fontVariationSettings: activeTab === tab.id ? "'FILL' 1" : "'FILL' 0" }}>{tab.icon}</span>
               <span className="text-sm tracking-wide">{tab.label}</span>
             </button>
           ))}
@@ -577,7 +582,8 @@ export default function AdminDashboard() {
           {activeTab === "claims" && <ClaimsDeskView entries={ownedClaimEntries} />}
           {activeTab === "disposal" && <DisposalView items={disposalItems} onDispose={(item) => setModal({ type: "dispose", item })} />}
           {activeTab === "audit" && <AuditView logs={filteredAuditLogs} />}
-          {activeTab === "reports" && <ReportsView itemCount={items.length} returnedCount={returnedItems.length} blockedCount={blockedUsers.length} onExport={exportReport} />}
+          {activeTab === "reports" && <FlaggedPostsView accessToken={accessToken ?? ''} />}
+          {activeTab === "exports" && <ExportsView itemCount={items.length} returnedCount={returnedItems.length} blockedCount={blockedUsers.length} onExport={exportReport} />}
         </div>
       </main>
 
@@ -1133,16 +1139,40 @@ function ClaimsDeskView({ entries }: { entries: ClaimOverviewEntry[] }) {
   );
 }
 
-function ReportsView({ itemCount, returnedCount, blockedCount, onExport }: { itemCount: number; returnedCount: number; blockedCount: number; onExport: (type: string, startDate: string, endDate: string) => void }) {
+// ── ExportsView ── Restored CSV download feature ──────────────────────────────
+function ExportsView({
+  itemCount,
+  returnedCount,
+  blockedCount,
+  onExport,
+}: {
+  itemCount: number;
+  returnedCount: number;
+  blockedCount: number;
+  onExport: (type: string, startDate: string, endDate: string) => void;
+}) {
   const today = new Date().toISOString().slice(0, 10);
   const [type, setType] = useState("User Activity");
   const [startDate, setStartDate] = useState(today.slice(0, 8) + "01");
   const [endDate, setEndDate] = useState(today);
 
+  const EXPORT_TYPES = [
+    { value: "User Activity", icon: "group", description: "All registered users with role and block status." },
+    { value: "Audit Logs", icon: "history_edu", description: "Time-filtered staff action log with categories." },
+    { value: "Disposal Manifest", icon: "delete_sweep", description: "Items eligible for or already purged." },
+    { value: "Item Inventory", icon: "inventory_2", description: "All tracked items with status, zone, and bin." },
+  ];
+
   return (
     <>
-      <PageHeader eyebrow="Institutional Export" title="System Reports" description="Configure and export institutional data parameters." />
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+      <PageHeader
+        eyebrow="Institutional Export"
+        title="System Reports"
+        description="Configure and download institutional data as CSV for reporting, auditing, or compliance."
+      />
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
+        {/* Export Form */}
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -1150,29 +1180,307 @@ function ReportsView({ itemCount, returnedCount, blockedCount, onExport }: { ite
           }}
           className="rounded-xl bg-white p-8 shadow-[0_20px_40px_rgba(0,36,51,0.06)]"
         >
-          <label className="mb-3 block font-headline text-lg font-bold text-primary">Report Parameter</label>
-          <select value={type} onChange={(event) => setType(event.target.value)} className="mb-8 w-full rounded-md border border-outline-variant/30 bg-surface py-3.5 pl-4 pr-10 text-on-surface outline-none focus:ring-2 focus:ring-[#44afa9]">
-            <option>User Activity</option>
-            <option>Audit Logs</option>
-            <option>Disposal Manifest</option>
-          </select>
-          <label className="mb-3 block font-headline text-lg font-bold text-primary">Temporal Range</label>
-          <div className="grid gap-4 md:grid-cols-2">
-            <input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} className="rounded-md border border-outline-variant/30 bg-surface px-4 py-3.5 outline-none focus:ring-2 focus:ring-[#44afa9]" />
-            <input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} className="rounded-md border border-outline-variant/30 bg-surface px-4 py-3.5 outline-none focus:ring-2 focus:ring-[#44afa9]" />
+          <p className="mb-5 text-xs font-bold uppercase tracking-widest text-[#41484c]/60">Report Type</p>
+          <div className="mb-8 grid gap-3 sm:grid-cols-2">
+            {EXPORT_TYPES.map((et) => (
+              <label
+                key={et.value}
+                className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all ${
+                  type === et.value
+                    ? "border-[#44afa9] bg-[#8df4ec]/10 text-[#002433]"
+                    : "border-[#002433]/10 hover:border-[#44afa9]/30 hover:bg-[#f5f3f3] text-[#41484c]"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="export-type"
+                  value={et.value}
+                  checked={type === et.value}
+                  onChange={() => setType(et.value)}
+                  className="sr-only"
+                />
+                <span
+                  className={`material-symbols-outlined shrink-0 text-xl ${type === et.value ? "text-[#44afa9]" : "text-[#41484c]/50"}`}
+                  style={{ fontVariationSettings: type === et.value ? "'FILL' 1" : "'FILL' 0" }}
+                >
+                  {et.icon}
+                </span>
+                <div>
+                  <p className="text-sm font-bold">{et.value}</p>
+                  <p className="mt-0.5 text-xs text-[#41484c]/60">{et.description}</p>
+                </div>
+              </label>
+            ))}
           </div>
-          <button className="mt-8 flex items-center justify-center gap-2 rounded-md bg-[#64CCC5] px-6 py-3 font-bold uppercase tracking-wider text-white shadow-lg shadow-[#64CCC5]/20 transition hover:brightness-95">
-            <span className="material-symbols-outlined">download</span>
-            Export CSV
+
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-[#41484c]/60">Date Range</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-semibold text-[#41484c]/60">From</span>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(event) => setStartDate(event.target.value)}
+                className="w-full rounded-md border border-[#002433]/10 bg-[#f5f3f3] px-4 py-3 text-sm outline-none transition focus:border-[#44afa9] focus:ring-1 focus:ring-[#44afa9]"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-semibold text-[#41484c]/60">To</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(event) => setEndDate(event.target.value)}
+                className="w-full rounded-md border border-[#002433]/10 bg-[#f5f3f3] px-4 py-3 text-sm outline-none transition focus:border-[#44afa9] focus:ring-1 focus:ring-[#44afa9]"
+              />
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            className="mt-8 flex items-center gap-2.5 rounded-xl bg-[#64CCC5] px-6 py-3.5 font-bold tracking-wide text-white shadow-[0_8px_20px_rgba(100,204,197,0.3)] transition hover:brightness-95 active:scale-[0.98]"
+          >
+            <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>download</span>
+            Download CSV
           </button>
         </form>
-        <div className="grid gap-4">
+
+        {/* Quick Stats */}
+        <div className="grid content-start gap-4">
           <MetricCard label="Tracked Items" value={itemCount} icon="inventory_2" />
           <MetricCard label="Returned Items" value={returnedCount} icon="assignment_turned_in" />
           <MetricCard label="Suspended Accounts" value={blockedCount} icon="block" />
         </div>
       </div>
     </>
+  );
+}
+
+function FlaggedPostsView({ accessToken }: { accessToken: string }) {
+  const [flaggedPosts, setFlaggedPosts] = useState<FlaggedPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
+  const [reportDetails, setReportDetails] = useState<Record<string, ReportDetail[]>>({});
+  const [loadingDetails, setLoadingDetails] = useState<string | null>(null);
+  const [actionBusy, setActionBusy] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<FlaggedPost | null>(null);
+  const [deleteReason, setDeleteReason] = useState('');
+
+  useEffect(() => {
+    if (!accessToken) return;
+    setLoading(true);
+    fetchFlaggedPostsAction(accessToken)
+      .then((data) => setFlaggedPosts(data))
+      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load reports.'))
+      .finally(() => setLoading(false));
+  }, [accessToken]);
+
+  async function loadDetails(postId: string) {
+    if (expandedPostId === postId) { setExpandedPostId(null); return; }
+    setExpandedPostId(postId);
+    if (reportDetails[postId]) return;
+    setLoadingDetails(postId);
+    try {
+      const details = await fetchPostReportDetailsAction(accessToken, postId);
+      setReportDetails((prev) => ({ ...prev, [postId]: details }));
+    } catch { /* silently fail */ }
+    setLoadingDetails(null);
+  }
+
+  async function handleDismiss(postId: string) {
+    setActionBusy(postId + '-dismiss');
+    try {
+      await dismissReportsAction(accessToken, postId);
+      setFlaggedPosts((prev) => prev.filter((p) => p.post_id !== postId));
+      setNotice('Reports dismissed. Post remains visible.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to dismiss.');
+    }
+    setActionBusy(null);
+  }
+
+  async function handleDelete(post: FlaggedPost) {
+    if (!deleteReason.trim()) return;
+    setActionBusy(post.post_id + '-delete');
+    try {
+      await actionReportDeletePostAction(accessToken, post.post_id, deleteReason.trim());
+      setFlaggedPosts((prev) => prev.filter((p) => p.post_id !== post.post_id));
+      setNotice(`Post deleted and all reports marked as Actioned.`);
+      setDeleteModal(null);
+      setDeleteReason('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete post.');
+    }
+    setActionBusy(null);
+  }
+
+  return (
+    <div className="animate-in fade-in duration-300">
+      <PageHeader
+        eyebrow="Content Moderation"
+        title="Flagged Posts"
+        description="User-submitted reports of suspicious or inappropriate posts. Review each report and take action."
+      />
+
+      {notice && (
+        <div className="mb-6 flex items-center justify-between rounded-xl border border-[#44afa9]/25 bg-[#8df4ec]/20 px-5 py-4 text-sm font-bold text-[#002433]">
+          {notice}
+          <button onClick={() => setNotice(null)} className="text-[#41484c] hover:text-[#002433]">Dismiss</button>
+        </div>
+      )}
+      {error && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-bold text-red-700">{error}</div>
+      )}
+
+      {loading ? (
+        <div className="space-y-4 animate-pulse">
+          {[1, 2, 3].map((n) => <div key={n} className="h-24 rounded-xl bg-white" />)}
+        </div>
+      ) : flaggedPosts.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#002433]/10 bg-white py-20 text-center">
+          <span className="material-symbols-outlined mb-3 text-5xl text-[#41484c]/25">verified_user</span>
+          <p className="font-bold text-[#41484c]/50">No flagged posts. The board looks clean.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {flaggedPosts.map((post) => {
+            const ref = `AC-${post.post_id.substring(0, 4).toUpperCase()}`;
+            const [title] = (post.general_description || '').split('\n\n');
+            const isExpanded = expandedPostId === post.post_id;
+            const details = reportDetails[post.post_id] ?? [];
+
+            return (
+              <div key={post.post_id} className="overflow-hidden rounded-xl border border-[#002433]/5 bg-white shadow-[0_2px_8px_rgba(0,36,51,0.04)]">
+                {/* Row header */}
+                <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-start gap-4">
+                    {/* Report count badge */}
+                    <div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-red-50">
+                      <span className="text-xl font-black text-[#ba1a1a]">{post.total_reports}</span>
+                      <span className="text-[8px] font-black uppercase tracking-widest text-[#ba1a1a]/60">reports</span>
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-black text-[#002433]">{title || 'Unknown Item'}</p>
+                        <span className="rounded bg-[#002433]/8 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-[#41484c]">{ref}</span>
+                        <StatusPill status={post.item_status as ItemStatus} />
+                      </div>
+                      <p className="mt-1 text-xs text-[#41484c]/60">
+                        Posted by {post.original_poster_name || 'Unknown'} · {post.original_poster_email || ''}
+                      </p>
+                      <p className="text-[10px] font-semibold text-[#41484c]/40 mt-0.5">
+                        Last report: {new Date(post.latest_report_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="flex shrink-0 gap-2">
+                    <button
+                      onClick={() => loadDetails(post.post_id)}
+                      className="flex items-center gap-1.5 rounded-lg border border-[#002433]/10 px-3 py-2 text-xs font-bold text-[#41484c] transition hover:bg-[#f5f3f3]"
+                    >
+                      <span className="material-symbols-outlined text-sm">{isExpanded ? 'expand_less' : 'expand_more'}</span>
+                      {isExpanded ? 'Hide' : 'View Reports'}
+                    </button>
+                    <button
+                      onClick={() => handleDismiss(post.post_id)}
+                      disabled={actionBusy === post.post_id + '-dismiss'}
+                      className="flex items-center gap-1.5 rounded-lg border border-[#002433]/10 px-3 py-2 text-xs font-bold text-[#41484c] transition hover:bg-[#f5f3f3] disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-sm">check</span>
+                      Dismiss
+                    </button>
+                    <button
+                      onClick={() => { setDeleteModal(post); setDeleteReason(''); }}
+                      disabled={actionBusy === post.post_id + '-delete'}
+                      className="flex items-center gap-1.5 rounded-lg bg-[#ba1a1a] px-3 py-2 text-xs font-bold text-white transition hover:brightness-105 disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-sm">delete</span>
+                      Delete Post
+                    </button>
+                  </div>
+                </div>
+
+                {/* Expanded report details */}
+                {isExpanded && (
+                  <div className="border-t border-[#002433]/5 bg-[#f5f3f3] px-5 py-4">
+                    {loadingDetails === post.post_id ? (
+                      <p className="text-xs font-semibold text-[#41484c]/50">Loading report details…</p>
+                    ) : details.length === 0 ? (
+                      <p className="text-xs font-semibold text-[#41484c]/50">No details available.</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {details.map((d) => {
+                          const reporter = Array.isArray(d.reporter) ? d.reporter[0] : d.reporter;
+                          return (
+                            <div key={d.report_id} className="rounded-lg bg-white p-3 shadow-sm">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="rounded bg-red-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-[#ba1a1a]">{d.reason}</span>
+                                  <span className="text-[10px] font-semibold text-[#41484c]/50">{new Date(d.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                                </div>
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#41484c]/40">{d.status}</span>
+                              </div>
+                              {d.details && <p className="mt-1.5 text-xs text-[#41484c]">{d.details}</p>}
+                              <p className="mt-1 text-[10px] text-[#41484c]/50">By: {reporter?.full_name || reporter?.email || 'Anonymous'}</p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Delete confirmation modal */}
+      {deleteModal && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-[#002433]/35 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-[0_20px_40px_rgba(0,36,51,0.2)]">
+            <div className="flex items-center justify-between bg-[#ba1a1a] px-6 py-5">
+              <div>
+                <h2 className="font-headline text-xl font-bold text-white">Delete Post</h2>
+                <p className="mt-0.5 text-sm text-red-100">This will purge the post and action all reports.</p>
+              </div>
+              <button onClick={() => setDeleteModal(null)} className="text-red-100 hover:text-white">
+                <span className="material-symbols-outlined text-2xl">close</span>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="rounded-xl bg-[#f5f3f3] p-3">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#41484c]/60">Post</p>
+                <p className="mt-1 text-sm font-bold text-[#002433] line-clamp-2">{(deleteModal.general_description || '').split('\n\n')[0]}</p>
+              </div>
+              <label className="block">
+                <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-[#41484c]">Deletion Reason <span className="text-[#ba1a1a]">*</span></span>
+                <textarea
+                  value={deleteReason}
+                  onChange={(e) => setDeleteReason(e.target.value)}
+                  rows={3}
+                  placeholder="State the reason for removing this post..."
+                  className="w-full rounded-md border border-[#002433]/10 bg-[#f5f3f3] px-4 py-3 text-sm outline-none focus:border-[#ba1a1a] focus:ring-1 focus:ring-[#ba1a1a]"
+                />
+              </label>
+              <div className="flex gap-3 justify-end">
+                <button onClick={() => setDeleteModal(null)} className="rounded-md border border-[#002433]/10 px-5 py-3 text-sm font-bold text-[#41484c] hover:bg-[#f5f3f3]">Cancel</button>
+                <button
+                  onClick={() => handleDelete(deleteModal)}
+                  disabled={!deleteReason.trim() || actionBusy === deleteModal.post_id + '-delete'}
+                  className="rounded-md bg-[#ba1a1a] px-5 py-3 text-sm font-bold text-white hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {actionBusy === deleteModal.post_id + '-delete' ? 'Deleting...' : 'Confirm Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

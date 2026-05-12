@@ -1,0 +1,231 @@
+"use server";
+
+import { createClient } from "@supabase/supabase-js";
+import { getAdminClient, verifyAdminAccess } from "./core";
+
+// ── Shared: verify any authenticated user (not admin-only) ──────────────────
+async function verifyUserSession(accessToken: string) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+  const authClient = createClient(supabaseUrl, supabaseAnonKey);
+
+  const {
+    data: { user },
+    error,
+  } = await authClient.auth.getUser(accessToken);
+
+  if (error || !user) throw new Error("Unauthorized: Invalid session.");
+  return user;
+}
+
+// ── Types ────────────────────────────────────────────────────────────────────
+export type ReportReason =
+  | "Spam"
+  | "Inappropriate Content"
+  | "Fake/Scam"
+  | "Duplicate"
+  | "Other";
+
+export type FlaggedPost = {
+  post_id: string;
+  general_description: string;
+  item_status: string;
+  original_poster_name: string | null;
+  original_poster_email: string | null;
+  total_reports: number;
+  latest_report_date: string;
+};
+
+export type ReportDetail = {
+  report_id: string;
+  reporter_id: string;
+  reason: string;
+  details: string | null;
+  status: string;
+  created_at: string;
+  reporter?: { full_name: string | null; email: string | null };
+};
+
+// ── USER ACTION: Submit a report on a post ───────────────────────────────────
+/**
+ * Any authenticated user can report a post they do NOT own.
+ * The unique(post_id, reporter_id) constraint prevents duplicate reports.
+ */
+export async function submitReportAction(
+  accessToken: string,
+  postId: string,
+  reason: ReportReason,
+  details?: string
+) {
+  const user = await verifyUserSession(accessToken);
+  const adminClient = getAdminClient();
+
+  // Prevent self-reporting
+  const { data: item } = await adminClient
+    .from("lost_items")
+    .select("reported_by")
+    .eq("post_id", postId)
+    .single();
+
+  if (!item) throw new Error("Post not found.");
+  if (item.reported_by === user.id)
+    throw new Error("You cannot report your own post.");
+
+  // Check for existing report from this user
+  const { data: existing } = await adminClient
+    .from("item_reports")
+    .select("report_id, status")
+    .eq("post_id", postId)
+    .eq("reporter_id", user.id)
+    .maybeSingle();
+
+  if (existing)
+    throw new Error("You have already submitted a report for this post.");
+
+  const { error: insertError } = await adminClient
+    .from("item_reports")
+    .insert({
+      post_id: postId,
+      reporter_id: user.id,
+      reason,
+      details: details?.trim() || null,
+      status: "Pending",
+    });
+
+  if (insertError) throw new Error(insertError.message);
+
+  return { success: true };
+}
+
+// ── ADMIN ACTIONS ─────────────────────────────────────────────────────────────
+
+/**
+ * Fetch all posts with pending reports, grouped via the admin_reported_items_summary view.
+ */
+export async function fetchFlaggedPostsAction(accessToken: string) {
+  await verifyAdminAccess(accessToken);
+  const adminClient = getAdminClient();
+
+  const { data, error } = await adminClient
+    .from("admin_reported_items_summary")
+    .select("*");
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as FlaggedPost[];
+}
+
+/**
+ * Fetch individual report rows for a specific post.
+ */
+export async function fetchPostReportDetailsAction(
+  accessToken: string,
+  postId: string
+) {
+  await verifyAdminAccess(accessToken);
+  const adminClient = getAdminClient();
+
+  const { data, error } = await adminClient
+    .from("item_reports")
+    .select(
+      `
+      report_id,
+      reporter_id,
+      reason,
+      details,
+      status,
+      created_at,
+      users:reporter_id (
+        full_name,
+        email
+      )
+    `
+    )
+    .eq("post_id", postId)
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as ReportDetail[];
+}
+
+/**
+ * Admin dismisses all pending reports for a post (false report).
+ * Sets all Pending reports for that post to Dismissed.
+ */
+export async function dismissReportsAction(
+  accessToken: string,
+  postId: string
+) {
+  const { adminClient, profile } = await verifyAdminAccess(accessToken);
+
+  const { error } = await adminClient
+    .from("item_reports")
+    .update({ status: "Dismissed", updated_at: new Date().toISOString() })
+    .eq("post_id", postId)
+    .eq("status", "Pending");
+
+  if (error) throw new Error(error.message);
+
+  await adminClient.from("audit_logs").insert({
+    post_id: postId,
+    actor_id: profile.user_id,
+    action: "REPORTS_DISMISSED",
+    new_state: { dismissed_by: profile.user_id },
+  });
+
+  return { success: true };
+}
+
+/**
+ * Admin deletes the reported post (marks it Purged) and marks all reports Actioned.
+ */
+export async function actionReportDeletePostAction(
+  accessToken: string,
+  postId: string,
+  deletionReason: string
+) {
+  const { adminClient, profile } = await verifyAdminAccess(accessToken);
+
+  // Fetch current state for audit
+  const { data: current } = await adminClient
+    .from("lost_items")
+    .select("status, reported_by")
+    .eq("post_id", postId)
+    .single();
+
+  if (!current) throw new Error("Post not found.");
+
+  // Purge the post
+  const { error: updateError } = await adminClient
+    .from("lost_items")
+    .update({
+      status: "Purged",
+      deleted_by: profile.user_id,
+      deletion_reason: deletionReason,
+      deleted_at: new Date().toISOString(),
+      last_handled_by: profile.user_id,
+    })
+    .eq("post_id", postId);
+
+  if (updateError) throw new Error(updateError.message);
+
+  // Mark all reports for this post as Actioned
+  await adminClient
+    .from("item_reports")
+    .update({ status: "Actioned", updated_at: new Date().toISOString() })
+    .eq("post_id", postId)
+    .in("status", ["Pending", "Reviewed"]);
+
+  await adminClient.from("audit_logs").insert({
+    post_id: postId,
+    actor_id: profile.user_id,
+    action: "POST_DELETED_VIA_REPORT",
+    previous_state: { status: current.status },
+    new_state: {
+      status: "Purged",
+      deleted_by: profile.user_id,
+      deletion_reason: deletionReason,
+    },
+  });
+
+  return { success: true };
+}

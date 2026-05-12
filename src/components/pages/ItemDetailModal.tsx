@@ -29,6 +29,8 @@ interface ItemDetailModalProps {
   isLostItem?: boolean;
   /** Called when the owner clicks "Mark as Returned" on a Lost item. */
   onMarkAsReturned?: () => void;
+  /** Called when a non-owner clicks "Report Post". */
+  onReportClick?: () => void;
 }
 
 export default function ItemDetailModal({
@@ -42,6 +44,7 @@ export default function ItemDetailModal({
   claimsHref,
   isLostItem = false,
   onMarkAsReturned,
+  onReportClick,
 }: ItemDetailModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -321,6 +324,16 @@ export default function ItemDetailModal({
                     <span className="material-symbols-outlined text-lg">check_circle</span>
                     Claim Item
                   </span>
+                </button>
+              )}
+              {/* Report button — always visible to non-owners */}
+              {onReportClick && (
+                <button
+                  onClick={onReportClick}
+                  className="shrink-0 bg-red-50 text-red-600 border border-red-200 px-4 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-red-100 transition-all active:scale-95 flex items-center gap-1.5"
+                  title="Report this post"
+                >
+                  <span className="material-symbols-outlined text-lg">flag</span>
                 </button>
               )}
             </>
