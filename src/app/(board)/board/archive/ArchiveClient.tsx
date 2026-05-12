@@ -1,66 +1,42 @@
 "use client";
 import { resolveIcon } from '@/src/lib/resolveIcon';
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/src/lib/supabase";
-import { fetchUserArchiveAction } from "@/src/app/admin/actions/posts";
+import { useState } from "react";
 import ItemCard from "@/src/components/pages/ItemCard";
 import ItemDetailModal from "@/src/components/pages/ItemDetailModal";
 import { useNotification } from "@/src/hooks/useNotification";
-
-interface ArchiveItem {
-  post_id: string;
-  general_description: string;
-  zone: string;
-  status: string;
-  image_url?: string | null;
-  reported_by: string;
-  deleted_by?: string | null;
-  deletion_reason?: string | null;
-  deleted_at?: string | null;
-  returned_at?: string | null;
-  categories?: {
-    name: string;
-    icon_identifier: string;
-  };
-  archiveLabel: string;
-}
+import { useCurrentUserProfile } from "@/src/hooks/useAuthSession";
+import { type ArchiveItem, useUserArchive } from "@/src/hooks/useUserItemLists";
 
 export default function ArchiveClient() {
   const { notify } = useNotification();
-  const [items, setItems] = useState<ArchiveItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    profile,
+    accessToken,
+    isLoading: authLoading,
+  } = useCurrentUserProfile();
+  const {
+    data: items = [],
+    error,
+    isLoading: archiveLoading,
+  } = useUserArchive(accessToken, profile?.userId);
   const [selectedItem, setSelectedItem] = useState<ArchiveItem | null>(null);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const accessToken = sessionData.session?.access_token;
-        if (!accessToken) {
-          setError("You must be logged in to view your archive.");
-          setLoading(false);
-          return;
-        }
-
-        const data = await fetchUserArchiveAction(accessToken);
-        setItems(data as ArchiveItem[]);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
+  const loading = authLoading || (Boolean(accessToken) && archiveLoading && items.length === 0);
+  const errorMessage =
+    error instanceof Error
+      ? error.message
+      : error
+        ? String(error)
+        : !loading && !accessToken
+          ? "You must be logged in to view your archive."
+          : null;
 
   if (loading) {
     return <div className="py-12 text-center text-outline-variant font-medium">Loading archive...</div>;
   }
 
-  if (error) {
-    return <div className="py-12 text-center text-red-600 font-medium">{error}</div>;
+  if (errorMessage) {
+    return <div className="py-12 text-center text-red-600 font-medium">{errorMessage}</div>;
   }
 
   if (items.length === 0) {
@@ -133,7 +109,7 @@ export default function ArchiveClient() {
 
       <ItemDetailModal
         isOpen={!!selectedItem}
-        item={selectedItem as any}
+        item={selectedItem}
         isOwner={true}
         onClaimClick={() => notify("Action disabled for archived items.", "warning")}
         onContactClick={() => notify("Action disabled for archived items.", "warning")}

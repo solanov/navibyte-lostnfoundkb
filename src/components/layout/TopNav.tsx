@@ -4,16 +4,16 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/src/lib/supabase";
+import { useCurrentUserProfile } from "@/src/hooks/useAuthSession";
 
 export default function TopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const isMessagesPage = pathname?.startsWith("/messages");
-
-  // User States
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<string>("");
+  const { profile } = useCurrentUserProfile();
+  const avatarUrl = profile?.avatarUrl ?? null;
+  const userName = profile?.fullName ?? null;
+  const userRole = profile?.role ?? "";
 
   // Popover States
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -28,28 +28,6 @@ export default function TopNav() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Fetch complete user data
-  useEffect(() => {
-    let isMounted = true;
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!isMounted) return;
-      if (user) {
-        setAvatarUrl(user.user_metadata?.avatar_url || user.user_metadata?.picture || null);
-        setUserName(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || null);
-
-        const { data: profile } = await supabase.from('users').select('full_name, role').eq('user_id', user.id).maybeSingle();
-        if (profile) {
-          if (profile.full_name) setUserName(profile.full_name);
-          if (profile.role) setUserRole(profile.role);
-        }
-      }
-    };
-    
-    fetchUser();
-    return () => { isMounted = false; };
   }, []);
 
   const handleLogout = async () => {

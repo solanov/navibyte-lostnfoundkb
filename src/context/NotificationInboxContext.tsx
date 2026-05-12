@@ -10,6 +10,7 @@ import React, {
 } from "react";
 import useSWR from "swr";
 import { supabase } from "@/src/lib/supabase";
+import { useAuthSession } from "@/src/hooks/useAuthSession";
 
 export type NotificationFeedType = "message" | "status" | "system";
 
@@ -140,8 +141,8 @@ function upsertNotification(
 }
 
 export function NotificationInboxProvider({ children }: { children: ReactNode }) {
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const { data: session, isLoading: authLoading } = useAuthSession();
+  const currentUserId = session?.user?.id ?? null;
   const [actionError, setActionError] = useState<string | null>(null);
 
   const {
@@ -157,37 +158,6 @@ export function NotificationInboxProvider({ children }: { children: ReactNode })
       keepPreviousData: true,
     }
   );
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const syncCurrentUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!isMounted) {
-        return;
-      }
-
-      setCurrentUserId(user?.id ?? null);
-      setAuthLoading(false);
-    };
-
-    void syncCurrentUser();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setCurrentUserId(session?.user?.id ?? null);
-      setAuthLoading(false);
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
 
   useEffect(() => {
     if (!currentUserId) {
