@@ -17,16 +17,14 @@ type CategoryResolutionResult =
   | { success: true; categoryId: number }
   | { success: false; message: string };
 
-const FALLBACK_CATEGORY_SEEDS = new Map(
-  [
-    ["wallet", { name: "Wallet", icon_identifier: "account_balance_wallet" }],
-    ["keys", { name: "Keys", icon_identifier: "vpn_key" }],
-    ["id", { name: "ID", icon_identifier: "badge" }],
-    ["tech", { name: "Tech", icon_identifier: "devices" }],
-    ["other", { name: "Others", icon_identifier: "other" }],
-    ["others", { name: "Others", icon_identifier: "other" }],
-  ] as const
-);
+const FALLBACK_CATEGORY_SEEDS = new Map<string, { name: string; icon_identifier: string }>([
+  ["wallet", { name: "Wallet", icon_identifier: "account_balance_wallet" }],
+  ["keys", { name: "Keys", icon_identifier: "vpn_key" }],
+  ["id", { name: "ID", icon_identifier: "badge" }],
+  ["tech", { name: "Tech", icon_identifier: "devices" }],
+  ["other", { name: "Others", icon_identifier: "other" }],
+  ["others", { name: "Others", icon_identifier: "other" }],
+]);
 
 function normalizeCategoryName(categoryName: string | null) {
   return categoryName?.trim().toLowerCase() ?? "";

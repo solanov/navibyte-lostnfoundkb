@@ -120,11 +120,6 @@ return (
                     <span className="text-xs font-bold">Admin Dashboard</span>
                   </Link>
                 )}
-
-                <Link href="/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#f5f3f3] transition-colors text-[#41484c]" onClick={() => setIsProfileMenuOpen(false)}>
-                  <span className="material-symbols-outlined text-[18px]">settings</span>
-                  <span className="text-xs font-bold">Account Settings</span>
-                </Link>
               </div>
 
               {/* Footer / Sign Out */}

@@ -5,6 +5,7 @@ import { supabase } from '@/src/lib/supabase';
 import ItemCard from './ItemCard';
 import ConversationModal from './ConversationModal';
 import ItemDetailModal from './ItemDetailModal';
+import EditPostModal, { type EditPostSuccessPayload } from './EditPostModal';
 import { submitClaimAction, userDeletePostAction, markAsReturnedAction } from '@/src/app/admin/actions/posts';
 import { submitReportAction, ReportReason } from '@/src/app/admin/actions/reports';
 import { useNotification } from '@/src/hooks/useNotification';
@@ -40,6 +41,8 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
   const [isClaimModalOpen, setIsClaimModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isConversationOpen, setIsConversationOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editPostId, setEditPostId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currentUserName, setCurrentUserName] = useState('You');
   const [currentUserRole, setCurrentUserRole] = useState('Public');
@@ -264,6 +267,29 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
     }
   };
 
+  // ── Edit handlers ─────────────────────────────────────────────────
+  const handleEditPost = () => {
+    if (!selectedItem || !currentUserId) return;
+    setEditPostId(selectedItem.post_id);
+    setIsModalOpen(false);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSuccess = (updated: EditPostSuccessPayload) => {
+    setVisibleItems((current) =>
+      current.map((item) =>
+        item.post_id === updated.post_id
+          ? {
+              ...item,
+              general_description: updated.general_description,
+              zone: updated.zone,
+              ...(updated.categories ? { categories: updated.categories } : {}),
+            }
+          : item
+      )
+    );
+  };
+
   // ── Report handlers ─────────────────────────────────────────────────
   const handleOpenReport = () => {
     if (!selectedItem) return;
@@ -347,6 +373,7 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
         onContactClick={handleContactPoster}
         onDeletePost={handleDeletePost}
         onMarkAsReturned={handleMarkAsReturned}
+        onEditPost={currentUserId && currentUserId === selectedItem?.reported_by ? handleEditPost : undefined}
         onReportClick={currentUserId && currentUserId !== selectedItem?.reported_by ? handleOpenReport : undefined}
         onClose={handleCloseModal}
       />
@@ -457,6 +484,14 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
           </div>
         </div>
       )}
+
+      {/* ── Edit Post Modal ───────────────────────────────────── */}
+      <EditPostModal
+        isOpen={isEditModalOpen}
+        postId={editPostId}
+        onClose={() => { setIsEditModalOpen(false); setEditPostId(null); }}
+        onSuccess={handleEditSuccess}
+      />
 
       {/* ── Report Post Modal ─────────────────────────────────── */}
       {isReportModalOpen && reportItem && (

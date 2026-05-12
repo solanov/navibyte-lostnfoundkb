@@ -183,12 +183,8 @@ export default function SideNav() {
                     <span className="text-xs font-bold">Admin Dashboard</span>
                   </Link>
                 )}
-
-                <Link href="/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#f5f3f3] transition-colors text-[#41484c] group" onClick={() => setIsProfileMenuOpen(false)}>
-                  <span className="material-symbols-outlined text-[18px] group-hover:text-[#002433]">settings</span>
-                  <span className="text-xs font-bold">Account Settings</span>
-                </Link>
               </div>
+
 
               {/* Footer / Sign Out */}
               <div className="p-2 bg-[#f5f3f3]/50 rounded-b-2xl relative z-10">
