@@ -1,6 +1,6 @@
 # NEUvigate: Lost and Found System (LFS)
 
-🌐 **Live Deployment:** [navibyte.vercel.app](https://navibyte-lfk.vercel.app/)
+🌐 **Live Deployment:** [navibyte-lfk.vercel.app](https://navibyte-lfk.vercel.app/)
 
 ## 1. Overview
 The NEUvigate Lost and Found System (LFS) is a secure, process-driven platform designed to modernize item recovery across campus. Traditional lost and found systems suffer from three critical failures:
@@ -30,7 +30,7 @@ To solve the challenges of subjective item reporting, the **SECI Model** was cho
 ---
 
 ## 3. Team
-* **Vinz Eulo A. Solano** - Scrum Master
+* **Vinz Eulo Solano** - Scrum Master
 * **Peja Latrell Escares** - Full Stack Developer
 * **Albert Julius Ortiz** - UI/UX Designer
 * **Saira Sofia De Mesa** - Knowledge Management Analyst
