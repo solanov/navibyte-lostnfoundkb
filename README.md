@@ -93,6 +93,7 @@ To run NEUvigate LFS locally, follow these steps:
 ---
 
 ## 7. Repository Structure
+```text
 navibyte-lostnfoundkb/
 ├── docs/               # Project documentation, guidelines, and test cases
 ├── public/             # Static assets (images, icons)
@@ -108,6 +109,7 @@ navibyte-lostnfoundkb/
 ├── postcss.config.mjs  # Tailwind/PostCSS configuration
 ├── tsconfig.json       # TypeScript configuration
 └── README.md           # Project overview
+```
 
 ---
 
