@@ -115,7 +115,33 @@ To maintain prompt-logs properly
 
 I have learned that this can be pulled off, should we have been experienced. I went with making a branch specific for prompt-logs, then the prompt-logs in that branch will be pushed to members branches.
 
-## Entry 2 - (26/03/2026)
+## Entry 2 - (06/04/2026)
+
+### **Task(s)**
+
+- Setting up Sprint 1 and Sprint 2 GitHub Issues for the project's Kanban board.
+
+### **Prompt (or Summary) provided to the AI**
+
+- We're making a Lost and Found Knowledge Board app. I'm the scrum... give me a list of tasks for sprints 1 and 2... Where Sprint 1 handles the most important features, and Sprint 2 is for testing/polishing." Followed by a refinement request to format them specifically as GitHub Issues for a Kanban board rather than general tasks.
+
+### **Output**
+
+- The AI initially generated a high-level breakdown of responsibilities for all 5 roles across the two sprints. After the follow-up prompt, it output a specific list of 14 formatted GitHub Issues (e.g., "[Feature] Implement Institutional Email Authentication", "[Docs] Define KM Taxonomy") complete with assigned roles and descriptions.
+
+### **What you changed/improved/rejected fom the AI's output**
+
+- I rejected the initial output because it was too broad and focused on general role duties. I refined the prompt to force the generation of strict GitHub Issues. I also reviewed the final list to ensure that specific grading requirements from the execution guidelines (like the Failure Analysis Report and KM Conceptual Report) were explicitly assigned as trackable tickets.
+
+### **Reason (Why?)**
+
+- The Kanban board requires discrete, actionable tasks that can physically move from "To Do" to "Done" with attached evidence. General role responsibilities cannot be tracked effectively in a sprint. Embedding the documentation deliverables directly alongside the coding features ensures the team doesn't neglect the required paperwork while building the app.
+
+### **What you learned or the decision you made as a result**
+
+- I learned that when prompting for project management structuring, I must explicitly define the output container (e.g., "Kanban GitHub Issues") upfront to avoid receiving generic advice. I made the decision to map every specific feature to a Capstone document requirement to guarantee we hit all grading rubrics by Sprint 2.
+
+## Entry 3 - (26/03/2026)
 
 ### **Task(s)**
 
@@ -166,7 +192,7 @@ I didn't change anything as this is mostly a refresher, I followed it's given ou
 
 - I refreshed my knowledge on how to properly apply git pulling and fetching, their differences and similarities.
 
-## Entry 3 - (06/04/2026)
+## Entry 4 - (06/04/2026)
 
 ### **Task(s)**
 
@@ -269,16 +295,59 @@ Here is the updated list of tasks, keeping your original items and injecting the
 
 - I learned how to properly delagate
 
-## Entry 4 - (06/04/2026)
+## Entry 5 - (06/04/2026)
 
 ### **Task(s)**
 
+- Setting up the GitHub Projects Kanban Board structure and defining the project milestones.
+
 ### **Prompt (or Summary) provided to the AI**
+
+- I am the scrum master for a Knowledge Management project. We are using a Scrum workflow over 8 weeks. Suggest a Kanban board column structure and a list of milestones to track our progress from kickoff to deployment.
 
 ### **Output**
 
+- The AI suggested a standard Kanban board with three columns (To Do, In Progress, Done) and four 2-week sprints as milestones.
+
 ### **What you changed/improved/rejected fom the AI's output**
+
+- **Added Columns:** I added "In Review" and "QA/Testing" columns.
+- **Restructured Milestones:** I rejected the generic "Sprint 1-4" labels and replaced them with the specific phases required by the instructor: Kickoff, Discovery, Design, Build Sprint 1, Build Sprint 2, Polish & Docs, and Deployment.
+- **Added Metadata:** I configured the board to include a custom "Story Points" field for tracking velocity.
 
 ### **Reason (Why?)**
 
+- **Compliance:** The instructor's guidelines explicitly require a specific milestone structure for grading.
+- **Quality Control:** Since every Pull Request (PR) requires a review before merging, a dedicated "In Review" column is necessary to prevent bottlenecks. - **QA Integration:** As I am also the QA Lead, I need a visual way to track which features are ready for test cases.
+
 ### **What you learned or the decision you made as a result**
+
+- I learned that while AI provides a great generic baseline, project management tools must be customized to the specific "Operating Manual" of the organization (or in this case, the course) to be effective. I decided to use GitHub's automated workflows so that when a member opens a PR, the task card moves from "In Progress" to "In Review" automatically, reducing manual overhead for me as the PM.
+
+## Entry 6 - (11/04/2026)
+
+### **Task(s)**
+
+- Clarifying project timeline and scheduling milestones for the Knowledge Management Analyst deliverables.
+
+### **Prompt (or Summary) provided to the AI**
+
+- With Knowledge Analyst, when do we start with the KM Architecture and KM Report?" (Provided alongside the Group Execution Guidelines PDF)
+
+### **Output**
+
+- The AI read the provided PDF and generated a chronological breakdown of the timeline. It outlined that the framework selection memo is due Weeks 1-2, the KM Architecture must start in Weeks 3-5 (Build Sprint 1), and the final KM Conceptual Report is finalized in Weeks 6-7 (Polish & Docs).
+
+### **What you changed/improved/rejected fom the AI's output**
+
+- I accepted the AI's timeline summary since it accurately reflected the PDF, but I rejected it as a final output. Instead, I took the AI's plain-text breakdown and translated it into specific, actionable task cards on our GitHub Projects board, assigning exact due dates for the "Framework Selection Memo," "Architecture Schema," and "Final Report."
+
+### **Reason (Why?)**
+
+- The AI provided a good high-level summary, but a summary alone doesn't keep the team on track. I needed to adapt the information into our actual sprint milestones so the Developer and KM Analyst are aligned on when the data schema needs to be ready for coding to begin.
+
+### **What you learned or the decision you made as a result**
+
+- I learned that we cannot wait until the documentation phase (Weeks 6-7) to start the KM architecture. I made the decision to prioritize the KM Architecture mapping during Build Sprint 1 (Weeks 3-5) so the Developer has the required data schema and retrieval logic to actually build the core application features.
+
+
