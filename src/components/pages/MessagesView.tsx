@@ -2,41 +2,22 @@
 
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import BottomNavBar from "@/src/components/layout/BottomNavBar";
 import { supabase } from "@/src/lib/supabase";
 import {
   Message,
-  getConversationPairKey,
-  useConversation,
+  buildOptimisticMessage,
+  markMessageAsReadRequest,
+  sendConversationMessage,
 } from "@/src/lib/useConversation";
-
-interface UserProfile {
-  user_id: string;
-  full_name: string | null;
-  email: string | null;
-  avatar_url: string | null;
-}
-
-interface ConversationRow {
-  conversation_id: string;
-  post_id: string;
-  initiator_id: string;
-  receiver_id: string;
-  created_at: string;
-}
-
-interface ConversationBundle {
-  activeConversationId: string;
-  conversationIds: string[];
-  createdAt: string;
-  otherUserId: string;
-  myProfile: UserProfile | null;
-  otherProfile: UserProfile | null;
-  messages: Message[];
-  lastMessage: Message | null;
-  unreadCount: number;
-}
+import {
+  UserProfile,
+  markConversationBundlesRead,
+  replaceOptimisticMessageInConversationBundles,
+  upsertMessageInConversationBundles,
+  useMessagesInbox,
+} from "@/src/lib/messagesInbox";
 
 function formatConversationTime(value?: string) {
   if (!value) return "";
@@ -82,163 +63,49 @@ export default function MessagesView() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [bundles, setBundles] = useState<ConversationBundle[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [messageError, setMessageError] = useState<string | null>(null);
   const requestedConversationId = searchParams.get("conversation");
+  const {
+    data: bundles = [],
+    error,
+    isLoading: bundlesLoading,
+    mutate: mutateBundles,
+  } = useMessagesInbox(currentUserId);
 
-  const loadInbox = useCallback(async (nextSelectedId?: string | null) => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    let isMounted = true;
 
-    try {
+    const syncCurrentUser = async () => {
       const {
         data: { user },
-        error: userError,
       } = await supabase.auth.getUser();
 
-      if (userError) throw userError;
-
-      if (!user) {
-        setCurrentUserId(null);
-        setBundles([]);
-        setSelectedConversationId(null);
+      if (!isMounted) {
         return;
       }
 
-      setCurrentUserId(user.id);
+      setCurrentUserId(user?.id ?? null);
+      setAuthLoading(false);
+    };
 
-      const { data: conversations, error: conversationError } = await supabase
-        .from("conversations")
-        .select("*")
-        .or(`initiator_id.eq.${user.id},receiver_id.eq.${user.id}`)
-        .order("created_at", { ascending: false });
-
-      if (conversationError) throw conversationError;
-
-      const conversationRows = (conversations || []) as ConversationRow[];
-      const conversationIds = conversationRows.map((conversation) => conversation.conversation_id);
-      const participantIds = Array.from(
-        new Set(
-          conversationRows.flatMap((conversation) => [
-            conversation.initiator_id,
-            conversation.receiver_id,
-          ])
-        )
-      );
-
-      const [profilesResult, messagesResult] = await Promise.all([
-        participantIds.length > 0
-          ? supabase.from("users").select("user_id,full_name,email,avatar_url").in("user_id", participantIds)
-          : Promise.resolve({ data: [], error: null }),
-        conversationIds.length > 0
-          ? supabase
-              .from("messages")
-              .select("*")
-              .in("conversation_id", conversationIds)
-              .order("created_at", { ascending: true })
-          : Promise.resolve({ data: [], error: null }),
-      ]);
-
-      if (profilesResult.error) throw profilesResult.error;
-      if (messagesResult.error) throw messagesResult.error;
-
-      const profilesById = new Map(
-        ((profilesResult.data || []) as UserProfile[]).map((profile) => [profile.user_id, profile])
-      );
-      const messagesByConversation = new Map<string, Message[]>();
-
-      ((messagesResult.data || []) as Message[]).forEach((message) => {
-        const grouped = messagesByConversation.get(message.conversation_id) || [];
-        grouped.push(message);
-        messagesByConversation.set(message.conversation_id, grouped);
-      });
-
-      const groupedConversations = new Map<string, ConversationRow[]>();
-
-      conversationRows.forEach((conversation) => {
-        const otherUserId =
-          conversation.initiator_id === user.id ? conversation.receiver_id : conversation.initiator_id;
-        const pairKey = getConversationPairKey(user.id, otherUserId);
-        const existing = groupedConversations.get(pairKey) || [];
-        existing.push(conversation);
-        groupedConversations.set(pairKey, existing);
-      });
-
-      const nextBundles = Array.from(groupedConversations.values())
-        .map((group) => {
-          const sortedGroup = [...group].sort(
-            (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-          );
-          const canonicalConversation = sortedGroup[0];
-          const otherUserId =
-            canonicalConversation.initiator_id === user.id
-              ? canonicalConversation.receiver_id
-              : canonicalConversation.initiator_id;
-          const mergedMessages = sortedGroup
-            .flatMap((conversation) => messagesByConversation.get(conversation.conversation_id) || [])
-            .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-          const lastMessage = mergedMessages[mergedMessages.length - 1] || null;
-
-          return {
-            activeConversationId: canonicalConversation.conversation_id,
-            conversationIds: sortedGroup.map((conversation) => conversation.conversation_id),
-            createdAt: canonicalConversation.created_at,
-            otherUserId,
-            myProfile: profilesById.get(user.id) || null,
-            otherProfile: profilesById.get(otherUserId) || null,
-            messages: mergedMessages,
-            lastMessage,
-            unreadCount: mergedMessages.filter(
-              (message) => !message.is_read && message.sender_id !== user.id
-            ).length,
-          };
-        })
-        // Only show conversations that have at least one message sent
-        .filter((bundle) => bundle.messages.length > 0)
-        .sort((a, b) => {
-          const aTime = new Date(a.lastMessage?.created_at || a.createdAt).getTime();
-          const bTime = new Date(b.lastMessage?.created_at || b.createdAt).getTime();
-          return bTime - aTime;
-        });
-
-      setBundles(nextBundles);
-
-      const selectedStillExists = nextBundles.some(
-        (bundle) => bundle.activeConversationId === nextSelectedId
-      );
-      const currentStillExists = nextBundles.some(
-        (bundle) => bundle.activeConversationId === selectedConversationId
-      );
-
-      if (nextSelectedId && selectedStillExists) {
-        setSelectedConversationId(nextSelectedId);
-      } else if (selectedConversationId && !currentStillExists) {
-        setSelectedConversationId(null);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load messages");
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedConversationId]);
-
-  useEffect(() => {
-    loadInbox();
+    void syncCurrentUser();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      loadInbox();
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUserId(session?.user?.id ?? null);
+      setAuthLoading(false);
     });
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
     };
-  }, [loadInbox]);
+  }, []);
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -248,8 +115,43 @@ export default function MessagesView() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "messages" },
-        () => {
-          loadInbox(selectedConversationId);
+        (payload) => {
+          const nextMessage = payload.new as Message | undefined;
+          const previousMessage = payload.old as Message | undefined;
+          const relevantConversationId =
+            nextMessage?.conversation_id || previousMessage?.conversation_id;
+
+          if (!relevantConversationId) {
+            return;
+          }
+
+          void mutateBundles((current = []) => {
+            const hasConversation = current.some((bundle) =>
+              bundle.conversationIds.includes(relevantConversationId)
+            );
+
+            if (!hasConversation) {
+              return current;
+            }
+
+            if (payload.eventType === "INSERT" && nextMessage) {
+              return upsertMessageInConversationBundles(
+                current,
+                nextMessage,
+                currentUserId
+              );
+            }
+
+            if (payload.eventType === "UPDATE" && nextMessage) {
+              return upsertMessageInConversationBundles(
+                current,
+                nextMessage,
+                currentUserId
+              );
+            }
+
+            return current;
+          }, false);
         }
       )
       .subscribe();
@@ -257,12 +159,70 @@ export default function MessagesView() {
     return () => {
       channel.unsubscribe();
     };
-  }, [currentUserId, loadInbox, selectedConversationId]);
+  }, [currentUserId, mutateBundles]);
+
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    const conversationsChannel = supabase
+      .channel(`conversation-membership:${currentUserId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "conversations",
+          filter: `initiator_id=eq.${currentUserId}`,
+        },
+        () => {
+          void mutateBundles();
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "conversations",
+          filter: `receiver_id=eq.${currentUserId}`,
+        },
+        () => {
+          void mutateBundles();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      conversationsChannel.unsubscribe();
+    };
+  }, [currentUserId, mutateBundles]);
+
+  useEffect(() => {
+    if (!selectedConversationId) {
+      return;
+    }
+
+    const stillExists = bundles.some(
+      (bundle) => bundle.activeConversationId === selectedConversationId
+    );
+
+    if (!stillExists) {
+      const timer = window.setTimeout(() => {
+        setSelectedConversationId(null);
+      }, 0);
+
+      return () => {
+        window.clearTimeout(timer);
+      };
+    }
+  }, [bundles, selectedConversationId]);
 
   useEffect(() => {
     if (!requestedConversationId) {
       return;
     }
+
+    let selectionTimer: number | undefined;
 
     const matchingBundle = bundles.find(
       (bundle) =>
@@ -271,20 +231,28 @@ export default function MessagesView() {
     );
 
     if (!matchingBundle) {
-      if (loading) {
+      if (bundlesLoading) {
         return;
       }
     } else if (selectedConversationId !== matchingBundle.activeConversationId) {
-      setSelectedConversationId(matchingBundle.activeConversationId);
+      selectionTimer = window.setTimeout(() => {
+        setSelectedConversationId(matchingBundle.activeConversationId);
+      }, 0);
     }
 
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.delete("conversation");
     const nextQuery = nextParams.toString();
     router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
+
+    return () => {
+      if (selectionTimer !== undefined) {
+        window.clearTimeout(selectionTimer);
+      }
+    };
   }, [
     bundles,
-    loading,
+    bundlesLoading,
     pathname,
     requestedConversationId,
     router,
@@ -296,25 +264,36 @@ export default function MessagesView() {
     () => bundles.find((bundle) => bundle.activeConversationId === selectedConversationId) || null,
     [bundles, selectedConversationId]
   );
-
-  const activeConversationIds = selectedBundle?.conversationIds || [];
-  const {
-    messages,
-    loading: messagesLoading,
-    error: messagesError,
-    sendMessage,
-    markAsRead,
-  } = useConversation(activeConversationIds, selectedBundle?.activeConversationId || null);
+  const messages = selectedBundle?.messages || [];
+  const loading = authLoading || (Boolean(currentUserId) && bundlesLoading);
+  const messagesLoading = loading && messages.length === 0;
+  const messagesError =
+    error instanceof Error ? error.message : error ? String(error) : null;
 
   useEffect(() => {
-    if (!currentUserId) return;
+    if (!currentUserId || !selectedBundle) {
+      return;
+    }
 
-    messages.forEach((message) => {
-      if (!message.is_read && message.sender_id !== currentUserId) {
-        markAsRead(message.message_id);
-      }
+    const unreadMessages = selectedBundle.messages.filter(
+      (message) => !message.is_read && message.sender_id !== currentUserId
+    );
+
+    if (unreadMessages.length === 0) {
+      return;
+    }
+
+    void mutateBundles((current = []) =>
+      markConversationBundlesRead(
+        current,
+        selectedBundle.conversationIds,
+        currentUserId
+      ), false);
+
+    unreadMessages.forEach((message) => {
+      void markMessageAsReadRequest(message.message_id).catch(() => undefined);
     });
-  }, [currentUserId, markAsRead, messages]);
+  }, [currentUserId, mutateBundles, selectedBundle]);
 
   const filteredBundles = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -334,9 +313,41 @@ export default function MessagesView() {
     const trimmed = messageText.trim();
     if (!trimmed || !selectedBundle || !currentUserId) return;
 
-    await sendMessage(trimmed, currentUserId);
+    const optimisticMessage = buildOptimisticMessage(
+      selectedBundle.activeConversationId,
+      currentUserId,
+      trimmed
+    );
+    const previousBundles = bundles;
+
+    setMessageError(null);
     setMessageText("");
-    loadInbox(selectedBundle.activeConversationId);
+    void mutateBundles((current = []) =>
+      upsertMessageInConversationBundles(current, optimisticMessage, currentUserId),
+      false);
+
+    try {
+      const persistedMessage = await sendConversationMessage(
+        selectedBundle.activeConversationId,
+        trimmed,
+        currentUserId
+      );
+
+      void mutateBundles((current = []) =>
+        replaceOptimisticMessageInConversationBundles(
+          current,
+          optimisticMessage.message_id,
+          persistedMessage,
+          currentUserId
+        ),
+        false);
+    } catch (sendError) {
+      setMessageText(trimmed);
+      setMessageError(
+        sendError instanceof Error ? sendError.message : "Failed to send message"
+      );
+      void mutateBundles(previousBundles, false);
+    }
   };
 
   if (!loading && !currentUserId) {
@@ -570,9 +581,9 @@ export default function MessagesView() {
                 </div>
               </div>
 
-              {(messagesError || error) && (
+              {(messagesError || messageError) && (
                 <div className="border-t border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
-                  {messagesError || error}
+                  {messageError || messagesError}
                 </div>
               )}
 

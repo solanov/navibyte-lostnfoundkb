@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
+import useSWR from 'swr';
 import { supabase } from '@/src/lib/supabase';
 
 export interface Message {
@@ -20,13 +21,81 @@ export interface Conversation {
   created_at: string;
 }
 
+function sortMessages(messages: Message[]) {
+  return [...messages].sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
+}
+
+export function buildOptimisticMessage(
+  conversationId: string,
+  senderId: string,
+  content: string
+): Message {
+  return {
+    message_id: `optimistic-${crypto.randomUUID()}`,
+    conversation_id: conversationId,
+    sender_id: senderId,
+    content,
+    is_read: false,
+    created_at: new Date().toISOString(),
+  };
+}
+
+export async function sendConversationMessage(
+  conversationId: string,
+  content: string,
+  senderId: string
+) {
+  const { data, error } = await supabase
+    .from('messages')
+    .insert([
+      {
+        conversation_id: conversationId,
+        sender_id: senderId,
+        content,
+        is_read: false,
+      },
+    ])
+    .select('*')
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data as Message;
+}
+
+export async function markMessageAsReadRequest(messageId: string) {
+  const { error } = await supabase
+    .from('messages')
+    .update({ is_read: true })
+    .eq('message_id', messageId);
+
+  if (error) {
+    throw error;
+  }
+}
+
+function replaceMessage(messages: Message[], nextMessage: Message) {
+  const alreadyExists = messages.some(
+    (message) => message.message_id === nextMessage.message_id
+  );
+
+  return sortMessages(
+    alreadyExists
+      ? messages.map((message) =>
+          message.message_id === nextMessage.message_id ? nextMessage : message
+        )
+      : [...messages, nextMessage]
+  );
+}
+
 export function useConversation(
   conversationIds: string[],
   targetConversationId?: string | null
 ) {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const conversationKey = useMemo(
     () => Array.from(new Set(conversationIds)).sort().join(","),
     [conversationIds]
@@ -37,35 +106,38 @@ export function useConversation(
   );
   const targetId = targetConversationId || normalizedConversationIds[0] || null;
 
+  const {
+    data: messages = [],
+    error,
+    isLoading,
+    mutate,
+  } = useSWR(
+    normalizedConversationIds.length > 0
+      ? ['conversation-messages', conversationKey]
+      : null,
+    async () => {
+      const { data, error: fetchError } = await supabase
+        .from('messages')
+        .select('*')
+        .in('conversation_id', normalizedConversationIds)
+        .order('created_at', { ascending: true });
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      return (data || []) as Message[];
+    },
+    {
+      fallbackData: [],
+      keepPreviousData: true,
+    }
+  );
+
   useEffect(() => {
     if (normalizedConversationIds.length === 0) {
-      setMessages([]);
-      setLoading(false);
-      setError(null);
       return;
     }
-
-    setLoading(true);
-    setError(null);
-
-    const fetchMessages = async () => {
-      try {
-        const { data, error: fetchError } = await supabase
-          .from('messages')
-          .select('*')
-          .in('conversation_id', normalizedConversationIds)
-          .order('created_at', { ascending: true });
-
-        if (fetchError) throw fetchError;
-        setMessages(data || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch messages');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMessages();
 
     const subscription = supabase
       .channel(`messages:${conversationKey}`)
@@ -90,22 +162,15 @@ export function useConversation(
           }
 
           if (payload.eventType === 'INSERT') {
-            setMessages((prev) => {
-              if (prev.some((message) => message.message_id === nextMessage.message_id)) {
-                return prev;
-              }
-
-              return [...prev, nextMessage].sort(
-                (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-              );
-            });
+            void mutate(
+              (current = []) => replaceMessage(current, nextMessage),
+              false
+            );
           } else if (payload.eventType === 'UPDATE') {
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.message_id === (payload.new as Message).message_id
-                  ? (payload.new as Message)
-                  : msg
-              )
+            void mutate(
+              (current = []) =>
+                replaceMessage(current, payload.new as Message),
+              false
             );
           }
         }
@@ -115,45 +180,74 @@ export function useConversation(
     return () => {
       subscription.unsubscribe();
     };
-  }, [conversationKey, normalizedConversationIds]);
+  }, [conversationKey, mutate, normalizedConversationIds]);
 
   const sendMessage = useCallback(async (content: string, senderId: string) => {
     if (!targetId) {
       throw new Error('Conversation is not ready yet');
     }
 
-    try {
-      setError(null);
-      const { error: insertError } = await supabase.from('messages').insert([
-        {
-          conversation_id: targetId,
-          sender_id: senderId,
-          content,
-          is_read: false,
-        },
-      ]);
+    const optimisticMessage = buildOptimisticMessage(targetId, senderId, content);
 
-      if (insertError) throw insertError;
+    try {
+      await mutate(
+        async (current = []) => {
+          const persistedMessage = await sendConversationMessage(
+            targetId,
+            content,
+            senderId
+          );
+          return replaceMessage(
+            current.filter(
+              (message) => message.message_id !== optimisticMessage.message_id
+            ),
+            persistedMessage
+          );
+        },
+        {
+          optimisticData: (current: Message[] = []) =>
+            replaceMessage(current, optimisticMessage),
+          rollbackOnError: true,
+          revalidate: false,
+        }
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send message');
       throw err;
     }
-  }, [targetId]);
+  }, [mutate, targetId]);
 
   const markAsRead = useCallback(async (messageId: string) => {
     try {
-      const { error: updateError } = await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .eq('message_id', messageId);
-
-      if (updateError) throw updateError;
+      await mutate(
+        async (current = []) => {
+          await markMessageAsReadRequest(messageId);
+          return current.map((message) =>
+            message.message_id === messageId ? { ...message, is_read: true } : message
+          );
+        },
+        {
+          optimisticData: (current: Message[] = []) =>
+            current.map((message) =>
+              message.message_id === messageId
+                ? { ...message, is_read: true }
+                : message
+            ),
+          rollbackOnError: true,
+          revalidate: false,
+        }
+      );
     } catch (err) {
       console.error('Failed to mark message as read:', err);
     }
-  }, []);
+  }, [mutate]);
 
-  return { messages, loading, error, sendMessage, markAsRead };
+  return {
+    messages,
+    loading: isLoading,
+    error: error instanceof Error ? error.message : error ? String(error) : null,
+    sendMessage,
+    markAsRead,
+  };
 }
 
 /**

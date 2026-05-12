@@ -1,3 +1,5 @@
+import { resolveIcon } from "./resolveIcon";
+
 export type ClaimFlowType = "P2P" | "Office";
 export type ClaimStatus = "Pending" | "Approved" | "Rejected" | "Released";
 
@@ -89,7 +91,7 @@ export function buildOwnedClaimOverview(
           zone: item.zone || "Unknown location",
           itemStatus: item.status,
           categoryName: category?.name || "Uncategorized",
-          iconIdentifier: category?.icon_identifier || "assignment",
+          iconIdentifier: resolveIcon(category?.icon_identifier, "assignment"),
           totalClaims: 0,
           pendingClaims: 0,
           approvedClaims: 0,
@@ -110,7 +112,7 @@ export function buildOwnedClaimOverview(
         zone: item.zone || "Unknown location",
         itemStatus: item.status,
         categoryName: category?.name || "Uncategorized",
-        iconIdentifier: category?.icon_identifier || "assignment",
+        iconIdentifier: resolveIcon(category?.icon_identifier, "assignment"),
         totalClaims: groupedClaims.length,
         pendingClaims: groupedClaims.filter((claim) => claim.status === "Pending").length,
         approvedClaims: groupedClaims.filter((claim) => claim.status === "Approved").length,

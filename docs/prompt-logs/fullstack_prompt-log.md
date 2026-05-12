@@ -441,3 +441,76 @@ I learned that you should always double check and test the codes that the AI age
 
 - I learned that separating workflows based on item custody is more reliable than basing it on who originally posted the item.  
 - I also learned that simplifying system logic improves maintainability without sacrificing functionality.
+
+# Prompt Log: Fullstack Developer - Peja Escares
+
+## Entry 15 - (05/12/2026)
+
+### **Task(s)**
+
+- REFINED CLAIM UI LABELING  
+- REMOVED STUDENT-TO-STUDENT / STUDENT-TO-ADMIN LABELS FROM CLAIM PAGES  
+- CONSOLIDATED AUDIT LOG CLAIM CATEGORIES INTO A SINGLE CLAIMS CATEGORY  
+- IMPLEMENTED DYNAMIC CLAIM FLOW BASED ON POSTER ROLE  
+
+### **Prompt (or Summary) provided to the AI**
+
+- Could you implement that if `user_role` of poster == `admin/staff` then process category == student to admin. Make this change dynamically as `user_role` can be changed.  
+- Do not display student to student nor student to admin on claims. And update audit logs to not separate student to student - student to admin audit -- just claims.
+
+### **Output**
+
+- The AI agent updated the backend logic so the claim flow is resolved dynamically using the poster’s current role instead of relying only on the originally stored flow value.  
+- It also removed the visible student-to-student and student-to-admin labels from the user and admin claim pages.  
+- The AI agent also refactored the audit log categorization so all claim-related actions are grouped under a single `Claims` category.
+
+### **What you changed/improved/rejected from the AI's output**
+
+- I accepted the implementation and kept the dynamic role-based claim flow.  
+- I also kept the UI cleanup that hides unnecessary process labels from claim pages.  
+- The consolidated audit log structure was also retained because it simplified the audit trail.
+
+### **Reason (Why?)**
+
+- The original setup became misleading once the poster’s role changed over time.  
+- Showing separate process labels on the claim UI added unnecessary complexity for users.  
+- Grouping all claim-related logs into one category made the audit trail cleaner and easier to review.
+
+### **What you learned or the decision you made as a result**
+
+- I learned that business logic tied to user roles should be resolved dynamically whenever possible, especially if roles can change later.  
+- I also learned that simplifying labels in user-facing pages can make the workflow feel more intuitive without affecting backend functionality.
+
+---
+
+## Entry 16 - (05/12/2026)
+
+### **Task(s)**
+
+- PROTECTED ADMIN ACCOUNTS FROM SUSPENSION  
+- BLOCKED STAFF OR OTHER ADMINS FROM SUSPENDING AN ADMIN ACCOUNT  
+- UPDATED ADMIN USER MANAGEMENT UI TO REFLECT PROTECTED ACCOUNTS  
+
+### **Prompt (or Summary) provided to the AI**
+
+- Make sure staff or other admins cannot suspend another admin account.
+
+### **Output**
+
+- The AI agent added a server-side validation that prevents suspension if the target account has the `Admin` role.  
+- It also updated the admin dashboard UI so protected admin accounts no longer show a suspend button and instead display a protected account state.
+
+### **What you changed/improved/rejected from the AI's output**
+
+- I accepted the server-side enforcement because it guarantees the rule even if someone bypasses the UI.  
+- I also kept the UI adjustment since it makes the restriction clear to admins and staff.
+
+### **Reason (Why?)**
+
+- Preventing suspension only in the frontend is not enough because it can still be bypassed.  
+- Admin accounts should remain protected to avoid privilege abuse or accidental lockout of critical system administrators.
+
+### **What you learned or the decision you made as a result**
+
+- I learned that important permission rules should always be enforced on the server side, not just in the interface.  
+- I also learned that security-related restrictions should be visible in the UI so users understand the intended system behavior.

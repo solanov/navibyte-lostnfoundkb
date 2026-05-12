@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { supabase } from '@/src/lib/supabase';
 import { useNotification } from '@/src/hooks/useNotification';
 import { createEntryAction } from '@/app/(board)/create/actions';
+import { resolveIcon } from '@/src/lib/resolveIcon';
 import {
   CREATE_ENTRY_ALLOWED_COLORS,
   CREATE_ENTRY_ALLOWED_IMAGE_TYPES,
@@ -25,6 +26,7 @@ const fallbackCategories = [
   { id: 2, label: 'Keys', icon: 'vpn_key' },
   { id: 3, label: 'ID', icon: 'badge' },
   { id: 4, label: 'Tech', icon: 'devices' },
+  { id: 62, label: 'Others', icon: 'category' },
 ];
 
 export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProps) {
@@ -61,11 +63,15 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
         }
 
         const mappedCategories = (data || [])
-          .map((category) => ({
-            id: category.category_id,
-            label: category.name,
-            icon: category.icon_identifier || 'help_outline',
-          }))
+          .map((category) => {
+            const rawIcon = category.icon_identifier || '';
+            const resolvedIcon = resolveIcon(rawIcon || undefined);
+            return {
+              id: category.category_id,
+              label: category.name,
+              icon: resolvedIcon,
+            };
+          })
           .filter((category) => Boolean(category.id) && Boolean(category.label));
 
         if (mappedCategories.length > 0) {
@@ -112,16 +118,22 @@ export default function EntryForm({ onSuccess, variant = 'page' }: EntryFormProp
     zone: string;
     selectedCategory: number | null;
     selectedColor: string | null;
-  }>) => ({
-    entryType,
-    selectedCategory: overrides?.selectedCategory ?? selectedCategory,
-    selectedColor: overrides?.selectedColor ?? selectedColor,
-    title: overrides?.title ?? title,
-    description: overrides?.description ?? description,
-    zone: overrides?.zone ?? zone,
-    hiddenNote: "",
-    imageUrl: null,
-  });
+  }>) => {
+    const nextSelectedCategory = overrides?.selectedCategory ?? selectedCategory;
+
+    return {
+      entryType,
+      selectedCategory: nextSelectedCategory,
+      selectedCategoryName:
+        categories.find((category) => category.id === nextSelectedCategory)?.label ?? null,
+      selectedColor: overrides?.selectedColor ?? selectedColor,
+      title: overrides?.title ?? title,
+      description: overrides?.description ?? description,
+      zone: overrides?.zone ?? zone,
+      hiddenNote: "",
+      imageUrl: null,
+    };
+  };
 
   const validateDraft = (overrides?: Parameters<typeof buildDraftInput>[0]) =>
     validateCreateEntryInput(buildDraftInput(overrides), { requireImage: false });

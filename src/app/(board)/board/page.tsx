@@ -11,6 +11,7 @@ import { Suspense } from 'react';
 export const dynamic = 'force-dynamic';
 
 const fallbackCategoryOptions = ['Wallet', 'Keys', 'ID', 'Tech'];
+const ITEMS_PER_PAGE = 8;
 
 interface SearchParamMap {
   [key: string]: string | string[] | undefined;
@@ -36,6 +37,8 @@ interface LostItemWithCategory {
   };
 }
 
+type LostItemsSectionItem = Parameters<typeof LostItemsSection>[0]['items'][number];
+
 function getSingleParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -43,12 +46,12 @@ function getSingleParam(value: string | string[] | undefined) {
 // Helper to clear a parameter
 function buildFilterHref(
   searchParams: SearchParamMap,
-  paramKeyToRemove?: 'category' | 'color' | 'building'
+  paramKeyToRemove?: 'category' | 'color' | 'building' | 'type'
 ) {
   const params = new URLSearchParams();
 
   Object.entries(searchParams).forEach(([key, value]) => {
-    if (!value || key === paramKeyToRemove) return;
+    if (!value || key === paramKeyToRemove || key === 'page') return;
 
     if (Array.isArray(value)) {
       value.forEach((entry) => {
@@ -65,7 +68,7 @@ function buildFilterHref(
 }
 
 // Helper to toggle a parameter (add it, or remove it if already active)
-function buildToggleHref(searchParams: SearchParamMap, key: 'category' | 'color' | 'building', value: string) {
+function buildToggleHref(searchParams: SearchParamMap, key: 'category' | 'color' | 'building' | 'type', value: string) {
   const currentVal = getSingleParam(searchParams[key]);
   if (currentVal === value) {
     return buildFilterHref(searchParams, key); // Remove if already active
@@ -73,7 +76,7 @@ function buildToggleHref(searchParams: SearchParamMap, key: 'category' | 'color'
   
   const params = new URLSearchParams();
   Object.entries(searchParams).forEach(([k, v]) => {
-    if (!v || k === key) return; // Skip empty or the key we are overriding
+    if (!v || k === key || k === 'page') return; // Skip empty, page, or the key we are overriding
     if (Array.isArray(v)) {
       v.forEach((entry) => { if (entry) params.append(k, entry); });
     } else {
@@ -84,10 +87,67 @@ function buildToggleHref(searchParams: SearchParamMap, key: 'category' | 'color'
   return `/board?${params.toString()}`;
 }
 
+function buildPageHref(searchParams: SearchParamMap, page: number) {
+  const params = new URLSearchParams();
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (!value || key === 'page') return;
+
+    if (Array.isArray(value)) {
+      value.forEach((entry) => {
+        if (entry) params.append(key, entry);
+      });
+      return;
+    }
+
+    params.set(key, value);
+  });
+
+  if (page > 1) {
+    params.set('page', String(page));
+  }
+
+  const query = params.toString();
+  return query ? `/board?${query}` : '/board';
+}
+
+function getPaginationPages(currentPage: number, totalPages: number) {
+  const pages = new Set<number>();
+
+  pages.add(1);
+  pages.add(totalPages);
+
+  for (let page = currentPage - 1; page <= currentPage + 1; page += 1) {
+    if (page >= 1 && page <= totalPages) {
+      pages.add(page);
+    }
+  }
+
+  return Array.from(pages).sort((a, b) => a - b);
+}
+
 function matchesFilter(value: string | undefined, selectedValue: string | undefined) {
   if (!selectedValue) return true;
   if (!value) return false;
   return value.trim().toLowerCase() === selectedValue.trim().toLowerCase();
+}
+
+function matchesItemType(status: string | undefined, selectedType: string | undefined) {
+  if (!selectedType) return true;
+  if (!status) return false;
+
+  const normalizedStatus = status.trim().toLowerCase();
+  const normalizedType = selectedType.trim().toLowerCase();
+
+  if (normalizedType === 'lost') {
+    return normalizedStatus === 'reported' || normalizedStatus === 'lost';
+  }
+
+  if (normalizedType === 'found') {
+    return normalizedStatus === 'found';
+  }
+
+  return true;
 }
 
 function getCategoryName(
@@ -110,7 +170,9 @@ export default async function PublicBoard({
   const selectedCategory = getSingleParam(resolvedSearchParams.category);
   const selectedColor = getSingleParam(resolvedSearchParams.color);
   const selectedBuilding = getSingleParam(resolvedSearchParams.building);
+  const selectedType = getSingleParam(resolvedSearchParams.type);
   const searchQuery = getSingleParam(resolvedSearchParams.q);
+  const requestedPage = Number.parseInt(getSingleParam(resolvedSearchParams.page) || '1', 10);
 
   let categoryDiscoveryData: { post_id: string; category: string | null }[] = [];
 
@@ -124,7 +186,7 @@ export default async function PublicBoard({
           icon_identifier
         )
       `)
-      .not('status', 'in', '("Returned","Purged")')
+      .not('status', 'in', '("Returned","Purged","Released")')
       .order('created_timestamp', { ascending: false }),
     supabase
       .from('categories')
@@ -183,11 +245,24 @@ const categoryOptionsFromTable = (categoriesResult.data || []).map((category) =>
 
     return (
       matchesSearch && // <-- Add this line to the return statement
+      matchesItemType(item.status, selectedType) &&
       matchesFilter(getCategoryName(item, discoveredCategoryMap), selectedCategory) &&
       matchesFilter(item.color, selectedColor) &&
       matchesFilter(item.zone, selectedBuilding)
     );
   });
+
+  const totalItems = items.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+  const currentPage = Number.isFinite(requestedPage)
+    ? Math.min(Math.max(requestedPage, 1), totalPages)
+    : 1;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedItems = items.slice(startIndex, endIndex);
+  const visibleRangeStart = totalItems === 0 ? 0 : startIndex + 1;
+  const visibleRangeEnd = Math.min(endIndex, totalItems);
+  const paginationPages = getPaginationPages(currentPage, totalPages);
 
   return (
     <div className="bg-[#fbf9f8] text-[#41484c] min-h-screen font-body selection:bg-[#8df4ec] selection:text-[#002433] pb-24 md:pb-0">
@@ -230,7 +305,7 @@ const categoryOptionsFromTable = (categoriesResult.data || []).map((category) =>
                   </div>
 
                   {/* Mobile Clear Button */}
-                  {(selectedCategory || selectedColor || selectedBuilding) && (
+                  {(selectedType || selectedCategory || selectedColor || selectedBuilding) && (
                     <Link 
                       href="/board" 
                       className="text-[10px] font-bold uppercase tracking-widest text-[#ba1a1a] hover:underline md:hidden"
@@ -242,6 +317,44 @@ const categoryOptionsFromTable = (categoriesResult.data || []).map((category) =>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
+                  <FilterDetails name="board-filters" className="relative group shrink-0">
+                    <summary className="list-none [&::-webkit-details-marker]:hidden flex w-full justify-between cursor-pointer items-center rounded-lg bg-[#f5f3f3] px-3 md:px-4 py-2 text-xs font-semibold text-[#41484c] hover:bg-[#002433]/10 transition-all select-none">
+                      <div className="flex items-center gap-2">
+                        Type
+                        {selectedType && <span className="w-2 h-2 rounded-full bg-[#44afa9]"></span>}
+                      </div>
+                      <span className="material-symbols-outlined text-[16px] group-open:rotate-180 transition-transform">expand_more</span>
+                    </summary>
+                    <div className="absolute left-0 top-full mt-2 w-40 rounded-xl bg-[#ffffff] p-2 shadow-[0_20px_40px_rgba(0,36,51,0.1)] border border-[#002433]/5 z-50">
+                      <Link
+                        href={buildFilterHref(resolvedSearchParams, 'type')}
+                        scroll={false}
+                        className={`block w-full rounded-md px-3 py-2 text-left text-xs font-semibold transition-all ${
+                          !selectedType ? "bg-[#002433] text-white" : "text-[#41484c] hover:bg-[#f5f3f3]"
+                        }`}
+                      >
+                        All Items
+                      </Link>
+                      {[
+                        { label: 'Lost', value: 'lost' },
+                        { label: 'Found', value: 'found' },
+                      ].map((itemType) => (
+                        <Link
+                          key={itemType.value}
+                          href={buildToggleHref(resolvedSearchParams, 'type', itemType.value)}
+                          scroll={false}
+                          className={`mt-1 block w-full rounded-md px-3 py-2 text-left text-xs font-semibold transition-all ${
+                            selectedType?.toLowerCase() === itemType.value
+                              ? "bg-[#002433] text-white"
+                              : "text-[#41484c] hover:bg-[#f5f3f3]"
+                          }`}
+                        >
+                          {itemType.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </FilterDetails>
+
                   {/* Category Dropdown */}
                   {categoryOptions.length > 0 && (
                     <FilterDetails name="board-filters" className="relative group shrink-0">
@@ -352,7 +465,7 @@ const categoryOptionsFromTable = (categoriesResult.data || []).map((category) =>
                 </div>
 
                 {/* Desktop Clear Button */}
-                {(selectedCategory || selectedColor || selectedBuilding) && (
+                {(selectedType || selectedCategory || selectedColor || selectedBuilding) && (
                   <Link 
                     href="/board" 
                     className="hidden md:block ml-auto text-[10px] font-bold uppercase tracking-widest text-[#ba1a1a] hover:underline px-2 shrink-0"
@@ -365,24 +478,65 @@ const categoryOptionsFromTable = (categoriesResult.data || []).map((category) =>
             </div>
 
             {/* Lost Items Grid */}
-            <LostItemsSection items={items as any} />
+            <LostItemsSection items={paginatedItems as LostItemsSectionItem[]} />
 
             {/* Pagination */}
-            {items.length > 0 && (
+            {totalItems > 0 && (
               <div className="mt-16 flex flex-col sm:flex-row items-center justify-between pt-6 gap-4 border-t border-[#002433]/5">
                 <p className="text-[13px] font-medium text-[#41484c]">
-                  Showing {items.length} curated archive items
+                  Showing {visibleRangeStart}-{visibleRangeEnd} of {totalItems} curated archive items
                 </p>
                 <div className="flex gap-2">
-                  <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#f5f3f3] text-[#41484c] hover:bg-[#002433]/10 transition-colors">
+                  <Link
+                    href={buildPageHref(resolvedSearchParams, currentPage - 1)}
+                    scroll={false}
+                    aria-disabled={currentPage === 1}
+                    className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
+                      currentPage === 1
+                        ? 'pointer-events-none bg-[#f5f3f3]/70 text-[#41484c]/35'
+                        : 'bg-[#f5f3f3] text-[#41484c] hover:bg-[#002433]/10'
+                    }`}
+                  >
                     <span className="material-symbols-outlined text-sm">chevron_left</span>
-                  </button>
-                  <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#002433] text-white font-bold text-sm shadow-md">1</button>
-                  <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#f5f3f3] text-[#41484c] hover:bg-[#002433]/10 font-semibold text-sm transition-colors">2</button>
-                  <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#f5f3f3] text-[#41484c] hover:bg-[#002433]/10 font-semibold text-sm transition-colors">3</button>
-                  <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#f5f3f3] text-[#41484c] hover:bg-[#002433]/10 transition-colors">
+                  </Link>
+
+                  {paginationPages.map((pageNumber, index) => {
+                    const previousPage = paginationPages[index - 1];
+                    const shouldShowGap =
+                      previousPage !== undefined && pageNumber - previousPage > 1;
+
+                    return (
+                      <div key={pageNumber} className="flex items-center gap-2">
+                        {shouldShowGap && (
+                          <span className="px-1 text-sm font-bold text-[#41484c]/55">…</span>
+                        )}
+                        <Link
+                          href={buildPageHref(resolvedSearchParams, pageNumber)}
+                          scroll={false}
+                          className={`w-10 h-10 flex items-center justify-center rounded-lg font-semibold text-sm transition-colors ${
+                            currentPage === pageNumber
+                              ? 'bg-[#002433] text-white shadow-md'
+                              : 'bg-[#f5f3f3] text-[#41484c] hover:bg-[#002433]/10'
+                          }`}
+                        >
+                          {pageNumber}
+                        </Link>
+                      </div>
+                    );
+                  })}
+
+                  <Link
+                    href={buildPageHref(resolvedSearchParams, currentPage + 1)}
+                    scroll={false}
+                    aria-disabled={currentPage === totalPages}
+                    className={`w-10 h-10 flex items-center justify-center rounded-lg transition-colors ${
+                      currentPage === totalPages
+                        ? 'pointer-events-none bg-[#f5f3f3]/70 text-[#41484c]/35'
+                        : 'bg-[#f5f3f3] text-[#41484c] hover:bg-[#002433]/10'
+                    }`}
+                  >
                     <span className="material-symbols-outlined text-sm">chevron_right</span>
-                  </button>
+                  </Link>
                 </div>
               </div>
             )}

@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import useSWR from "swr";
 import SideNav from "@/src/components/layout/SideNav";
 import BottomNavBar from "@/src/components/layout/BottomNavBar";
 import { supabase } from "@/src/lib/supabase";
-import { ClaimOverviewEntry } from "@/src/lib/claimOverview";
 import { fetchOwnedClaimsOverviewAction } from "@/src/app/admin/actions/claims";
 
 const STATUS_STYLES: Record<string, string> = {
@@ -26,38 +26,55 @@ function formatDate(value: string) {
 }
 
 export default function PublicClaimsOverviewPage() {
-  const [entries, setEntries] = useState<ClaimOverviewEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
-  const loadClaimsOverview = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    let isMounted = true;
 
-    try {
+    const syncSession = async () => {
       const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
 
-      if (!accessToken) {
-        setIsAuthenticated(false);
-        setEntries([]);
+      if (!isMounted) {
         return;
       }
 
-      setIsAuthenticated(true);
-      const nextEntries = await fetchOwnedClaimsOverviewAction(accessToken);
-      setEntries(nextEntries);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load claims.");
-    } finally {
-      setLoading(false);
-    }
+      setAccessToken(sessionData.session?.access_token ?? null);
+      setAuthLoading(false);
+    };
+
+    void syncSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAccessToken(session?.access_token ?? null);
+      setAuthLoading(false);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  useEffect(() => {
-    void loadClaimsOverview();
-  }, [loadClaimsOverview]);
+  const {
+    data: entries = [],
+    error,
+    isLoading,
+    mutate,
+  } = useSWR(
+    accessToken ? ["owned-claims-overview", accessToken] : null,
+    () => fetchOwnedClaimsOverviewAction(accessToken as string),
+    {
+      fallbackData: [],
+    }
+  );
+
+  const loading = authLoading || (Boolean(accessToken) && isLoading);
+  const errorMessage =
+    error instanceof Error ? error.message : error ? String(error) : null;
+  const isAuthenticated = Boolean(accessToken);
 
   return (
     <div className="bg-[#fbf9f8] text-[#41484c] min-h-screen font-body selection:bg-[#8df4ec] selection:text-[#002433] pb-24 md:pb-0">
@@ -118,14 +135,14 @@ export default function PublicClaimsOverviewPage() {
                     Sign in
                   </Link>
                 </div>
-              ) : error ? (
+              ) : errorMessage ? (
                 <div className="px-6 py-16 text-center">
                   <span className="material-symbols-outlined text-5xl text-[#ba1a1a]">error</span>
                   <p className="mt-4 text-lg font-black text-[#002433]">Unable to load claims</p>
-                  <p className="mt-2 text-sm text-[#41484c]">{error}</p>
+                  <p className="mt-2 text-sm text-[#41484c]">{errorMessage}</p>
                   <button
                     type="button"
-                    onClick={() => void loadClaimsOverview()}
+                    onClick={() => void mutate()}
                     className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#002433] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#053b50]"
                   >
                     <span className="material-symbols-outlined text-[18px]">refresh</span>
@@ -201,11 +218,6 @@ export default function PublicClaimsOverviewPage() {
                           >
                             {entry.totalClaims === 0 ? "No Claims" : `Latest: ${entry.latestClaimStatus}`}
                           </span>
-                          {entry.totalClaims > 0 && (
-                            <span className="mt-2 text-[10px] font-black uppercase tracking-widest text-[#41484c]/60">
-                              {entry.latestFlowType === "P2P" ? "Student-to-student" : "Office pickup"}
-                            </span>
-                          )}
                         </div>
                         <Link
                           href={`/board/claims/${entry.postId}`}
