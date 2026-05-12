@@ -71,10 +71,10 @@ Blocked user attempts to log in to the platform
 Access is denied. The system prevents login and displays a specific error message (e.g., "Your account has been suspended. Please contact the administrator.").
 
 ## Actual Result
-
+Access is successfully denied for the blocked user. 
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -247,12 +247,13 @@ User successfully edits their own existing post
 The post is updated successfully, and the revised description is immediately visible on the post details page.
 
 ## Actual Result
-
+There is no edit function or button available for posts on the platform.
 
 ## Status:
-
+Failed
 
 ## Notes
+The core edit functionality is missing from the application.
 
 
 ---
@@ -275,12 +276,13 @@ User successfully deletes their own post
 The post is permanently removed from the user's profile and is no longer visible in public listings.
 
 ## Actual Result
-
+The post is successfully removed from the active public listings and is moved to "My Archive".
 
 ## Status:
-
+Successful
 
 ## Notes
+Expected Result should be updated to reflect that deleted items are correctly archived rather than permanently destroyed.
 
 
 ---
@@ -303,12 +305,13 @@ User attempts to edit another user's post
 The UI hides edit controls. Direct URL manipulation results in a 403 Forbidden error page.
 
 ## Actual Result
-
+Cannot be accurately tested because the base edit function does not exist at all.
 
 ## Status:
-
+Failed
 
 ## Notes
+Blocked by missing feature from TC-CRUD-FUNC-001.
 
 
 ---
@@ -331,12 +334,13 @@ User submits an edit without making any changes
 The system should not activate the Save Changes Button, and instead click the cancel button.
 
 ## Actual Result
-
+Cannot be tested because there is no edit button for posts.
 
 ## Status:
-
+Failed
 
 ## Notes
+Blocked by missing feature from TC-CRUD-FUNC-001.
 
 
 ---
@@ -358,12 +362,13 @@ Filtering items by exact category
 The listing grid updates to display strictly "Found" items, filtering out all "Lost" items.
 
 ## Actual Result
-
+The platform correctly filters by item categories, color, and location. However, there is no specific filter available for "Lost" or "Found" status.
 
 ## Status:
-
+Failed
 
 ## Notes
+The core "Lost" and "Found" status filter is missing and needs to be implemented.
 
 
 ---
@@ -379,19 +384,20 @@ Searching items using special characters and partial words
 ## Steps
 1. Log in and navigate to Search.
 2. Enter "W@ll3t!".
-3. Clear, then enter "uni".
+3. Clear, then enter "fol".
 4. Click "Search".
 
 ## Expected Result
-Special characters are handled without crashing. Partial searches return relevant results (e.g., "uniform").
+Special characters are handled without crashing. Partial searches return relevant results (e.g., "folder").
 
 ## Actual Result
-
+Special characters are handled perfectly without crashing. The platform has real-time search that automatically reloads for matching items.
 
 ## Status:
-
+Successful
 
 ## Notes
+Excellent implementation of real-time search functionality.
 
 
 ---
@@ -413,10 +419,10 @@ Submitting an excessively long search query
 The system truncates the input or handles the query without performance degradation, returning "No results found".
 
 ## Actual Result
-
+The system successfully handles the excessively long query without crashing.
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -433,19 +439,20 @@ Navigating between core pages and viewing specific listings
 
 ## Steps
 1. Log in.
-2. Click through Home, Search, and Profile links.
+2. Click through Home, My Archive, My Claims, Inbox, Notifications, and more links.
 3. Click an existing post to view details.
 
 ## Expected Result
 Smooth transitions occur without dead links (404s). Post details load correctly.
 
 ## Actual Result
-
+Transitions occur correctly without dead links, but the loading takes a few seconds between pages.
 
 ## Status:
-
+Successful
 
 ## Notes
+Performance optimization is needed to improve page load times.
 
 
 ---
@@ -467,12 +474,13 @@ Standard user attempts to access Admin Dashboard via URL
 Access is denied. User is redirected to Home or shown a 403 Forbidden error.
 
 ## Actual Result
-
+Access is correctly denied, but a bug occurs: The system displays a Next.js Server Components render error instead of a clean 403 Forbidden page or redirect.
 
 ## Status:
-
+Successful
 
 ## Notes
+The security block works, but the UI error handling needs to be fixed. Exposing Server Component errors in production is bad practice.
 
 
 ---
@@ -487,7 +495,7 @@ Contacting another user regarding a listed item
 
 ## Steps
 1. Log in and navigate to another user's post.
-2. Click "Contact User".
+2. Click "Contact".
 3. Type a message.
 4. Click "Send".
 
@@ -495,10 +503,10 @@ Contacting another user regarding a listed item
 The message is sent successfully, and the platform notifies the recipient.
 
 ## Actual Result
-
+The message is sent successfully.
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -515,7 +523,7 @@ Attempting to send an empty message
 
 ## Steps
 1. Log in and navigate to a post.
-2. Click "Contact User".
+2. Click "Contact".
 3. Leave message body blank.
 4. Click "Send".
 
@@ -523,10 +531,10 @@ Attempting to send an empty message
 The send button is disabled or an error states "Message body cannot be empty."
 
 ## Actual Result
-
+The send button is correctly disabled when there is no message typed.
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -578,10 +586,10 @@ Admin searches for a specific student's posting history
 The system retrieves all active and deleted posts associated with that email.
 
 ## Actual Result
-
+The system successfully retrieves the student's posting history.
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -594,23 +602,23 @@ The system retrieves all active and deleted posts associated with that email.
 Moderation
 
 ## Scenario
-Admin successfully blocks a standard user account
+Admin successfully suspends a standard user account
 
 ## Steps
 1. Log in using an Admin account.
 2. Navigate to the Admin Dashboard / User Management page.
 3. Search for a specific student's email (e.g., juan.delacruz@neu.edu.ph).
-4. Click the "Block" or "Suspend" button next to their profile.
+4. Click the "Suspend" button next to their profile.
 5. Confirm the action in the prompt.
 
 ## Expected Result
-The user's account status is updated to "Blocked", and a success confirmation message is displayed to the Admin.
+The user's account status is updated to "Blocked", and a success confirmation message is displayed to the Admin. The suspended user's active session should be immediately terminated.
 
 ## Actual Result
-
+The system successfully updates the backend status and asks for an administrative reason. 
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -623,23 +631,22 @@ The user's account status is updated to "Blocked", and a success confirmation me
 Moderation
 
 ## Scenario
-Admin successfully unblocks a previously blocked user
+Admin successfully restore a previously suspended user
 
 ## Steps
 1. Log in using an Admin account.
-2. Navigate to the User Management page and filter for "Blocked" users.
-3. Locate a previously blocked student account.
-4. Click the "Unblock" or "Restore" button.
-5. Confirm the action.
+2. Locate a previously blocked student account.
+3. Click the "Restore" button.
+4. Confirm the action.
 
 ## Expected Result
 The account status reverts to "Active", restoring the user's ability to log in and interact with the board.
 
 ## Actual Result
-
+The user's account is successfully restored.
 
 ## Status:
-
+Successful
 
 ## Notes
 
@@ -664,9 +671,10 @@ Core platform features are accessible on mobile screen resolutions
 The layout adapts seamlessly. Text is readable without zooming, images scale correctly, buttons are tappable, and no elements overlap or push off-screen.
 
 ## Actual Result
-
+There is a UI bug: When the Archive button is clicked on the mobile view, the navigation pane below it vanishes.
 
 ## Status:
-
+Failed
 
 ## Notes
+UI Bug: The bottom navigation pane needs to remain fixed/visible when interacting with the archive elements.
