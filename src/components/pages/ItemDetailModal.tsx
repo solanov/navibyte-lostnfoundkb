@@ -32,6 +32,8 @@ interface ItemDetailModalProps {
   onMarkAsReturned?: () => void;
   /** Called when a non-owner clicks "Report Post". */
   onReportClick?: () => void;
+  /** Called when the owner clicks "Edit Post". */
+  onEditPost?: () => void;
 }
 
 export default function ItemDetailModal({
@@ -46,6 +48,7 @@ export default function ItemDetailModal({
   isLostItem = false,
   onMarkAsReturned,
   onReportClick,
+  onEditPost,
 }: ItemDetailModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -253,8 +256,17 @@ export default function ItemDetailModal({
           {isOwner ? (
             <>
               {isLostItem ? (
-                /* Lost item owner: Mark as Returned + Delete */
+                /* Lost item owner: Mark as Returned + Edit + Delete */
                 <>
+                  {item.status !== 'Returned' && item.status !== 'Purged' && item.status !== 'Released' && onEditPost && (
+                    <button
+                      onClick={onEditPost}
+                      className="shrink-0 bg-surface-container-low text-primary border border-outline-variant/30 px-4 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all active:scale-95 flex items-center gap-1.5"
+                      title="Edit this post"
+                    >
+                      <span className="material-symbols-outlined text-lg">edit</span>
+                    </button>
+                  )}
                   {item.status !== 'Returned' && item.status !== 'Purged' && onMarkAsReturned && (
                     <button
                       onClick={onMarkAsReturned}
@@ -277,7 +289,7 @@ export default function ItemDetailModal({
                   )}
                 </>
               ) : (
-                /* Found item owner: View Claims + Delete */
+                /* Found item owner: View Claims + Edit + Delete */
                 <>
                   {item.status !== 'Returned' && item.status !== 'Released' && item.status !== 'Purged' && (
                     <Link
@@ -288,6 +300,15 @@ export default function ItemDetailModal({
                       <span className="material-symbols-outlined text-lg">assignment</span>
                       View Claims
                     </Link>
+                  )}
+                  {item.status !== 'Returned' && item.status !== 'Released' && item.status !== 'Purged' && onEditPost && (
+                    <button
+                      onClick={onEditPost}
+                      className="shrink-0 bg-surface-container-low text-primary border border-outline-variant/30 px-4 py-3 rounded-lg font-bold text-sm tracking-tight hover:bg-outline-variant/10 transition-all active:scale-95 flex items-center gap-1.5"
+                      title="Edit this post"
+                    >
+                      <span className="material-symbols-outlined text-lg">edit</span>
+                    </button>
                   )}
                   {onDeletePost && (
                     <button
