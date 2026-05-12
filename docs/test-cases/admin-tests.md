@@ -8,19 +8,21 @@ Admin moderates and removes an inappropriate post
 
 ## Steps
 1. Log in with Admin privileges.
-2. Locate a guideline-violating post.
-3. Click the Admin-only "Delete" button.
+2. Navigate to the "Flagged Posts" tab in the Admin Dashboard.
+3. Locate a guideline-violating post.
+4. Click the "Delete Post" button.
 
 ## Expected Result
-The post is deleted from the public board, overriding original ownership.
+The post is deleted from the public board, overriding original ownership, and removed from active circulation.
 
 ## Actual Result
-
+The admin successfully navigated to the Flagged Posts tab and deleted the post. The item was removed from the public board as expected.
 
 ## Status:
-
+Successful
 
 ## Notes
+Core moderation flow is functioning perfectly.
 
 
 ---
