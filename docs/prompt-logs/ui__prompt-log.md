@@ -114,3 +114,59 @@
 **What I learned / decided:** Contextual sidebars are great for grouping static pages without cluttering the main admin navigation. Furthermore, well-written placeholders prove to stakeholders that the UI/UX encompasses the entire system architecture.
 
 *Next entries will be added as I continue using AI for UI/UX tasks.*
+
+## Entry 9
+**Date:** May 12, 2026
+**Task:** Building the Active Notification System (Bell Icon).
+
+**Prompt given to AI:** Generate a "Notification Center" dropdown card triggered by the Top Nav bell icon. Create 3 distinct states: Critical Alert (red tint for 30-day lifecycle breaches), Action Required (teal tint for pending claims), and System Info (white).
+
+**What the AI produced:** A dynamic dropdown panel with visual hierarchy indicating which system alerts required immediate human intervention.
+
+**What I changed / improved:** I integrated the SECI concept directly into the notifications, ensuring alerts specifically call out physical bins (e.g., "Bin B-12") to bridge the digital-to-physical gap.
+
+**What I learned / decided:** Notifications are not just UI flair; they are the active defense mechanism of the system. Proactive alerts prevent "Inventory Drift" before it happens.
+
+*Next entries will be added as I continue using AI for UI/UX tasks.*
+
+## Entry 10
+**Date:** May 12, 2026
+**Task:** Formulating a professional rebuttal to developer pushback regarding Admin Verification.
+
+**Prompt given to AI:** Help construct a Taglish rebuttal to the Dev team who wants to remove admin verification per post to save time. Base the argument on the SECI framework, QA test cases, and the purpose of the system.
+
+**What the AI produced:** A highly structured, empathetic, but firm 4-point defense utilizing project documentation to justify the manual verification workflow.
+
+**What I changed / improved:** I adjusted the tone to be collaborative, validating their scalability concerns ("1000 posts") while anchoring the final decision in our graded academic requirements.
+
+**What I learned / decided:** A UI/UX Designer must advocate for the architecture. Design decisions aren't just about aesthetics; they are the execution of security frameworks (SECI) and QA testing mandates.
+
+*Next entries will be added as I continue using AI for UI/UX tasks.*
+
+## Entry 11
+**Date:** May 12, 2026
+**Task:** Redesigning the Public Board (The Compact UI Shift).
+
+**Prompt given to AI:** Redesign the Public Feed. Eliminate the Top Nav to maximize vertical space. Pin User Controls to the bottom of the left sidebar. Remove "View More" buttons to make cards fully clickable. Overlay LOST/FOUND status pills directly on the images. Add a clean, modern Pagination component at the bottom of the grid.
+
+**What the AI produced:** A modernized, app-like interface that consolidated navigation, decluttered the item feed, and included robust pagination controls.
+
+**What I changed / improved:** I added explicit conditional logic rules for the developer (If LOST, display "Lost: [Date]", if FOUND, display "Found: [Date]") to fix a known bug.
+
+**What I learned / decided:** Removing redundant navigation elements (like stacking a Top Nav and a Side Nav on a public board) vastly improves the modern feel of the application and prioritizes user content.
+
+*Next entries will be added as I continue using AI for UI/UX tasks.*
+
+## Entry 12
+**Date:** May 12, 2026
+**Task:** Implementing Responsive Mobile Views for the Admin Portal.
+
+**Prompt given to AI:** Generate mobile-responsive layouts for the Admin Portal to satisfy TC-UI-FUNC-001. Collapse the navigation into a hamburger menu and scale the dense data tables efficiently so unredacted thumbnails and action buttons remain usable.
+
+**What the AI produced:** Mobile-friendly versions of the Secure Vault and Modals that preserved functionality on smaller viewports.
+
+**What I changed / improved:** I ensured that overlay modals (like the Disposal and Verification pop-ups) took up the full viewport width on mobile to guarantee buttons were easily tappable.
+
+**What I learned / decided:** Admin consoles are notoriously difficult to scale down for mobile. Prioritizing the visibility of "Hidden Notes" and primary action buttons ensures that on-the-go moderation is still highly effective.
+
+*Next entries will be added as I continue using AI for UI/UX tasks.*
