@@ -22,7 +22,7 @@ import {
   getAuditTargetValue,
 } from "@/src/lib/adminAudit";
 
-type AdminTab = "vault" | "users" | "claims" | "disposal" | "audit" | "reports";
+type AdminTab = "overview" | "vault" | "users" | "claims" | "disposal" | "audit" | "reports";
 type ItemStatus = "Reported" | "Found" | "Returned" | "Released" | "Purged";
 type UserRole = "Public" | "Staff" | "Admin";
 
@@ -90,6 +90,7 @@ type ModalState =
   | null;
 
 const tabs: Array<{ id: AdminTab; label: string; icon: string }> = [
+  { id: "overview", label: "Dashboard", icon: "dashboard" },
   { id: "vault", label: "Secure Vault", icon: "enhanced_encryption" },
   { id: "users", label: "User Management", icon: "group" },
   { id: "claims", label: "My Post Claims", icon: "assignment" },
@@ -108,7 +109,7 @@ function isProtectedAdminAccount(user: Pick<AdminProfile, "role">) {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<AdminTab>("vault");
+  const [activeTab, setActiveTab] = useState<AdminTab>("overview");
   const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [users, setUsers] = useState<AdminProfile[]>([]);
   const [items, setItems] = useState<LostItem[]>([]);
@@ -121,6 +122,23 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
 
+  // Added Avatar State
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  // Profile Popover State
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const loadAdminData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -132,6 +150,9 @@ export default function AdminDashboard() {
       router.replace("/login");
       return;
     }
+
+    // Fetch the Avatar URL directly from Auth Metadata
+    setAvatarUrl(currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || null);
 
     const accessToken = sessionData.session?.access_token;
     if (!accessToken) {
@@ -184,6 +205,21 @@ export default function AdminDashboard() {
     if (!needle) return users;
     return users.filter((user) => [user.full_name, user.email, user.role].join(" ").toLowerCase().includes(needle));
   }, [users, query]);
+
+  const filteredAuditLogs = useMemo(() => {
+    const needle = query.toLowerCase().trim();
+    if (!needle) return auditLogs;
+    return auditLogs.filter((log) => {
+      const text = [
+        log.action.replaceAll("_", " "),
+        log.actor_id,
+        getAuditCategoryLabel(log),
+        getAuditTargetValue(log),
+        stateSummary(log.new_state),
+      ].join(" ").toLowerCase();
+      return text.includes(needle);
+    });
+  }, [auditLogs, query]);
 
   const disposalItems = useMemo(
     () => filteredItems.filter((item) => item.status !== "Returned" && item.status !== "Purged" && itemAgeDays(item) >= 120),
@@ -372,7 +408,7 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-surface-container-low p-8 pt-24">
+      <main className="min-h-screen bg-[#fdfcfc] p-8 pt-24">
         <div className="mx-auto h-96 max-w-6xl animate-pulse rounded-xl bg-white shadow-sm" />
       </main>
     );
@@ -383,74 +419,138 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-container-low text-on-surface">
-      <header className="fixed top-0 z-[60] flex h-16 w-full items-center justify-between bg-[#053B50]/90 px-4 text-white shadow-[0_20px_40px_rgba(0,36,51,0.06)] backdrop-blur-xl md:px-8">
-        <div className="flex items-center gap-3">
-          <Image src="/navibyte-logo-v2.svg" alt="Navibyte Logo" width={36} height={36} className="drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] transform hover:scale-110 transition-all duration-300 will-change-transform" />
-          <span className="font-headline text-lg font-black tracking-tight drop-shadow-md">NEUvigate Admin</span>
-        </div>
-        <div className="hidden max-w-md flex-1 px-8 md:block">
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-white/45">search</span>
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search vault, users, logs..."
-              className="w-full rounded-full border border-white/10 bg-white/10 py-2 pl-10 pr-4 text-sm text-white outline-none transition focus:ring-2 focus:ring-[#44afa9] placeholder:text-white/45"
-            />
+    <div className="min-h-screen bg-[#fbf9f8] text-[#002433] flex">
+      
+      {/* Sidebar */}
+      <aside className="sticky top-0 z-50 hidden h-screen w-[280px] shrink-0 flex-col border-r border-[#002433]/5 bg-[#f5f3f3] px-5 py-8 transition-all duration-300 ease-in-out md:flex">
+        
+        {/* Logo & Branding */}
+        <div className="mb-10 flex items-center gap-4 px-2">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#002433] shadow-[0_10px_20px_rgba(0,36,51,0.15)]">
+            <Image src="/navibyte-logo-v2.svg" alt="Navibyte Logo" width={24} height={24} />
+          </div>
+          <div className="overflow-hidden whitespace-nowrap transition-all duration-300">
+            <h1 className="font-headline text-xl font-black leading-tight tracking-tight text-[#002433]">NEUvigate</h1>
+            <p className="mt-0.5 text-xs font-black uppercase tracking-widest text-[#44afa9]">Admin</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/board" className="hidden rounded-full px-3 py-2 text-sm font-bold text-white/70 transition hover:text-white md:inline-flex">
-            Board
-          </Link>
-          <button onClick={handleLogout} className="rounded-full p-2 text-white/75 transition hover:bg-white/10 hover:text-white" aria-label="Logout">
-            <span className="material-symbols-outlined">logout</span>
-          </button>
-        </div>
-      </header>
 
-      <aside className="fixed left-0 top-0 z-50 hidden h-screen w-72 flex-col border-r border-outline-variant/20 bg-white p-6 pt-20 shadow-xl shadow-[#002433]/5 md:flex">
-        <div className="mb-8 flex items-center gap-4 px-2">
-          <div className="grid h-11 w-11 place-items-center rounded-lg bg-primary-container text-white">
-            <span className="material-symbols-outlined">admin_panel_settings</span>
-          </div>
-          <div>
-            <h2 className="font-headline text-sm font-bold text-primary">Admin Console</h2>
-            <p className="text-xs text-on-surface-variant">System Oversight</p>
-          </div>
-        </div>
-        <nav className="flex flex-1 flex-col gap-1 font-label text-[11px] font-bold uppercase tracking-widest">
+        {/* Tab Navigation */}
+        <nav className="flex flex-1 flex-col gap-2">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-3 rounded-md px-4 py-3 text-left transition ${
+              className={`flex items-center gap-4 rounded-xl px-4 py-3 text-left transition-all duration-300 ${
                 activeTab === tab.id
-                  ? "translate-x-1 bg-[#44afa9]/10 text-[#44afa9]"
-                  : "text-slate-500 hover:bg-slate-50 hover:text-primary"
+                  ? "bg-[#ffffff] font-bold text-[#002433] shadow-[0_8px_16px_rgba(0,36,51,0.04)]"
+                  : "text-[#41484c] hover:bg-[#ffffff]/60 hover:text-[#002433]"
               }`}
             >
-              <span className="material-symbols-outlined text-lg">{tab.icon}</span>
-              {tab.label}
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: activeTab === tab.id ? "'FILL' 1" : "'FILL' 0" }}>{tab.icon}</span>
+              <span className="text-sm tracking-wide">{tab.label}</span>
             </button>
           ))}
         </nav>
-        <button onClick={() => setActiveTab("reports")} className="mt-auto flex w-full items-center justify-center gap-2 rounded-md bg-primary-container py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-primary">
-          <span className="material-symbols-outlined text-base">summarize</span>
-          Generate Report
-        </button>
+
+        {/* Bottom Pinned User Dock */}
+        <div className="mt-auto space-y-2">
+          <Link
+            href="/board"
+            className="mb-4 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-[#41484c] transition-all hover:bg-[#ffffff]/60 hover:bg-[#002433]/5"
+          >
+            <span className="material-symbols-outlined text-lg">arrow_back</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest">Return to Board</span>
+          </Link>
+
+          {/* Profile Popover Toggle */}
+          <div className="relative" ref={profileMenuRef}>
+            {isProfileMenuOpen && (
+              <div className="absolute bottom-full left-0 mb-3 flex w-64 flex-col overflow-visible rounded-2xl border border-[#002433]/5 bg-white shadow-[0_4px_24px_rgba(0,36,51,0.12)] z-50">
+                {/* Arrow */}
+                <div className="absolute -bottom-1.5 left-7 h-3 w-3 rotate-45 border-b border-r border-[#002433]/5 bg-white"></div>
+
+                {/* Header */}
+                <div className="relative z-10 rounded-t-2xl border-b border-[#002433]/5 bg-white p-4">
+                  <p className="truncate text-sm font-bold text-[#002433]" title={profile?.full_name || profile?.email || ""}>
+                    {profile?.full_name || profile?.email || "Admin User"}
+                  </p>
+                  <span className="mt-1.5 inline-block rounded bg-[#44afa9]/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-[#44afa9]">
+                    {profile?.role || "ADMIN"}
+                  </span>
+                </div>
+
+                {/* Footer / Sign Out */}
+                <div className="relative z-10 rounded-b-2xl bg-[#f5f3f3]/50 p-2">
+                  <button
+                    onClick={handleLogout}
+                    className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[#41484c] transition-all hover:bg-[#ba1a1a] hover:text-white"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">logout</span>
+                    <span className="text-xs font-bold">Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Trigger Button */}
+            <button
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              className="group flex w-full items-center gap-3 rounded-2xl border border-transparent bg-[#ffffff] p-3 shadow-[0_10px_30px_rgba(0,36,51,0.03)] transition-all duration-300 hover:border-[#002433]/5 hover:shadow-[0_10px_30px_rgba(0,36,51,0.08)] focus:outline-none focus:ring-2 focus:ring-[#44afa9]/20"
+              aria-label="Admin Profile Menu"
+              aria-expanded={isProfileMenuOpen}
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-black/5 bg-[#f5f3f3]">
+                {avatarUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  <span className="material-symbols-outlined flex h-full w-full items-center justify-center text-[#41484c]">account_circle</span>
+                )}
+              </div>
+              <div className="flex min-w-0 flex-1 items-center justify-between text-left transition-opacity duration-300">
+                <div className="min-w-0 pr-2">
+                  <p className="truncate text-sm font-bold text-[#002433]">{profile?.full_name || profile?.email?.split('@')[0] || "Admin"}</p>
+                  <p className="mt-0.5 text-[10px] font-black uppercase tracking-widest text-[#44afa9]">{profile?.role || "Admin"}</p>
+                </div>
+                <span className={`material-symbols-outlined text-[#41484c]/40 transition-transform duration-200 group-hover:text-[#41484c] ${isProfileMenuOpen ? 'rotate-180' : ''}`}>
+                  expand_less
+                </span>
+              </div>
+            </button>
+          </div>
+        </div>
       </aside>
 
-      <main className="px-4 pb-24 pt-24 md:ml-72 md:px-8 lg:px-12">
+      {/* Main Content Area */}
+      <main className="flex-1 w-full max-w-full overflow-hidden px-4 py-8 lg:px-12">
         <div className="mx-auto max-w-7xl">
+          
+        {/* Universal Search Bar (Hidden on Dashboard & Reports) */}
+          {["vault", "users", "claims", "disposal", "audit"].includes(activeTab) && (
+            <div className="mb-8 flex items-center animate-in fade-in duration-200">
+              <div className="relative w-full max-w-md">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[20px] text-[#41484c]/50">
+                  search
+                </span>
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search vault, users, logs..."
+                  className="w-full rounded-2xl border border-[#002433]/10 bg-white py-3 pl-11 pr-4 text-sm text-[#002433] shadow-[0_2px_10px_rgba(0,36,51,0.02)] outline-none transition-all hover:border-[#002433]/20 focus:border-[#44afa9] focus:ring-1 focus:ring-[#44afa9] placeholder:text-[#41484c]/50"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Tabs */}
           <div className="mb-6 flex gap-2 overflow-x-auto md:hidden">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`shrink-0 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider ${
-                  activeTab === tab.id ? "bg-primary text-white" : "bg-white text-slate-500"
+                  activeTab === tab.id ? "bg-[#002433] text-white" : "bg-white text-slate-500 shadow-sm border border-[#002433]/5"
                 }`}
               >
                 {tab.label}
@@ -459,26 +559,29 @@ export default function AdminDashboard() {
           </div>
 
           {notice && (
-            <div className="mb-4 flex items-center justify-between rounded-lg border border-[#44afa9]/25 bg-[#8df4ec]/20 px-4 py-3 text-sm font-semibold text-primary">
+            <div className="mb-6 flex items-center justify-between rounded-xl border border-[#44afa9]/25 bg-[#8df4ec]/20 px-5 py-4 text-sm font-bold text-[#002433]">
               {notice}
-              <button onClick={() => setNotice(null)} className="text-on-surface-variant">Dismiss</button>
+              <button onClick={() => setNotice(null)} className="text-[#41484c] hover:text-[#002433]">Dismiss</button>
             </div>
           )}
           {error && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+            <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-bold text-red-700">
               {error}
             </div>
           )}
 
+          {/* Render Active View */}
+          {activeTab === "overview" && <OverviewDashboard items={items} users={users} claims={claimRequests} />}
           {activeTab === "vault" && <VaultView items={activeItems} onReview={(item) => setModal({ type: "reviewPost", item })} onDelete={(item) => setModal({ type: "adminDelete", item })} />}
           {activeTab === "users" && <UsersView users={filteredUsers} items={items} onSuspend={(user) => setModal({ type: "suspend", user })} onRestore={(user) => setModal({ type: "restore", user })} onHistory={(user) => setModal({ type: "history", user })} />}
           {activeTab === "claims" && <ClaimsDeskView entries={ownedClaimEntries} />}
           {activeTab === "disposal" && <DisposalView items={disposalItems} onDispose={(item) => setModal({ type: "dispose", item })} />}
-          {activeTab === "audit" && <AuditView logs={auditLogs} />}
+          {activeTab === "audit" && <AuditView logs={filteredAuditLogs} />}
           {activeTab === "reports" && <ReportsView itemCount={items.length} returnedCount={returnedItems.length} blockedCount={blockedUsers.length} onExport={exportReport} />}
         </div>
       </main>
 
+      {/* Modals */}
       {modal?.type === "verify" && <VerifyModal item={modal.item} busy={busy} onClose={() => setModal(null)} onSubmit={verifyClaim} />}
       {modal?.type === "suspend" && <AccountModal mode="suspend" user={modal.user} busy={busy} onClose={() => setModal(null)} onSubmit={updateUserBlock} />}
       {modal?.type === "restore" && <AccountModal mode="restore" user={modal.user} busy={busy} onClose={() => setModal(null)} onSubmit={updateUserBlock} />}
@@ -486,6 +589,235 @@ export default function AdminDashboard() {
       {modal?.type === "dispose" && <DisposeModal item={modal.item} busy={busy} onClose={() => setModal(null)} onSubmit={disposeItem} />}
       {modal?.type === "adminDelete" && <AdminDeleteModal item={modal.item} busy={busy} onClose={() => setModal(null)} onSubmit={adminDeletePost} />}
       {modal?.type === "reviewPost" && <ReviewPostModal item={modal.item} onClose={() => setModal(null)} />}
+    </div>
+  );
+}
+
+function OverviewDashboard({ items, users, claims }: { items: LostItem[]; users: AdminProfile[]; claims: ClaimRequestSummary[] }) {
+  // --- Dynamic Date Range State (Default: Last 7 Days) ---
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 6);
+    return d.toISOString().slice(0, 10);
+  });
+  const [endDate, setEndDate] = useState(() => new Date().toISOString().slice(0, 10));
+
+  // --- Core Analytics ---
+  const lostCount = items.filter((i) => i.status === "Reported").length;
+  const foundCount = items.filter((i) => i.status === "Found").length;
+  const returnedCount = items.filter((i) => i.status === "Returned" || i.status === "Released").length;
+  const purgedCount = items.filter((i) => i.status === "Purged").length;
+  const total = items.length || 1;
+
+  const pendingClaims = claims.filter((c) => c.status === "Pending");
+
+  // --- Dynamic Chart Math ---
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const dateArray = [];
+  
+  // Safely loop through selected dates
+  if (start <= end) {
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      dateArray.push(new Date(d).toISOString().slice(0, 10));
+    }
+  }
+
+  // Cap at 90 days to prevent browser lag if an admin selects a massive multi-year range
+  const safeDateArray = dateArray.slice(0, 90);
+
+  const chartData = safeDateArray.map((dateStr) => {
+    const count = items.filter((item) => item.created_timestamp.startsWith(dateStr)).length;
+    return {
+      dateStr,
+      label: new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      count,
+    };
+  });
+  
+  // Find max value to scale the Y-axis relatively (minimum 1 to avoid dividing by zero)
+  const maxCount = Math.max(...chartData.map((d) => d.count), 1);
+
+  return (
+    <div className="animate-in fade-in duration-300">
+      <PageHeader
+        eyebrow="System Analytics"
+        title="Admin Dashboard"
+        description="Real-time overview of system metrics, asset statuses, and recent platform activity."
+      />
+
+      {/* Top Metrics Grid */}
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard label="Total Assets Tracked" value={items.length} icon="inventory_2" />
+        <MetricCard label="Active Claims" value={pendingClaims.length} icon="assignment" />
+        <MetricCard label="Assets Returned" value={returnedCount} icon="task_alt" />
+        <MetricCard label="Registered Users" value={users.length} icon="group" />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+        
+        {/* Left Column: Charts */}
+        <div className="space-y-6">
+          
+          {/* Dynamic Trend Line Chart */}
+          <div className="rounded-xl border border-outline-variant/15 bg-white p-6 shadow-[0_10px_30px_rgba(0,36,51,0.02)]">
+            <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <h3 className="font-headline text-lg font-bold text-primary">System Activity Trend</h3>
+              
+              {/* Date Range Selector */}
+              <div className="flex items-center gap-2">
+                <input 
+                  type="date" 
+                  value={startDate} 
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="rounded-md border border-outline-variant/30 bg-surface px-2.5 py-1.5 text-xs font-bold text-on-surface outline-none focus:border-[#44afa9] focus:ring-1 focus:ring-[#44afa9]"
+                />
+                <span className="text-on-surface-variant text-xs font-bold">to</span>
+                <input 
+                  type="date" 
+                  value={endDate} 
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="rounded-md border border-outline-variant/30 bg-surface px-2.5 py-1.5 text-xs font-bold text-on-surface outline-none focus:border-[#44afa9] focus:ring-1 focus:ring-[#44afa9]"
+                />
+              </div>
+            </div>
+
+              {chartData.length === 0 ? (
+              <div className="flex h-56 items-center justify-center text-sm font-semibold text-on-surface-variant">
+                Invalid date range selected.
+              </div>
+            ) : (
+              <div className="relative mt-4 h-56 w-full border-b border-outline-variant/20">
+                {/* SVG Line Background with entrance animation */}
+                <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full overflow-visible animate-in fade-in zoom-in-[98%] duration-700" preserveAspectRatio="none">
+                  {/* Fill Area underneath line */}
+                  <polygon 
+                    fill="rgba(141, 244, 236, 0.15)" 
+                    points={`0,100 ${chartData.map((d, i) => `${(i / Math.max(chartData.length - 1, 1)) * 100},${(1 - d.count / maxCount) * 100}`).join(' ')} 100,100`}
+                    style={{ transition: 'all 500ms cubic-bezier(0.4, 0, 0.2, 1)' }}
+                  />
+                  {/* The Line */}
+                  <polyline 
+                    fill="none" 
+                    stroke="#44afa9" 
+                    strokeWidth="2.5" 
+                    vectorEffect="non-scaling-stroke"
+                    points={chartData.map((d, i) => `${(i / Math.max(chartData.length - 1, 1)) * 100},${(1 - d.count / maxCount) * 100}`).join(' ')} 
+                    style={{ transition: 'all 500ms cubic-bezier(0.4, 0, 0.2, 1)' }}
+                  />
+                </svg>
+                
+                {/* Interaction & Tooltip Layer */}
+                <div className="absolute inset-0 animate-in fade-in duration-700 delay-150 fill-mode-both">
+                  {chartData.map((d, i) => {
+                    // Calculate EXACT mathematical percentages to match SVG
+                    const xPercent = (i / Math.max(chartData.length - 1, 1)) * 100;
+                    const yPercent = (1 - d.count / maxCount) * 100;
+
+                    return (
+                      <div 
+                        key={d.dateStr} // Keying by date allows React to smoothly track and glide existing points
+                        className="absolute group z-10"
+                        style={{ 
+                          left: `${xPercent}%`, 
+                          top: `${yPercent}%`,
+                          transition: 'all 500ms cubic-bezier(0.4, 0, 0.2, 1)' 
+                        }}
+                      >
+                        {/* Invisible larger hit target for easier hovering on mobile/mouse */}
+                        <div className="absolute left-1/2 top-1/2 h-8 w-8 -translate-x-1/2 -translate-y-1/2 cursor-pointer" />
+
+                        {/* Hover Tooltip */}
+                        <div className="absolute bottom-full left-1/2 mb-3 hidden -translate-x-1/2 whitespace-nowrap rounded-md bg-[#053b50] px-3 py-1.5 text-xs font-bold text-white shadow-lg group-hover:block">
+                          {d.label}: {d.count} item{d.count !== 1 ? 's' : ''}
+                          <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-[#053b50]"></div>
+                        </div>
+                        
+                        {/* Point Marker */}
+                        <div className="absolute left-1/2 top-1/2 h-[11px] w-[11px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[2.5px] border-[#44afa9] bg-white shadow-sm transition-all duration-200 group-hover:scale-150 group-hover:bg-[#44afa9]" />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Smart X-Axis Labels (Only shows Start, Middle, and End to prevent overlapping) */}
+            {chartData.length > 0 && (
+              <div className="mt-3 flex justify-between px-2 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
+                <span>{chartData[0]?.label}</span>
+                {chartData.length > 2 && <span>{chartData[Math.floor(chartData.length / 2)]?.label}</span>}
+                <span>{chartData[chartData.length - 1]?.label}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Status Breakdown Progress Bar */}
+          <div className="rounded-xl border border-outline-variant/15 bg-white p-6 shadow-[0_10px_30px_rgba(0,36,51,0.02)]">
+            <h3 className="mb-4 font-headline text-lg font-bold text-primary">Asset Status Breakdown</h3>
+            
+            <div className="mb-4 flex h-5 w-full overflow-hidden rounded-full bg-surface-container">
+              <div style={{ width: `${(lostCount / total) * 100}%` }} className="bg-amber-400 transition-all duration-500" title={`Lost: ${lostCount}`}></div>
+              <div style={{ width: `${(foundCount / total) * 100}%` }} className="bg-blue-400 transition-all duration-500" title={`Found: ${foundCount}`}></div>
+              <div style={{ width: `${(returnedCount / total) * 100}%` }} className="bg-emerald-400 transition-all duration-500" title={`Returned: ${returnedCount}`}></div>
+              <div style={{ width: `${(purgedCount / total) * 100}%` }} className="bg-red-400 transition-all duration-500" title={`Purged: ${purgedCount}`}></div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 text-sm font-semibold text-primary sm:grid-cols-4">
+              <div className="flex items-center gap-2"><span className="h-3 w-3 shrink-0 rounded-full bg-amber-400"></span> Lost ({lostCount})</div>
+              <div className="flex items-center gap-2"><span className="h-3 w-3 shrink-0 rounded-full bg-blue-400"></span> Found ({foundCount})</div>
+              <div className="flex items-center gap-2"><span className="h-3 w-3 shrink-0 rounded-full bg-emerald-400"></span> Returned ({returnedCount})</div>
+              <div className="flex items-center gap-2"><span className="h-3 w-3 shrink-0 rounded-full bg-red-400"></span> Purged ({purgedCount})</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Action Items */}
+        <div className="rounded-xl border border-outline-variant/15 bg-white p-6 shadow-[0_10px_30px_rgba(0,36,51,0.02)]">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="font-headline text-lg font-bold text-primary">Pending Actions</h3>
+            <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-amber-700">
+              {pendingClaims.length} Tasks
+            </span>
+          </div>
+          
+          <div className="space-y-3">
+            {pendingClaims.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-outline-variant/30 py-12 text-on-surface-variant">
+                <span className="material-symbols-outlined mb-2 text-4xl opacity-30">check_circle</span>
+                <p className="text-sm font-semibold">No pending claims to review.</p>
+              </div>
+            ) : (
+              pendingClaims.slice(0, 6).map((claim) => (
+                <Link
+                  key={claim.claim_id}
+                  href={`/admin/claims/${claim.post_id}`}
+                  className="group flex items-center justify-between rounded-xl border border-outline-variant/15 bg-surface-container-low p-4 transition-all hover:border-[#44afa9]/30 hover:bg-[#8df4ec]/10"
+                >
+                  <div>
+                    <p className="font-bold text-primary text-sm transition-colors group-hover:text-[#053b50]">
+                      Review Post {reference(claim.post_id)}
+                    </p>
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                      {claim.flow_type} Flow · {new Date(claim.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <span className="material-symbols-outlined text-outline transition-transform group-hover:translate-x-1 group-hover:text-[#44afa9]">
+                    chevron_right
+                  </span>
+                </Link>
+              ))
+            )}
+            
+            {pendingClaims.length > 6 && (
+              <p className="text-center text-xs font-bold text-on-surface-variant pt-2">
+                + {pendingClaims.length - 6} more pending claims
+              </p>
+            )}
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
