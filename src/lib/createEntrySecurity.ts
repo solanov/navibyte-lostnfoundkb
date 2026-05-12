@@ -24,6 +24,7 @@ export type CreateEntryErrors = Partial<Record<CreateEntryField, string>>;
 export type CreateEntryInput = {
   entryType: "lost" | "found";
   selectedCategory: number | null;
+  selectedCategoryName?: string | null;
   selectedColor: string | null;
   title: string;
   description: string;
@@ -35,6 +36,7 @@ export type CreateEntryInput = {
 export type SanitizedCreateEntryInput = {
   entryType: "lost" | "found";
   selectedCategory: number;
+  selectedCategoryName: string | null;
   selectedColor: (typeof CREATE_ENTRY_ALLOWED_COLORS)[number];
   title: string;
   description: string;
@@ -93,6 +95,14 @@ export function validateCreateEntryInput(
     errors.category = "Choose a category before posting your entry.";
   }
 
+  const selectedCategoryName = normalizeCreateEntryText(input.selectedCategoryName ?? "");
+  if (
+    selectedCategoryName.length > 100 ||
+    containsBlockedContent(input.selectedCategoryName ?? selectedCategoryName)
+  ) {
+    errors.category = "Choose a valid category before posting your entry.";
+  }
+
   if (!input.selectedColor || !isAllowedColor(input.selectedColor)) {
     errors.color = "Select the item's primary color.";
   }
@@ -146,6 +156,7 @@ export function validateCreateEntryInput(
     data: {
       entryType: input.entryType === "found" ? "found" : "lost",
       selectedCategory: input.selectedCategory!,
+      selectedCategoryName: selectedCategoryName || null,
       selectedColor: input.selectedColor as (typeof CREATE_ENTRY_ALLOWED_COLORS)[number],
       title: title.value,
       description: description.value,
