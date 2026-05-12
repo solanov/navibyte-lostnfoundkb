@@ -30,7 +30,7 @@ To solve the challenges of subjective item reporting, the **SECI Model** was cho
 ---
 
 ## 3. Team
-* **Vinz Eulo Solano** - Scrum Master
+* **Vinz Eulo A. Solano** - Scrum Master
 * **Peja Latrell Escares** - Full Stack Developer
 * **Albert Julius Ortiz** - UI/UX Designer
 * **Saira Sofia De Mesa** - Knowledge Management Analyst
