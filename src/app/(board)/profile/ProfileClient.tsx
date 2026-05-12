@@ -10,6 +10,7 @@ import {
 import StatusBadge from '@/src/components/pages/StatusBadge';
 import ItemDetailModal from '@/src/components/pages/ItemDetailModal';
 import { useNotification } from '@/src/hooks/useNotification';
+import { resolveIcon } from '@/src/lib/resolveIcon';
 
 interface UserPost {
   post_id: string;
@@ -297,7 +298,7 @@ export default function ProfileClient() {
               const isLost      = displayStatus === 'Lost';
               const isArchived  = ['Purged', 'Returned', 'Released'].includes(post.status);
               const category    = resolveCategory(post.categories);
-              const icon        = category?.icon_identifier || 'help_outline';
+              const icon        = resolveIcon(category?.icon_identifier);
               const reference   = `LF-${post.post_id.substring(0, 4).toUpperCase()}`;
               const formattedDate = new Date(post.created_timestamp).toLocaleDateString('en-US', {
                 month: 'short', day: 'numeric', year: 'numeric',

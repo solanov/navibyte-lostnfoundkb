@@ -22,6 +22,7 @@ import {
   getAuditCategoryLabel,
   getAuditTargetValue,
 } from "@/src/lib/adminAudit";
+import { resolveIcon } from "@/src/lib/resolveIcon";
 
 type AdminTab = "overview" | "vault" | "users" | "claims" | "disposal" | "audit" | "reports" | "exports";
 type ItemStatus = "Reported" | "Found" | "Returned" | "Released" | "Purged";
@@ -1895,7 +1896,7 @@ function categoryName(item: LostItem) {
 
 function categoryIcon(item: LostItem) {
   const category = Array.isArray(item.categories) ? item.categories[0] : item.categories;
-  return category?.icon_identifier ?? "inventory_2";
+  return resolveIcon(category?.icon_identifier, "inventory_2");
 }
 
 function reference(id: string) {
