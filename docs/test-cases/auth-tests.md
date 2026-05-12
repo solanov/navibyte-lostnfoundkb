@@ -77,6 +77,3 @@ Access is successfully denied for the blocked user.
 Successful
 
 ## Notes
-
-
----

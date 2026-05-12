@@ -50,6 +50,3 @@ Successful
 
 ## Notes
 The security block works, but the UI error handling needs to be fixed. Exposing Server Component errors in production is bad practice.
-
-
----

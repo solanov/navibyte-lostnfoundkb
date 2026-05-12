@@ -50,6 +50,3 @@ The send button is correctly disabled when there is no message typed.
 Successful
 
 ## Notes
-
-
----
