@@ -58,3 +58,59 @@
 **What I learned / decided:** Using high-fidelity mockups (real image placeholders instead of colored boxes) makes the UI intent instantly understandable during developer handoff.
 
 *Next entries will be added as I continue using AI for UI/UX tasks.*
+
+## Entry 5
+**Date:** May 11, 2026
+**Task:** Satisfying QA Test Cases for User Moderation & Audit Trails.
+
+**Prompt given to AI:** Generate an Audit Trail (System Logs) table showing chronological administrative actions. Also, generate a User Moderation table with "Active/Suspended" status pills and action buttons to suspend/restore accounts.
+
+**What the AI produced:** Two distinct admin views that directly mapped to the QA requirements for tracking chain-of-custody and managing bad actors.
+
+**What I changed / improved:** I realized the User Management table needed a way to view a student's history. I added a `#176B87` outline button labeled "View History" next to the suspend actions.
+
+**What I learned / decided:** Every UI element must map back to a specific QA requirement. The UI is simply the visual execution of the project's testing and framework documents.
+
+*Next entries will be added as I continue using AI for UI/UX tasks.*
+
+## Entry 6
+**Date:** May 11, 2026
+**Task:** Creating the "User Posting History" Modal.
+
+**Prompt given to AI:** Generate a new overlay modal triggered from the User Management screen. Show a scrollable mini-feed of a specific student's posts. Next to every active post, place a stark red `#ba1a1a` "Force Delete" button for strict admin moderation.
+
+**What the AI produced:** A centered modal overlay detailing the user's specific asset history alongside aggressive moderation controls.
+
+**What I changed / improved:** I ensured this was an *overlay* rather than a new page.
+
+**What I learned / decided:** Keeping the admin in the same view via a modal streamlines the moderation workflow. They can audit a user and immediately suspend them without losing their place in the student roster.
+
+*Next entries will be added as I continue using AI for UI/UX tasks.*
+
+## Entry 7
+**Date:** May 11, 2026
+**Task:** Aligning Report Generation UI with strict institutional color palettes.
+
+**Prompt given to AI:** Regenerate the "Report Generation" screen correcting color palette inconsistencies. Update primary actions ("Generate & Download") and download format icons to the `#64CCC5` action color, and secondary inputs to `#176B87`.
+
+**What the AI produced:** A unified report panel that perfectly matched the visual hierarchy of the rest of the application.
+
+**What I changed / improved:** Overrode the AI's default greenish-blue tints, forcing it to adhere strictly to the system's defined hex codes.
+
+**What I learned / decided:** Establishing a clear visual language (Primary Action = Teal, Secondary = Dark Blue, Danger = Red) makes the application intuitive. AI needs strict hex code boundaries to maintain this.
+
+*Next entries will be added as I continue using AI for UI/UX tasks.*
+
+## Entry 8
+**Date:** May 12, 2026
+**Task:** Designing static Legal & Compliance Pages (Privacy Policy, Terms of Service).
+
+**Prompt given to AI:** Generate Legal pages keeping the global Top Nav, but swap the SideNav for a "Legal Directory". Use a large `#FFFFFF` document card in the center with generous padding (`p-12`) and high line-height. Use lore-accurate text explaining the SECI "Hidden Notes" and 30-Day Purge.
+
+**What the AI produced:** Highly readable, typography-focused pages that looked like official institutional documents rather than standard web forms.
+
+**What I changed / improved:** I rejected standard "Lorem Ipsum" and forced the use of lore-accurate placeholder text that actually references the system's architecture.
+
+**What I learned / decided:** Contextual sidebars are great for grouping static pages without cluttering the main admin navigation. Furthermore, well-written placeholders prove to stakeholders that the UI/UX encompasses the entire system architecture.
+
+*Next entries will be added as I continue using AI for UI/UX tasks.*
