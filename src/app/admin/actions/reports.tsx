@@ -74,13 +74,28 @@ export async function submitReportAction(
   // Check for existing report from this user
   const { data: existing } = await adminClient
     .from("item_reports")
-    .select("report_id, status")
+    .select("report_id, status, created_at")
     .eq("post_id", postId)
     .eq("reporter_id", user.id)
     .maybeSingle();
 
-  if (existing)
-    throw new Error("You have already submitted a report for this post.");
+  if (existing) {
+    if (existing.status === "Pending") {
+      throw new Error("You already have a pending report for this post.");
+    }
+
+    const lastReportTime = new Date(existing.created_at).getTime();
+    const now = Date.now();
+    const COOLDOWN_MS = 5 * 60 * 1000;
+
+    if (now - lastReportTime < COOLDOWN_MS) {
+      const remainingMinutes = Math.ceil((COOLDOWN_MS - (now - lastReportTime)) / 60000);
+      throw new Error(`Please wait ${remainingMinutes} minute(s) before reporting this post again.`);
+    }
+
+    // Delete the existing report to allow a new one (bypasses unique constraint and UPDATE trigger bug)
+    await adminClient.from("item_reports").delete().eq("report_id", existing.report_id);
+  }
 
   const { error: insertError } = await adminClient
     .from("item_reports")
