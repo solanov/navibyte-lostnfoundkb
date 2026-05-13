@@ -71,20 +71,24 @@ export async function submitReportAction(
   if (item.reported_by === user.id)
     throw new Error("You cannot report your own post.");
 
-  // Check for existing report from this user
-  const { data: existing } = await adminClient
+  // Check for existing reports from this user
+  const { data: existingReports, error: existingError } = await adminClient
     .from("item_reports")
     .select("report_id, status, created_at")
     .eq("post_id", postId)
     .eq("reporter_id", user.id)
-    .maybeSingle();
+    .order("created_at", { ascending: false });
 
-  if (existing) {
-    if (existing.status === "Pending") {
+  if (existingError) throw new Error(existingError.message);
+
+  if (existingReports && existingReports.length > 0) {
+    const latestReport = existingReports[0];
+
+    if (latestReport.status === "Pending") {
       throw new Error("You already have a pending report for this post.");
     }
 
-    const lastReportTime = new Date(existing.created_at).getTime();
+    const lastReportTime = new Date(latestReport.created_at).getTime();
     const now = Date.now();
     const COOLDOWN_MS = 5 * 60 * 1000;
 
@@ -93,8 +97,9 @@ export async function submitReportAction(
       throw new Error(`Please wait ${remainingMinutes} minute(s) before reporting this post again.`);
     }
 
-    // Delete the existing report to allow a new one (bypasses unique constraint and UPDATE trigger bug)
-    await adminClient.from("item_reports").delete().eq("report_id", existing.report_id);
+    // Delete existing reports to allow a new one (bypasses unique constraint and UPDATE trigger bug)
+    const reportIds = existingReports.map((r) => r.report_id);
+    await adminClient.from("item_reports").delete().in("report_id", reportIds);
   }
 
   const { error: insertError } = await adminClient
