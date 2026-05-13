@@ -255,7 +255,10 @@ export default function LostItemsSection({ items }: LostItemsSectionProps) {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData.session?.access_token;
       if (!accessToken) throw new Error('Authentication token missing.');
-      await submitReportAction(accessToken, reportItem.post_id, reason, details);
+      const result = await submitReportAction(accessToken, reportItem.post_id, reason, details);
+      if (result && 'error' in result && result.error) {
+        throw new Error(result.error);
+      }
       notify('Report submitted. Our team will review it shortly.', 'success');
       setIsReportModalOpen(false);
       setReportItem(null);

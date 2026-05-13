@@ -67,9 +67,9 @@ export async function submitReportAction(
     .eq("post_id", postId)
     .single();
 
-  if (!item) throw new Error("Post not found.");
+  if (!item) return { success: false, error: "Post not found." };
   if (item.reported_by === user.id)
-    throw new Error("You cannot report your own post.");
+    return { success: false, error: "You cannot report your own post." };
 
   // Check for existing reports from this user
   const { data: existingReports, error: existingError } = await adminClient
@@ -85,7 +85,7 @@ export async function submitReportAction(
     const latestReport = existingReports[0];
 
     if (latestReport.status === "Pending") {
-      throw new Error("You already have a pending report for this post.");
+      return { success: false, error: "You already have a pending report for this post." };
     }
 
     const lastReportTime = new Date(latestReport.created_at).getTime();
@@ -94,7 +94,7 @@ export async function submitReportAction(
 
     if (now - lastReportTime < COOLDOWN_MS) {
       const remainingMinutes = Math.ceil((COOLDOWN_MS - (now - lastReportTime)) / 60000);
-      throw new Error(`Please wait ${remainingMinutes} minute(s) before reporting this post again.`);
+      return { success: false, error: `Please wait ${remainingMinutes} minute(s) before reporting this post again.` };
     }
 
     // Delete existing reports to allow a new one (bypasses unique constraint and UPDATE trigger bug)
