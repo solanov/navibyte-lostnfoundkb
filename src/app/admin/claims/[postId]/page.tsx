@@ -304,9 +304,11 @@ export default function AdminClaimsPage({
 
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-4">
         <div className="bg-white rounded-2xl border border-[#002433]/5 p-5 flex gap-4 items-start">
-          <div className="w-10 h-10 bg-[#002433]/5 rounded-xl flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-[#002433]">
-              {post?.categories?.icon_identifier ?? "help_outline"}
+          <div className="w-10 h-10 bg-[#002433]/5 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+            <span className="material-symbols-outlined text-[20px] leading-none text-[#002433]">
+              {post?.categories?.icon_identifier === "other" || !post?.categories?.icon_identifier
+                ? "category"
+                : post.categories.icon_identifier}
             </span>
           </div>
           <div className="min-w-0">

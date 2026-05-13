@@ -952,7 +952,6 @@ function DisposalView({ items, onDispose }: { items: LostItem[]; onDispose: (ite
               <tr>
                 <th className="p-4">Asset Details</th>
                 <th className="p-4">Status</th>
-                <th className="p-4">Location</th>
                 <th className="p-4 text-right">Action</th>
               </tr>
             </thead>
@@ -973,7 +972,6 @@ function DisposalView({ items, onDispose }: { items: LostItem[]; onDispose: (ite
                     <p className="font-bold text-red-700">{Math.max(0, itemAgeDays(item) - 90)} Days Overdue</p>
                     <p className="text-xs text-on-surface-variant">Final review required</p>
                   </td>
-                  <td className="p-4"><BinBadge bin={item.bin_number} /></td>
                   <td className="p-4 text-right">
                     <button onClick={() => onDispose(item)} className="rounded-md bg-primary px-4 py-2 text-sm font-bold text-white transition hover:bg-primary-container">Initiate Audit</button>
                   </td>
