@@ -144,6 +144,3 @@ Successful
 
 ## Notes
 Expected Result documentation should be updated to reflect the actual 10MB limit.
-
-
----

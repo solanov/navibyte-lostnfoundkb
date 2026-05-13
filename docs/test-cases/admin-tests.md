@@ -111,3 +111,60 @@ Successful
 
 
 ---
+
+
+# `TC-ADMIN-SEC-001`
+
+## Feature
+Secure Vault Privacy (RBAC)
+
+## Scenario
+Verify that Private Tier data (Hidden Notes) is strictly isolated from public users
+
+## Steps
+1. Log in as a standard student user.
+2. Inspect an active post on the public board; ensure no "Hidden Note" or unredacted administrative details are visible in the UI or network payload.
+3. Log out, then log back in using an Admin/Staff account.
+4. Navigate to the "Secure Vault" dashboard.
+5. Locate the same item.
+
+## Expected Result
+Role-Based Access Control (RBAC) properly gates the data. Standard users cannot see or fetch Private Tier data, while Admins have full unredacted views.
+
+## Actual Result
+Privacy tiers function exactly as intended. The hidden note is completely inaccessible to standard users and clearly visible to staff in the Secure Vault.
+
+## Status:
+Successful
+
+## Notes
+Core security requirement met.
+
+---
+
+# `TC-ADMIN-FUNC-005`
+
+## Feature
+Institutional Export
+
+## Scenario
+Admin generates and downloads system reports
+
+## Steps
+1. Log in with Admin/Staff privileges.
+2. Navigate to "Export Reports" on the admin sidebar.
+3. Select a specific Report Type (e.g., User Activity or Item Inventory).
+4. Define a valid "From" and "To" Date Range.
+5. Click "Download CSV".
+
+## Expected Result
+The system compiles the requested data and initiates a download of a properly formatted CSV file containing the accurate column headers and data rows.
+
+## Actual Result
+The CSV generates and downloads seamlessly with correct, time-filtered data.
+
+## Status:
+Successful
+
+## Notes
+Reporting functionality is stable and ready for administrative auditing.
