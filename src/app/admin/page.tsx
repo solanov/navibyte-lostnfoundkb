@@ -228,7 +228,7 @@ export default function AdminDashboard() {
   }, [auditLogs, query]);
 
   const disposalItems = useMemo(
-    () => filteredItems.filter((item) => item.status !== "Returned" && item.status !== "Purged" && itemAgeDays(item) >= 120),
+    () => filteredItems.filter((item) => item.status !== "Returned" && item.status !== "Purged" && itemAgeDays(item) >= 90),
     [filteredItems],
   );
 
@@ -940,7 +940,7 @@ function UsersView({ users, items, onSuspend, onRestore, onHistory }: { users: A
 function DisposalView({ items, onDispose }: { items: LostItem[]; onDispose: (item: LostItem) => void }) {
   return (
     <>
-      <PageHeader eyebrow="Lifecycle Control" title="Disposal Queue" description="Review and authorize items that have exceeded the institutional retention window." />
+      <PageHeader eyebrow="Lifecycle Control" title="Disposal Queue" description="Review and authorize items that have exceeded the institutional retention window (90 days)." />
       <div className="mb-4 flex items-center gap-2 text-lg font-bold text-red-700">
         <span className="material-symbols-outlined">warning</span>
         Overdue Assets
@@ -970,7 +970,7 @@ function DisposalView({ items, onDispose }: { items: LostItem[]; onDispose: (ite
                     </div>
                   </td>
                   <td className="p-4">
-                    <p className="font-bold text-red-700">{Math.max(0, itemAgeDays(item) - 120)} Days Overdue</p>
+                    <p className="font-bold text-red-700">{Math.max(0, itemAgeDays(item) - 90)} Days Overdue</p>
                     <p className="text-xs text-on-surface-variant">Final review required</p>
                   </td>
                   <td className="p-4"><BinBadge bin={item.bin_number} /></td>
@@ -1958,7 +1958,7 @@ function reportRows(type: string, startDate: string, endDate: string, items: Los
     return [
       ["Reference", "Title", "Status", "Bin", "Age Days"],
       ...items
-        .filter((item) => item.status === "Purged" || itemAgeDays(item) >= 120)
+        .filter((item) => item.status === "Purged" || itemAgeDays(item) >= 90)
         .map((item) => [reference(item.post_id), itemTitle(item), item.status, item.bin_number ?? "", String(itemAgeDays(item))]),
     ];
   }

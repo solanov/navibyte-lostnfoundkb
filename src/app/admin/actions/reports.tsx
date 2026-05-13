@@ -157,13 +157,30 @@ export async function dismissReportsAction(
 ) {
   const { adminClient, profile } = await verifyAdminAccess(accessToken);
 
-  const { error } = await adminClient
+  // Workaround for DB trigger bug: "record 'new' has no field 'last_edited_timestamp'"
+  // We delete and re-insert to bypass the broken UPDATE trigger on item_reports.
+  const { data: pendingReports } = await adminClient
     .from("item_reports")
-    .update({ status: "Dismissed", updated_at: new Date().toISOString() })
+    .select("*")
     .eq("post_id", postId)
     .eq("status", "Pending");
 
-  if (error) throw new Error(error.message);
+  if (pendingReports && pendingReports.length > 0) {
+    const reportIds = pendingReports.map((r) => r.report_id);
+    await adminClient.from("item_reports").delete().in("report_id", reportIds);
+
+    const dismissedReports = pendingReports.map((r) => ({
+      ...r,
+      status: "Dismissed",
+      updated_at: new Date().toISOString(),
+    }));
+
+    const { error: insertError } = await adminClient
+      .from("item_reports")
+      .insert(dismissedReports);
+
+    if (insertError) throw new Error(insertError.message);
+  }
 
   await adminClient.from("audit_logs").insert({
     post_id: postId,
@@ -209,11 +226,25 @@ export async function actionReportDeletePostAction(
   if (updateError) throw new Error(updateError.message);
 
   // Mark all reports for this post as Actioned
-  await adminClient
+  // Workaround for DB trigger bug: bypass UPDATE trigger via DELETE + INSERT
+  const { data: reportsToUpdate } = await adminClient
     .from("item_reports")
-    .update({ status: "Actioned", updated_at: new Date().toISOString() })
+    .select("*")
     .eq("post_id", postId)
     .in("status", ["Pending", "Reviewed"]);
+
+  if (reportsToUpdate && reportsToUpdate.length > 0) {
+    const reportIds = reportsToUpdate.map((r) => r.report_id);
+    await adminClient.from("item_reports").delete().in("report_id", reportIds);
+
+    const actionedReports = reportsToUpdate.map((r) => ({
+      ...r,
+      status: "Actioned",
+      updated_at: new Date().toISOString(),
+    }));
+
+    await adminClient.from("item_reports").insert(actionedReports);
+  }
 
   await adminClient.from("audit_logs").insert({
     post_id: postId,
